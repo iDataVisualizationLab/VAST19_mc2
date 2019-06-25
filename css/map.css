@@ -1,0 +1,20 @@
+#map{
+    width: 770px;
+    height: 660px;
+    background-color: white;
+    /* position: fixed; */
+}
+
+#dot{
+  padding-left: 20px;
+  padding-top: 25px;
+  cursor: pointer;
+}
+
+path{
+  stroke-width:1px;
+}
+
+.text-labels {
+   font-weight: 1000;
+}

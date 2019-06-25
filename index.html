@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="utf-8">
+    <title>VAST Mini Challenge Two</title>
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <script src="https://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-tip/0.7.1/d3-tip.js"></script>
+    <!--<script src="data/StHimark.geojson"></script>-->
+    <script src="lib/leaflet.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.js"></script>
+    <script src="https://d3js.org/colorbrewer.v1.min.js"></script>
+    <script src="data/route.json"></script>
+    <script src="js/MovingMarker.js"></script>
+    <link rel="stylesheet" href="css/heatmap.css">
+    <link rel="stylesheet" href="css/leaflet.css">
+    <link rel="stylesheet" href="css/map.css">
+    <link rel="stylesheet" href="css/time_series.css">
+    <link rel="stylesheet" href="css/ts.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+<!-- Navigation -->
+<nav class="navbar navbar-default" role="navigation">
+    <div class="container-fluid">
+        <div class="navbar-header my-header">VAST MINI CHALLENGE TWO</div>
+    </div>
+</nav>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-5">
+            <span id="map_title">StHimark Map</span>
+            <div id="map"></div>
+            <div id='dot'>
+                <span id="mobile_title">Mobile Route</span>
+            </div>
+        </div>
+        <div class="col-md-7">
+            <div class="region_name" id="region_name"></div>
+            <!--time series container-->
+            <div id="timeSeries"></div>
+            <script src="js/ts.js"></script>
+            <!--<script src="js/time_series_revised.js"></script>-->
+
+            <!--select/clear button-->
+            <!-- <div id="option">
+              <input name="updateButton" type="button" value="Select/Clear all lines" />
+            </div> -->
+
+            <div id="heatmap"></div>
+            <script src="js/heatmap.js"></script>
+        </div>
+    </div>
+</div>
+<script src="js/map.js"></script>
+
+<!-- Footer -->
+<footer class="footer">
+    <!-- Copyright -->
+    <!-- <div class="footer-copyright">© 2019 Copyright:
+        <a href="https://idatavisualizationlab.github.io/CS5331_Spring2019/">Visualization and Visual Analytics</a>
+    </div> -->
+</footer>
+</body>
+</html>
