@@ -7,7 +7,9 @@
 <style>
     #map{
         width:50%;
+        margin:auto;
         display:inline-block;
+        float:left;
     }
     #map .map path {
         fill: lightgrey;
@@ -27,21 +29,21 @@
         transform:translate(0,-50%);
         pointer-events:none;
     }
-    .selected {
+    .active {
         fill: green;
     }
-    .unselected{
+    .inactive{
         fill: lightgrey
     }
     #heatmap{
-        float:right;
-        width: 60%;
-        height: 95%;
-        margin: 0px 0px 0px 0.6%;
+        float:left;
+        width: 45%;
+        height: 900px;
+        margin:auto;
         padding: 10px;
         border-style: solid;
         border-color: lightgrey;
-        overflow-y: scroll;
+        overflow:auto;
     }
 
 </style>
@@ -83,16 +85,19 @@
                 })
                 alldata.push(files[i]);
             }
+            //initialize heatmap
             draw_heatmap(alldata[index-1]);
+
+debugger
+            const mapTip = d3.select("#map")
+                .append("div")
+                .style("opacity", 0)
+                .attr("class", "tooltip");
 
 
             d3.json('data/StHimark.geojson').then(geojson => {
-                const mapTip = d3.select("#map")
-                    .append("div")
-                    .style("opacity", 0)
-                    .attr("class", "tooltip");
 
-                let width = 600, height = 600;
+                let width = 500, height = 500;
                 let projection = d3.geoEquirectangular().scale(1).translate([0, 0]);
 
                 let geoPath = d3.geoPath()
@@ -114,9 +119,48 @@
                         .append('path')
                         .attr('d', geoPath)
                         .attr("id", d=>removeWhitespace(d.properties.Nbrhood))
-                        .classed("unselected",d=>d.properties.Nbrhood == "Palace Hills")
-                        .classed("selected", d=>d.properties.Nbrhood == "Palace Hills")
-                        .on("click", d=>draw_heatmap(this.id))
+                        .classed("inactive",d=>d.properties.Nbrhood != "Palace Hills")
+                        .classed("active", d=>d.properties.Nbrhood == "Palace Hills")
+                        .on("click", d=>{
+                            if(d.properties.Nbrhood == "Palace Hills"){
+                                draw_heatmap(alldata[0]);
+                            }else if(d.properties.Nbrhood == "Northwest")
+                                draw_heatmap(alldata[1]);
+                            else if(d.properties.Nbrhood == "Old Town")
+                                draw_heatmap(alldata[2]);
+                            else if(d.properties.Nbrhood == "Safe Town")
+                                draw_heatmap(alldata[3]);
+                            else if(d.properties.Nbrhood == "Southwest")
+                                draw_heatmap(alldata[4]);
+                            else if(d.properties.Nbrhood == "Downtown")
+                                draw_heatmap(alldata[5]);
+                            else if(d.properties.Nbrhood == "Wilson Forest")
+                                draw_heatmap(alldata[6]);
+                            else if(d.properties.Nbrhood == "Scenic Vista")
+                                draw_heatmap(alldata[7]);
+                            else if(d.properties.Nbrhood == "Broadview")
+                                draw_heatmap(alldata[8]);
+                            else if(d.properties.Nbrhood == "Chapparal")
+                                draw_heatmap(alldata[9]);
+                            else if(d.properties.Nbrhood == "Terrapin Springs")
+                                draw_heatmap(alldata[10]);
+                            else if(d.properties.Nbrhood == "Pepper Mill")
+                                draw_heatmap(alldata[11]);
+                            else if(d.properties.Nbrhood == "Cheddarford")
+                                draw_heatmap(alldata[12]);
+                            else if(d.properties.Nbrhood == "Easton")
+                                draw_heatmap(alldata[13]);
+                            else if(d.properties.Nbrhood == "Weston")
+                                draw_heatmap(alldata[14]);
+                            else if(d.properties.Nbrhood == "Southton")
+                                draw_heatmap(alldata[15]);
+                            else if(d.properties.Nbrhood == "Oak Willow")
+                                draw_heatmap(alldata[16]);
+                            else if(d.properties.Nbrhood == "East Parton")
+                                draw_heatmap(alldata[17]);
+                            else if(d.properties.Nbrhood == "West Parton")
+                                draw_heatmap(alldata[18]);
+                        })
                         .on("mouseover", mouseover)
                         .on("mousemove", mousemove)
                         .on("mouseleave", mouseleave)
@@ -137,51 +181,48 @@
 
                 draw_map(geojson);
 
-                function removeWhitespace(str){
-                    return str.replace(/\s+/g, '');
-                }
 
-                function mouseover() {
-                    mapTip
-                        .transition()
-                        .duration(500)
-                        .style("opacity", 1)
-                    d3.select(this)
-                    // .style("stroke", "black")
-                        .style("opacity", 0.5)
-                }
-
-                function mousemove(d) {
-                    mapTip
-                        .html("Region: " + d.properties.Nbrhood + "<br>"
-                            + "ID  : " + d.properties.Id)
-                        .style("left", (d3.mouse(this)[0] + 30) + "px")
-                        .style("top", (d3.mouse(this)[1]) + 20 + "px")
-                }
-
-                function mouseleave() {
-                    mapTip
-                        .transition()
-                        .duration(500)
-                        .style("opacity", 0)
-                    d3.select(this)
-                    // .style("stroke", "black")
-                        .style("opacity", 1)
-                }
-
-                function selected() {
-                    d3.select(".selected").classed("selected",false);
-                    d3.select(this).classed("selected",true);
-                }
 
             })
+
+            function removeWhitespace(str){
+                return str.replace(/\s+/g, '');
+            }
+
+            function mouseover() {
+                mapTip
+                    .transition()
+                    .duration(500)
+                    .style("opacity", 1)
+                d3.select(this)
+                // .style("stroke", "black")
+                    .style("opacity", 0.5)
+            }
+
+            function mousemove(d) {
+                mapTip
+                    .html("Region: " + d.properties.Nbrhood + "<br>"
+                        + "ID  : " + d.properties.Id)
+                    .style("left", (d3.mouse(this)[0] + 30) + "px")
+                    .style("top", (d3.mouse(this)[1]) + 20 + "px")
+            }
+
+            function mouseleave() {
+                mapTip
+                    .transition()
+                    .duration(500)
+                    .style("opacity", 0)
+                d3.select(this)
+                // .style("stroke", "black")
+                    .style("opacity", 1)
+            }
+
+
 
 
 
         });
     });
-
-
 
 
 
