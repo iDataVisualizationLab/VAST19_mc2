@@ -3,10 +3,10 @@ var parse = d3.timeParse("%Y-%m-%d %H:%M:%S");
 // set the dimensions and margins of the graph
 var heatMargin = {top: 20, right: 120, bottom: 90, left: 50};
 // var heatWidth = Math.max(Math.min(window.innerWidth, 1000), 500) - heatMargin.left - heatMargin.right - 20;
-var heatWidth = 1100 - heatMargin.left - heatMargin.right;
+var heatWidth = 900 - heatMargin.left - heatMargin.right;
 
 //set the colors
-var colors = ['#fee8c8','#fdbb84','#e34a33'];
+var colors = ['#ffffbf','#91cf60','#d7191c'];
 
 // create a tooltip
 
@@ -104,14 +104,14 @@ function draw_heatmap(data) {
 		.range(colors);
 
 	var sensorLabels = svgHeat.selectAll(".sensorLabel")
-														.data(sensors)
-														.enter().append("text")
-														.text( d => d)
-														.attr("x", heatWidth + 15)
-														.attr("y", (d,i) => i * cellSize)
-														.style("text-anchor", "head")
-														.attr("transform", "translate(0," + cellSize/1.5 + ")")
-														.attr("class", d => d);
+		.data(sensors)
+		.enter().append("text")
+		.text( d => d)
+		.attr("x", heatWidth + 15)
+		.attr("y", (d,i) => i * cellSize)
+		.style("text-anchor", "head")
+		.attr("transform", "translate(0," + cellSize/1.5 + ")")
+		.attr("class", d => d);
 
 	// var timeLabels = svgHeat.selectAll(".timeLabel")
 	// 												.data(times)
@@ -128,89 +128,21 @@ function draw_heatmap(data) {
 	// 												.attr("class", d=> d.toLocaleString());
 
 	var heatMap = svgHeat.selectAll(".cmp")
-											 .data(data)
-											 .enter().append("rect")
-											 .attr("x", d => times.indexOf(d.Timestamp.toString()) * cellSize)
-											 .attr("y", d => sensors.indexOf(d["Sensor-id"]) * cellSize)
-											 .attr("class", "cmp bordered")
-											 .attr("width", cellSize)
-											 .attr("height", cellSize)
-											 .style("stroke", "white")
-											 .style("stroke-opacity", 0.6)
-											 .style("fill", d => heatColor(d["Value"]))
-										 	 .on("mouseover", mouseover)
-										 	 .on("mousemove", mousemove)
-										 	 .on("mouseleave", mouseleave);
+		 .data(data.filter(d=>d.Value>0))
+		 .enter().append("rect")
+		 .attr("x", d => times.indexOf(d.Timestamp.toString()) * cellSize)
+		 .attr("y", d => sensors.indexOf(d["Sensor-id"]) * cellSize)
+		 .attr("class", "cmp bordered")
+		 .attr("width", cellSize)
+		 .attr("height", cellSize)
+		 .style("stroke", "white")
+		 .style("stroke-opacity", 0.6)
+		 .style("fill", d => heatColor(d["Value"]))
+		 .on("mouseover", mouseover)
+		 .on("mousemove", mousemove)
+		 .on("mouseleave", mouseleave);
 
-// 	// define x scale
-// 	var xHeat = d3.scaleLinear()
-// 		.domain(d3.extent(data,d=>d.Timestamp))
-// 		.range([ 0, heatWidth]);
-//
-// 	// define y scale
-// 	var  yHeat = d3.scaleBand()
-// 		.domain(sensors)
-// 		.range([ heatHeight, 0]);
-//
-//
-// 	//define x axis
-// 	var xAxisHeat = d3.axisBottom(xHeat)
-// 	// .ticks(d3.timeHour.every(6))
-// 		.tickFormat(d3.timeFormat("%m/%d %H:%m"))
-//
-// 	// define y axis
-// 	var yAxisHeat = d3.axisLeft(yHeat);
-//
-//
-//
-//
-// 	//draw x axis
-// 	svgHeat.append("g")
-// 	// .style("font-size", 9)
-// 		.attr("transform", "translate(0," + heatHeight + ")")
-// 		.call(xAxisHeat)
-// 		.selectAll('text')
-// 		.attr('font-weight', 'normal')
-// 		.style("text-anchor", "end")
-// 		.attr("dx", "-.8em")
-// 		.attr("dy", "-.5em")
-// 		.attr("transform", function (d) {
-// 			return "rotate(-65)";
-// 		});;
-//
-// 	//draw y axis
-// 	svgHeat.append("g")
-// 		.style("font-size", 9.5)
-// 		.call(yAxisHeat);
-//
-// 	//draw heat map
-// 	var heatMap = svgHeat.selectAll(".cell")
-// 	// .data(data,d=>(d["sensor-id"] + ":" +d.Timestamp))
-// 		.data(data);
-// 	heatMap.append("title")
-// 	heatMap.enter().append("rect")
-// 		.attr("x", function(d) { return xHeat(d.Timestamp); })
-// 		.attr("y", function(d) { return yHeat(d["Sensor-id"]) })
-//
-// 		// .attr("rx", 4)
-// 		// .attr("ry", 4)
-// 		.attr("class", "cell")
-// 		.attr("width", cellSize)
-// 		.attr("height", cellSize)
-// 		.style("stroke", "grey")
-// 		.style("stroke-opacity", 0.3)
-// 		.style("fill", function(d) { return heatColor(d.Value); })
-// 		.on("mouseover", mouseover)
-// 		.on("mousemove", mousemove)
-// 		.on("mouseleave", mouseleave);
-//
-// // debugger
-// 	heatMap.selectAll(".cell")
-// 		.transition().duration(1000)
-// 		.attr("y", function(d){return yHeat(d["Sensor-id"])})
-// 		.style("fill", function(d) { return heatColor(d.Value); });
-//
-// 	heatMap.select("title").text(function(d) { return d.Value; });
+
 
 	heatMap.exit().remove();
 
