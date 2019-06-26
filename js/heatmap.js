@@ -1,9 +1,9 @@
 
 var parse = d3.timeParse("%Y-%m-%d %H:%M:%S");
 // set the dimensions and margins of the graph
-var heatMargin = {top: 20, right: 120, bottom: 90, left: 50};
+var heatMargin = {top: 20, right: 120, bottom: 90, left: 10};
 // var heatWidth = Math.max(Math.min(window.innerWidth, 1000), 500) - heatMargin.left - heatMargin.right - 20;
-var heatWidth = 900 - heatMargin.left - heatMargin.right;
+var heatWidth = 800 - heatMargin.left - heatMargin.right;
 
 //set the colors
 var colors = ['#ffffbf','#91cf60','#d7191c'];
@@ -81,15 +81,16 @@ function draw_heatmap(data) {
 	var heatHeight = cellSize * (sensors.length + 2);
 
 	//append heat map svg
-	d3.select("#heatmap").selectAll("*").remove();
+	// d3.select("#heatmap").selectAll("*").remove();
 	
 	var heatTip = d3.select("#heatmap")
 		.append("div")
 		.style("opacity", 0)
-		.attr("class", "tstooltip");
+		.attr("class", "tooltip");
 
 	var svgHeat = d3.select("#heatmap")
 		.append("svg")
+		.style("display", "block")
 		.attr("width", heatWidth + heatMargin.left + heatMargin.right)
 		.attr("height", heatHeight + heatMargin.top + heatMargin.bottom)
 		.append("g")
