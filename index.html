@@ -88,12 +88,11 @@
             //initialize heatmap
             draw_heatmap(alldata[index-1]);
 
-debugger
+            debugger
             const mapTip = d3.select("#map")
                 .append("div")
                 .style("opacity", 0)
                 .attr("class", "tooltip");
-
 
             d3.json('data/StHimark.geojson').then(geojson => {
 
@@ -109,6 +108,9 @@ debugger
                     t = [(width - s * (b[1][0] + b[0][0])) / 2, (height - s * (b[1][1] + b[0][1])) / 2];
 
                 projection.scale(s).translate(t);
+                let regionNameList =['Palace Hills', 'Northwest', 'Old Town', 'Safe Town', 'Southwest', 'Downtown', 'Wilson Forest', 'Scenic-Vista', 'Broadview', 'Chapparal', 'Terrapin Springs', 'Pepper Mill', 'Cheddar-ford', 'Easton', 'Weston', 'Southton', 'Oak Willow', 'East Parton', 'West Parton'];
+                let staticLocation = [[0.15689, -119.9594], [0.15109, -119.90952], [0.1218, -119.9043],[0.18299, -119.85558], [0.04147, -119.82861], [0.20764, -119.81556], [0.15979, -119.80715],[0.1218, -119.79265], [0.16849, -119.79033]];
+                let hospitalLocation = [[0.180960, -119.959400], [0.153120, -119.915900], [0.151090, -119.909520], [0.121800, -119.904300], [0.134560, -119.883420], [0.182990, -119.855580], [0.041470, -119.828610], [0.065250, -119.744800]];
 
                 function draw_map(geojson) {
                     let u = d3.select('#map g.map')
@@ -119,12 +121,18 @@ debugger
                         .append('path')
                         .attr('d', geoPath)
                         .attr("id", d=>removeWhitespace(d.properties.Nbrhood))
-                        .classed("inactive",d=>d.properties.Nbrhood != "Palace Hills")
-                        .classed("active", d=>d.properties.Nbrhood == "Palace Hills")
-                        .on("click", d=>{
-                            if(d.properties.Nbrhood == "Palace Hills"){
+                        .attr("class", "inactive")
+                        // .classed("inactive",d,i=>d.properties.Nbrhood != "Palace Hills")
+                        // .classed("active", d=>d.properties.Nbrhood == "Palace Hills")
+                        .on("click", d=> {
+                            // let id = removeWhitespace(d.properties.Nbrhood);
+                            // let heatmapId =
+                            // let selectedHeatmap = d3.select("#heatmap").select("#")
+                            // let selectedRegion = d3.selece("#map").select("#" + id);
+                            // let active =
+                            if (d.properties.Nbrhood == "Palace Hills")
                                 draw_heatmap(alldata[0]);
-                            }else if(d.properties.Nbrhood == "Northwest")
+                            else if (d.properties.Nbrhood == "Northwest")
                                 draw_heatmap(alldata[1]);
                             else if(d.properties.Nbrhood == "Old Town")
                                 draw_heatmap(alldata[2]);
@@ -163,10 +171,39 @@ debugger
                         })
                         .on("mouseover", mouseover)
                         .on("mousemove", mousemove)
-                        .on("mouseleave", mouseleave)
+                        .on("mouseleave", mouseleave);
 
-                    debugger
-                    ;
+
+
+                    d3.csv("data/StaticSensorLocations.csv").then(location=>{
+                        u.enter()
+                            .data(location)
+                            // .append("circle")
+                            // .attr("id",d=>"static"+d["Sensor-id"])
+                            // .attr("cx", d=> {
+                            //     return projection([d.Long, d.Lat])[0];
+                            // })
+                            // .attr("cy", function(d) {
+                            //     return projection([d.Long, d.Lat])[1];
+                            // })
+                            // .attr("r", "5px")
+                            // .style("fill", "white");
+                            .append("image")
+                            .attr("class","statIcon")
+                            .attr("width",10)
+                            .attr("height",10)
+                            .attr("xlink:href","Icon/meter.svg")
+                            .attr("transform", d =>{ return "translate(" + projection([d.Long,d.Lat]) + ")"; })
+                            .attr("cx", d=> {
+                                return projection([d.Long, d.Lat])[0];
+                            })
+                            .attr("cy", function(d) {
+                                return projection([d.Long, d.Lat])[1];
+                            })
+                            .on("mouseover",d=>mouseover);
+
+
+                    });
                     u.enter()
                         .append("svg:text")
                         .text(d => d.properties.Id + " " + d.properties.Nbrhood)
@@ -176,7 +213,7 @@ debugger
                         .attr("text-anchor", "middle")
                         .attr("font-size", "8pt");
 
-
+                    debugger
                 }
 
                 draw_map(geojson);
@@ -216,8 +253,6 @@ debugger
                 // .style("stroke", "black")
                     .style("opacity", 1)
             }
-
-
 
 
 
