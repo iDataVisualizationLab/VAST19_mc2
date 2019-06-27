@@ -1,7 +1,7 @@
 
 var parse = d3.timeParse("%Y-%m-%d %H:%M:%S");
 // set the dimensions and margins of the graph
-var heatMargin = {top: 20, right: 120, bottom: 90, left: 10};
+var heatMargin = {top: 5, right: 100, bottom: 0, left: 10};
 // var heatWidth = Math.max(Math.min(window.innerWidth, 1000), 500) - heatMargin.left - heatMargin.right - 20;
 var heatWidth = 800 - heatMargin.left - heatMargin.right;
 
@@ -129,7 +129,7 @@ function draw_heatmap(data) {
 	// 												.attr("class", d=> d.toLocaleString());
 
 	var heatMap = svgHeat.selectAll(".cmp")
-		 .data(data.filter(d=>d.Value>0))
+		 .data(data.filter(d=>{return d.Value>0}))
 		 .enter().append("rect")
 		 .attr("x", d => times.indexOf(d.Timestamp.toString()) * cellSize)
 		 .attr("y", d => sensors.indexOf(d["Sensor-id"]) * cellSize)
@@ -148,84 +148,84 @@ function draw_heatmap(data) {
 	heatMap.exit().remove();
 
 
-//=============================legend ============================
-	//create value scale for the legend
-	var valueScale = d3.scaleLinear()
-		.domain([0, d3.max(data, d=>d.Value)])
-		.range([0, heatWidth]);
-
-	//Calculate the variables for the temp gradient
-	var numStops = 3;
-	valueRange = valueScale.domain();
-	valueRange[2] = valueRange[1] - valueRange[0];
-	valuePoint = [];
-	for(var i = 0; i < numStops; i++) {
-		valuePoint.push(i * valueRange[2]/(numStops-1) + valueRange[0]);
-	}//for i
-
-	// console.log(d3.range(numStops));
-	// console.log(valueScale( valuePoint[i] ));
-	//create the gradient
-	svgHeat.append("defs")
-		.append("linearGradient")
-		.attr("id", "legend-heatmap")
-		.attr("x1", "0%").attr("y1", "0%")
-		.attr("x2", "100%").attr("y2", "0%")
-		.selectAll("stop")
-		.data(d3.range(numStops))
-		.enter().append("stop")
-		.attr("offset", function(d,i) {
-			return valueScale( valuePoint[i] )/heatWidth;
-		})
-		.attr("stop-color", function(d,i) {
-			return heatColor( valuePoint[i] );
-		});
-	// debugger
-	// draw legend
-	var legendWidth = Math.min(heatWidth * 0.8, 400);
-
-	// var legend = svgHeat.selectAll(".legend")
-	//     .data([0].concat(heatColor.quantiles()), function(d) { return d; });
-
-	var legend = svgHeat.append("g")
-		.attr("class", "legendWapper")
-		.attr("transform", "translate(" + (heatWidth/2) + "," + (cellSize * sensors.length + 40) + ")");
-
-	legend.append("rect")
-		.attr("class", "legendRect")
-		.attr("x", -legendWidth/2)
-		.attr("y", 0)
-		.attr("width", legendWidth)
-		.attr("height", 10)
-		.style("fill", "url(#legend-heatmap)");
-
-	legend.append("text")
-		.attr("class", "mono")
-		.text(function(d) { return "≥ " + Math.round(d); })
-		.attr("x", 0)
-		.attr("y", -10)
-		.style("text-anchor", "middle")
-		.text("Radiation Values (cmp)");
-
-	// legend.exit().remove();
-
-	//Set scale of x axis for legend
-	var xLegend = d3.scaleLinear()
-		.range([-legendWidth/2, legendWidth/2])
-		.domain([ 0, d3.max(data, function(d) { return d.Value; })] );
-
-	//Define x-axis for legend
-	var xAxisLegend = d3.axisBottom(xLegend)
-		.ticks(6);
-	//.tickFormat(formatPercent)
-
-
-	//draw X axis for legend
-	legend.append("g")
-		.attr("class", "axis--legend")
-		.attr("transform", "translate(0," + (10) + ")")
-		.call(xAxisLegend);
-
+// //=============================legend ============================
+// 	//create value scale for the legend
+// 	var valueScale = d3.scaleLinear()
+// 		.domain([0, d3.max(data, d=>d.Value)])
+// 		.range([0, heatWidth]);
+//
+// 	//Calculate the variables for the temp gradient
+// 	var numStops = 3;
+// 	valueRange = valueScale.domain();
+// 	valueRange[2] = valueRange[1] - valueRange[0];
+// 	valuePoint = [];
+// 	for(var i = 0; i < numStops; i++) {
+// 		valuePoint.push(i * valueRange[2]/(numStops-1) + valueRange[0]);
+// 	}//for i
+//
+// 	// console.log(d3.range(numStops));
+// 	// console.log(valueScale( valuePoint[i] ));
+// 	//create the gradient
+// 	svgHeat.append("defs")
+// 		.append("linearGradient")
+// 		.attr("id", "legend-heatmap")
+// 		.attr("x1", "0%").attr("y1", "0%")
+// 		.attr("x2", "100%").attr("y2", "0%")
+// 		.selectAll("stop")
+// 		.data(d3.range(numStops))
+// 		.enter().append("stop")
+// 		.attr("offset", function(d,i) {
+// 			return valueScale( valuePoint[i] )/heatWidth;
+// 		})
+// 		.attr("stop-color", function(d,i) {
+// 			return heatColor( valuePoint[i] );
+// 		});
+// 	// debugger
+// 	// draw legend
+// 	var legendWidth = Math.min(heatWidth * 0.8, 400);
+//
+// 	// var legend = svgHeat.selectAll(".legend")
+// 	//     .data([0].concat(heatColor.quantiles()), function(d) { return d; });
+//
+// 	var legend = svgHeat.append("g")
+// 		.attr("class", "legendWapper")
+// 		.attr("transform", "translate(" + (heatWidth/2) + "," + (cellSize * sensors.length + 40) + ")");
+//
+// 	legend.append("rect")
+// 		.attr("class", "legendRect")
+// 		.attr("x", -legendWidth/2)
+// 		.attr("y", 0)
+// 		.attr("width", legendWidth)
+// 		.attr("height", 10)
+// 		.style("fill", "url(#legend-heatmap)");
+//
+// 	legend.append("text")
+// 		.attr("class", "mono")
+// 		.text(function(d) { return "≥ " + Math.round(d); })
+// 		.attr("x", 0)
+// 		.attr("y", -10)
+// 		.style("text-anchor", "middle")
+// 		.text("Radiation Values (cmp)");
+//
+// 	// legend.exit().remove();
+//
+// 	//Set scale of x axis for legend
+// 	var xLegend = d3.scaleLinear()
+// 		.range([-legendWidth/2, legendWidth/2])
+// 		.domain([ 0, d3.max(data, function(d) { return d.Value; })] );
+//
+// 	//Define x-axis for legend
+// 	var xAxisLegend = d3.axisBottom(xLegend)
+// 		.ticks(6);
+// 	//.tickFormat(formatPercent)
+//
+//
+// 	//draw X axis for legend
+// 	legend.append("g")
+// 		.attr("class", "axis--legend")
+// 		.attr("transform", "translate(0," + (10) + ")")
+// 		.call(xAxisLegend);
+//
 
 
 	// Three function that change the tooltip when user hover / move / leave a cell

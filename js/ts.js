@@ -3,8 +3,8 @@
 // Width and height, height2 is for slider
 var tsMargin = {top:20, right:120, bottom: 90, left: 50},
     tsMargin2 = {top: 400, right: 10, bottom: 20, left: 40},
-    tsWidth = 1100 - tsMargin.left - tsMargin.right,
-    tsHeight = 450 - tsMargin.top - tsMargin.bottom,
+    tsWidth = 800 - tsMargin.left - tsMargin.right,
+    tsHeight = 440 - tsMargin.top - tsMargin.bottom,
     tsHeight2 = 440 - tsMargin2.top - tsMargin2.bottom;
 
 var tsParseTime = d3.timeParse("%Y-%m-%d %H:%M:%S");
