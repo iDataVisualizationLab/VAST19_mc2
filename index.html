@@ -30,16 +30,18 @@
         transform:translate(0,-50%);
         pointer-events:none;
     }
-    /*.active {*/
-    /*fill: green;*/
-    /*}*/
-    /*.inactive{*/
-    /*fill: lightgrey*/
-    /*}*/
+    .radIcon .hospIcon .
+        /*.active {*/
+        /*fill: green;*/
+        /*}*/
+        /*.inactive{*/
+        /*fill: lightgrey*/
+        /*}*/
     .unselected{
         fill:lightgoldenrodyellow;
     }
     .selected{
+        border-color:black;
         fill:green;
     }
     /*heatmap*/
@@ -52,6 +54,9 @@
         border-style: solid;
         border-color: lightgrey;
         overflow:auto;
+    }
+    .hidden{
+        display:none;
     }
 
 
@@ -155,6 +160,7 @@
     <svg width="500px" height="500px">
         <g class="map"></g>
     </svg>
+    <!--<span class="">-->
 </div>
 <div id="heatmap"></div>
 <div id="timeSeries"></div>
@@ -218,88 +224,37 @@
                 let regionNameList =['Palace Hills', 'Northwest', 'Old Town', 'Safe Town', 'Southwest', 'Downtown', 'Wilson Forest', 'Scenic-Vista', 'Broadview', 'Chapparal', 'Terrapin Springs', 'Pepper Mill', 'Cheddar-ford', 'Easton', 'Weston', 'Southton', 'Oak Willow', 'East Parton', 'West Parton'];
                 let hospitalLocation = [{Lat:0.180960,Long:-119.959400}, {Lat:0.153120, Long:-119.915900}, {Lat:0.151090, Long:-119.909520}, {Lat:0.121800, Long:-119.904300}, {Lat:0.134560, Long:119.883420}, {Lat:0.182990, Long:-119.855580}, {Lat:0.041470, Long:-119.828610}, {Lat:0.065250, Long:-119.744800}];
                 let radiationStation =[{Lat:0.162679, Long:-119.784825}];
+                // draw map
                 function draw_map(geojson) {
                     let u = d3.select('#map g.map')
                         .selectAll('path')
                         .data(geojson.features);
 
+                    //append path to map
                     u.enter()
                         .append('path')
                         .attr('d', geoPath)
+                        // .attr("class","geoPath")
                         .attr("id", d=>removeWhitespace(d.properties.Nbrhood))
-                        .classed("unselected", d=>d.properties.Nbrhood != "Palace Hills")                        // .classed("inactive",d,i=>d.properties.Nbrhood != "Palace Hills")
-                        // .classed("active", d=>d.properties.Nbrhood == "Palace Hills")
+                        .classed("unselected", d=>d.properties.Nbrhood != "Palace Hills")
                         .classed("selected",d=>d.properties.Nbrhood == "Palace Hills")
-                        .on("click",d=>{
-                            // let id = removeWhitespace(d.properties.Nbrhood);
-                            // let heatmapId =
-                            // let selectedHeatmap = d3.select("#heatmap").select("#" + id)
-                            // let selectedRegion = d3.selece("#map").select("#" + id);
-                            // let active =
-                            if (d.properties.Nbrhood == "Palace Hills"){
-                                draw_heatmap(alldata[0]);
-                                drawTimeSeries(tsfiles[0]);}
-                            else if (d.properties.Nbrhood == "Northwest"){
-                                draw_heatmap(alldata[1]);
-                                drawTimeSeries(tsfiles[1]);}
-                            else if(d.properties.Nbrhood == "Old Town"){
-                                draw_heatmap(alldata[2]);
-                                drawTimeSeries(tsfiles[2])}
-                            else if(d.properties.Nbrhood == "Safe Town"){
-                                draw_heatmap(alldata[3]);
-                                drawTimeSeries(tsfiles[3]);}
-                            else if(d.properties.Nbrhood == "Southwest"){
-                                draw_heatmap(alldata[4]);
-                                drawTimeSeries(tsfiles[4]);}
-                            else if(d.properties.Nbrhood == "Downtown"){
-                                draw_heatmap(alldata[5]);
-                                drawTimeSeries(tsfiles[5]);}
-                            else if(d.properties.Nbrhood == "Wilson Forest"){
-                                draw_heatmap(alldata[6]);
-                                drawTimeSeries(tsfiles[6]);}
-                            else if(d.properties.Nbrhood == "Scenic Vista"){
-                                draw_heatmap(alldata[7]);
-                                drawTimeSeries(tsfiles[7]);}
-                            else if(d.properties.Nbrhood == "Broadview"){
-                                draw_heatmap(alldata[8]);
-                                drawTimeSeries(tsfiles[8]);}
-                            else if(d.properties.Nbrhood == "Chapparal"){
-                                draw_heatmap(alldata[9]);
-                                drawTimeSeries(tsfiles[9]);}
-                            else if(d.properties.Nbrhood == "Terrapin Springs"){
-                                draw_heatmap(alldata[10]);
-                                drawTimeSeries(tsfiles[10]);}
-                            else if(d.properties.Nbrhood == "Pepper Mill"){
-                                draw_heatmap(alldata[11]);
-                                drawTimeSeries(tsfiles[11]);}
-                            else if(d.properties.Nbrhood == "Cheddarford"){
-                                draw_heatmap(alldata[12]);
-                                drawTimeSeries(tsfiles[12]);}
-                            else if(d.properties.Nbrhood == "Easton"){
-                                draw_heatmap(alldata[13]);
-                                drawTimeSeries(tsfiles[13]);}
-                            else if(d.properties.Nbrhood == "Weston"){
-                                draw_heatmap(alldata[14]);
-                                drawTimeSeries(tsfiles[14]);}
-                            else if(d.properties.Nbrhood == "Southton"){
-                                draw_heatmap(alldata[15]);
-                                drawTimeSeries(tsfiles[15]);}
-                            else if(d.properties.Nbrhood == "Oak Willow"){
-                                draw_heatmap(alldata[16]);
-                                drawTimeSeries(tsfiles[16]);}
-                            else if(d.properties.Nbrhood == "East Parton"){
-                                draw_heatmap(alldata[17]);
-                                drawTimeSeries(tsfiles[17]);}
-                            else if(d.properties.Nbrhood == "West Parton"){
-                                draw_heatmap(alldata[18]);
-                                drawTimeSeries(tsfiles[18]);}
-                        })
                         .on("mouseover", mouseover)
                         .on("mousemove", mousemove)
-                        .on("mouseleave", mouseleave);
+                        .on("mouseleave", mouseleave)
+                        .on("click",d=>{
+                            // d3.selectAll("id").classed("unselected",true);
+                            // d3.select(this).classed("selected",true);
+                            for(const region of regionNameList) {
+                                const index = regionNameList.indexOf(region);
+                                if (d.properties.Nbrhood == region) {
+                                    draw_heatmap(alldata[index]);
+                                    drawTimeSeries(tsfiles[index]);
 
+                                }
+                            }
+                        })
 
-                    //load data for static sensors and plot on to the map
+                    //load data for static sensors and plot them on to the map
                     d3.csv("data/StaticSensorLocations.csv").then(location=>{
                         u.enter()
                             .data(location)
@@ -366,15 +321,17 @@
                         })
                         .attr("cy", function(d) {
                             return projection([d.Long, d.Lat])[1];
-                        })
+                        });
+
                     debugger
                 }
 
                 draw_map(geojson);
 
 
-
             })
+
+
 
             function removeWhitespace(str){
                 return str.replace(/\s+/g, '');
