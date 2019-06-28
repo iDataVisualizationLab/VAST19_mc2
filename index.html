@@ -5,6 +5,8 @@
 </head>
 
 <style>
+    /*.header{*/
+    /*}*/
     /*map*/
     #map{
         width:50%;
@@ -15,6 +17,20 @@
     #map .map path {
         fill: lightgoldenrodyellow;
         stroke: #bbbbbb;
+    }
+
+    #legendContainer{
+        width:30%;
+        hight:50%;
+        float:right;
+        margin:auto;
+        background:lightgoldenrodyellow;
+    }
+
+    #slider{
+        /*float:left;*/
+        margin:auto;
+        background:lightcyan;
     }
     div.tooltip {
         position:absolute;
@@ -48,7 +64,7 @@
     #heatmap{
         float:right;
         width: 45%;
-        height: 900px;
+        height: 800px;
         margin:auto;
         padding: 10px;
         border-style: solid;
@@ -156,16 +172,29 @@
 </style>
 
 <body>
+<div class="header">
+    <h2>VAST Mini Challenge 2: Citizen Science to the Rescue</h2>
+</div>
 <div id="map">
-    <svg width="500px" height="500px">
+    <svg width="500px" height="450px">
         <g class="map"></g>
     </svg>
+    <div id="legendContainer">
+        <h4>legend and control</h4>
+        <svg width="200", height="400">
+            <g class="legendIcon"></g>
+        </svg>
+    </div>
+    <div id="slider">
+        <h4>slider</h4>
+    </div>
     <!--<span class="">-->
 </div>
 <div id="heatmap"></div>
 <div id="timeSeries"></div>
 
 <script src="https://d3js.org/d3.v5.min.js"></script>
+<script src="https://unpkg.com/d3-simple-slider"></script>
 <script src="js/heatmap.js"></script>
 <script src="js/ts.js"></script>
 
@@ -221,23 +250,23 @@
                     t = [(width - s * (b[1][0] + b[0][0])) / 2, (height - s * (b[1][1] + b[0][1])) / 2];
 
                 projection.scale(s).translate(t);
-                let regionNameList =['Palace Hills', 'Northwest', 'Old Town', 'Safe Town', 'Southwest', 'Downtown', 'Wilson Forest', 'Scenic-Vista', 'Broadview', 'Chapparal', 'Terrapin Springs', 'Pepper Mill', 'Cheddar-ford', 'Easton', 'Weston', 'Southton', 'Oak Willow', 'East Parton', 'West Parton'];
+                let regionNameList =['Palace Hills', 'Northwest', 'Old Town', 'Safe Town', 'Southwest', 'Downtown', 'Wilson Forest', 'Scenic Vista', 'Broadview', 'Chapparal', 'Terrapin Springs', 'Pepper Mill', 'Cheddarford', 'Easton', 'Weston', 'Southton', 'Oak Willow', 'East Parton', 'West Parton'];
                 let hospitalLocation = [{Lat:0.180960,Long:-119.959400}, {Lat:0.153120, Long:-119.915900}, {Lat:0.151090, Long:-119.909520}, {Lat:0.121800, Long:-119.904300}, {Lat:0.134560, Long:119.883420}, {Lat:0.182990, Long:-119.855580}, {Lat:0.041470, Long:-119.828610}, {Lat:0.065250, Long:-119.744800}];
                 let radiationStation =[{Lat:0.162679, Long:-119.784825}];
                 // draw map
                 function draw_map(geojson) {
-                    let u = d3.select('#map g.map')
+                    let mapSvg = d3.select('#map g.map')
                         .selectAll('path')
                         .data(geojson.features);
 
                     //append path to map
-                    u.enter()
+                    mapSvg.enter()
                         .append('path')
                         .attr('d', geoPath)
                         // .attr("class","geoPath")
                         .attr("id", d=>removeWhitespace(d.properties.Nbrhood))
-                        .classed("unselected", d=>d.properties.Nbrhood != "Palace Hills")
-                        .classed("selected",d=>d.properties.Nbrhood == "Palace Hills")
+                        .classed("unselected", d=>d.properties.Nbrhood !== "Palace Hills")
+                        .classed("selected",d=>d.properties.Nbrhood === "Palace Hills")
                         .on("mouseover", mouseover)
                         .on("mousemove", mousemove)
                         .on("mouseleave", mouseleave)
@@ -246,7 +275,7 @@
                             // d3.select(this).classed("selected",true);
                             for(const region of regionNameList) {
                                 const index = regionNameList.indexOf(region);
-                                if (d.properties.Nbrhood == region) {
+                                if (d.properties.Nbrhood === region) {
                                     draw_heatmap(alldata[index]);
                                     drawTimeSeries(tsfiles[index]);
 
@@ -254,9 +283,19 @@
                             }
                         })
 
+                    //add region names to map
+                    mapSvg.enter()
+                        .append("svg:text")
+                        .text(d => d.properties.Id + " " + d.properties.Nbrhood)
+                        .style("display", "block")
+                        .attr("x", d => geoPath.centroid(d)[0])
+                        .attr("y", d => geoPath.centroid(d)[1])
+                        .attr("text-anchor", "middle")
+                        .attr("font-size", "8pt");
+
                     //load data for static sensors and plot them on to the map
                     d3.csv("data/StaticSensorLocations.csv").then(location=>{
-                        u.enter()
+                        mapSvg.enter()
                             .data(location)
                             // .append("circle")
                             // .attr("id",d=>"static"+d["Sensor-id"])
@@ -280,20 +319,15 @@
                             .attr("cy", function(d) {
                                 return projection([d.Long, d.Lat])[1];
                             })
-                            .on("mouseover",d=>mouseover);
+                        // .on("mouseover",d=>{
+                        //     d3.select(".statIcon")
+                        //         .html("Static: " + d["Sensor-id"])
+                        // });
                     });
-                    //add region names to map
-                    u.enter()
-                        .append("svg:text")
-                        .text(d => d.properties.Id + " " + d.properties.Nbrhood)
-                        .style("display", "block")
-                        .attr("x", d => geoPath.centroid(d)[0])
-                        .attr("y", d => geoPath.centroid(d)[1])
-                        .attr("text-anchor", "middle")
-                        .attr("font-size", "8pt");
+
 
                     //plot hospitals on map
-                    u.enter()
+                    mapSvg.enter()
                         .data(hospitalLocation)
                         .append("image")
                         .attr("class","hospIcon")
@@ -307,8 +341,9 @@
                         .attr("cy", function(d) {
                             return projection([d.Long, d.Lat])[1];
                         })
-                    //plot ratiation station on map
-                    u.enter()
+
+                    //plot radiation station on map
+                    mapSvg.enter()
                         .data(radiationStation)
                         .append("image")
                         .attr("class","radIcon")
@@ -323,15 +358,14 @@
                             return projection([d.Long, d.Lat])[1];
                         });
 
+                    // add legend
+
                     debugger
                 }
-
                 draw_map(geojson);
-
-
             })
 
-
+            // where helper functions go
 
             function removeWhitespace(str){
                 return str.replace(/\s+/g, '');
