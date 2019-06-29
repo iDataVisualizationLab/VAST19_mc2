@@ -19,8 +19,8 @@
         stroke: #bbbbbb;
     }
 
-    #legendContainer{
-        width:30%;
+    #controlContainer{
+        width:40%;
         hight:50%;
         float:right;
         margin:auto;
@@ -176,11 +176,17 @@
     <h2>VAST Mini Challenge 2: Citizen Science to the Rescue</h2>
 </div>
 <div id="map">
-    <svg width="500px" height="450px">
+    <svg width="550px" height="450px">
+        <!--<div id="mapLegend">-->
+        <!--</div>-->
+        <svg width = 70 height = 70>
+            <g class="legendGroup"></g>
+        </svg>
         <g class="map"></g>
     </svg>
-    <div id="legendContainer">
-        <h4>legend and control</h4>
+
+    <div id="controlContainer">
+        <h4>Control</h4>
         <svg width="200", height="400">
             <g class="legendIcon"></g>
         </svg>
@@ -230,7 +236,6 @@
             draw_heatmap(alldata[index-1]);
             drawTimeSeries(tsfiles[index-1]);
 
-            debugger
             const mapTip = d3.select("#map")
                 .append("div")
                 .style("opacity", 0)
@@ -250,9 +255,16 @@
                     t = [(width - s * (b[1][0] + b[0][0])) / 2, (height - s * (b[1][1] + b[0][1])) / 2];
 
                 projection.scale(s).translate(t);
+
+                // some variables for later usage
                 let regionNameList =['Palace Hills', 'Northwest', 'Old Town', 'Safe Town', 'Southwest', 'Downtown', 'Wilson Forest', 'Scenic Vista', 'Broadview', 'Chapparal', 'Terrapin Springs', 'Pepper Mill', 'Cheddarford', 'Easton', 'Weston', 'Southton', 'Oak Willow', 'East Parton', 'West Parton'];
                 let hospitalLocation = [{Lat:0.180960,Long:-119.959400}, {Lat:0.153120, Long:-119.915900}, {Lat:0.151090, Long:-119.909520}, {Lat:0.121800, Long:-119.904300}, {Lat:0.134560, Long:119.883420}, {Lat:0.182990, Long:-119.855580}, {Lat:0.041470, Long:-119.828610}, {Lat:0.065250, Long:-119.744800}];
                 let radiationStation =[{Lat:0.162679, Long:-119.784825}];
+                let mobileSensors = [];
+                for(let i=1; i<51; i++){
+                    mobileSensors.push(i);
+                }
+
                 // draw map
                 function draw_map(geojson) {
                     let mapSvg = d3.select('#map g.map')
@@ -358,10 +370,67 @@
                             return projection([d.Long, d.Lat])[1];
                         });
 
-                    // add legend
+                    // add map legend
+                    let iconFiles =[{"Neuclear station":"Icon/radiation.svg"},{"Hospital":"Icon/hospital.svg"},{"Static sensor":"Icon/meter.svg"}];
+                    let legendSvg = d3.select("#map g.legendGroup");
+                    legendSvg.selectAll("image")
+                        .data(iconFiles)
+                        .enter()
+                        .append("image")
+                        .attr("width",13)
+                        .attr("height",13)
+                        .attr("xlink:href",d=>Object.values(d))
+                        .attr("y",(d,i)=>i*15)
+                        .attr("class","mapLegend");
+                    // legendSvg.selectAll("text")
+                    //     .append("text")
+                    //     .text(d=>Object.keys(d))
+                    //     .attr("font-size",10)
+                    //     .attr("x", 30)
+                    //     .attr("y",(d,i)=>i*15);
+debugger
+
+                    // legendSvg.append("svg:image")
+                    //     .attr("class","mapLegend")
+                    //     .attr("width",13)
+                    //     .attr("height",13)
+                    //     .attr("xlink:href","Icon/radiation.svg")
+                    //     .append("text")
+                    //     .attr("x", 40)
+                    //     .text("Radiation station")
+                    //     ;
+                    // legendSvg.append("svg:image")
+                    //     .attr("class","mapLegend")
+                    //     .attr("width",13)
+                    //     .attr("height",13)
+                    //     .attr("y",15)
+                    //     .attr("xlink:href","Icon/hospital.svg")
+                    //     .append("text")
+                    //     .text("Hospital")
+                    //     .attr("x", 40);
+                    // legendSvg.append("svg:image")
+                    //     .attr("class","mapLegend")
+                    //     .attr("width",13)
+                    //     .attr("height",13)
+                    //     .attr("y",30)
+                    //     .attr("xlink:href","Icon/meter.svg")
+                    //     .append("text")
+                    //     .text("Static sensor location")
+                    //     .attr("x", 40);
+
+
+
 
                     debugger
+                    //
+                    //  legendSvg.selectAll("g")
+                    //      .attr("class","radIcon")
+                    //      .attr("width",15)
+                    //      .attr("height",15)
+                    //      .attr("xlink:href","Icon/radiation.svg");
+
                 }
+                debugger
                 draw_map(geojson);
             })
 
