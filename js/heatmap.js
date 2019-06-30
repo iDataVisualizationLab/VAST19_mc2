@@ -93,6 +93,7 @@ function draw_heatmap(data) {
 		.style("display", "block")
 		.attr("width", heatWidth + heatMargin.left + heatMargin.right)
 		.attr("height", heatHeight + heatMargin.top + heatMargin.bottom)
+		.attr("class","heatmapBlock")
 		.append("g")
 		.attr("transform",
 			"translate(" + heatMargin.left + "," + heatMargin.top + ")");
@@ -141,92 +142,13 @@ function draw_heatmap(data) {
 		 .style("fill", d => heatColor(d["Value"]))
 		 .on("mouseover", mouseover)
 		 .on("mousemove", mousemove)
-		 .on("mouseleave", mouseleave);
+		 .on("mouseleave", mouseleave)
+		 .append("text")
+		 .text();
 
 
 
-	heatMap.exit().remove();
-
-
-// //=============================legend ============================
-// 	//create value scale for the legend
-// 	var valueScale = d3.scaleLinear()
-// 		.domain([0, d3.max(data, d=>d.Value)])
-// 		.range([0, heatWidth]);
-//
-// 	//Calculate the variables for the temp gradient
-// 	var numStops = 3;
-// 	valueRange = valueScale.domain();
-// 	valueRange[2] = valueRange[1] - valueRange[0];
-// 	valuePoint = [];
-// 	for(var i = 0; i < numStops; i++) {
-// 		valuePoint.push(i * valueRange[2]/(numStops-1) + valueRange[0]);
-// 	}//for i
-//
-// 	// console.log(d3.range(numStops));
-// 	// console.log(valueScale( valuePoint[i] ));
-// 	//create the gradient
-// 	svgHeat.append("defs")
-// 		.append("linearGradient")
-// 		.attr("id", "legend-heatmap")
-// 		.attr("x1", "0%").attr("y1", "0%")
-// 		.attr("x2", "100%").attr("y2", "0%")
-// 		.selectAll("stop")
-// 		.data(d3.range(numStops))
-// 		.enter().append("stop")
-// 		.attr("offset", function(d,i) {
-// 			return valueScale( valuePoint[i] )/heatWidth;
-// 		})
-// 		.attr("stop-color", function(d,i) {
-// 			return heatColor( valuePoint[i] );
-// 		});
-// 	// debugger
-// 	// draw legend
-// 	var legendWidth = Math.min(heatWidth * 0.8, 400);
-//
-// 	// var legend = svgHeat.selectAll(".legend")
-// 	//     .data([0].concat(heatColor.quantiles()), function(d) { return d; });
-//
-// 	var legend = svgHeat.append("g")
-// 		.attr("class", "legendWapper")
-// 		.attr("transform", "translate(" + (heatWidth/2) + "," + (cellSize * sensors.length + 40) + ")");
-//
-// 	legend.append("rect")
-// 		.attr("class", "legendRect")
-// 		.attr("x", -legendWidth/2)
-// 		.attr("y", 0)
-// 		.attr("width", legendWidth)
-// 		.attr("height", 10)
-// 		.style("fill", "url(#legend-heatmap)");
-//
-// 	legend.append("text")
-// 		.attr("class", "mono")
-// 		.text(function(d) { return "≥ " + Math.round(d); })
-// 		.attr("x", 0)
-// 		.attr("y", -10)
-// 		.style("text-anchor", "middle")
-// 		.text("Radiation Values (cmp)");
-//
-// 	// legend.exit().remove();
-//
-// 	//Set scale of x axis for legend
-// 	var xLegend = d3.scaleLinear()
-// 		.range([-legendWidth/2, legendWidth/2])
-// 		.domain([ 0, d3.max(data, function(d) { return d.Value; })] );
-//
-// 	//Define x-axis for legend
-// 	var xAxisLegend = d3.axisBottom(xLegend)
-// 		.ticks(6);
-// 	//.tickFormat(formatPercent)
-//
-//
-// 	//draw X axis for legend
-// 	legend.append("g")
-// 		.attr("class", "axis--legend")
-// 		.attr("transform", "translate(0," + (10) + ")")
-// 		.call(xAxisLegend);
-//
-
+	// heatMap.exit().remove();
 
 	// Three function that change the tooltip when user hover / move / leave a cell
 	function mouseover() {
@@ -243,8 +165,8 @@ function draw_heatmap(data) {
 			.html( "Sensor: " + d["Sensor-id"] + "<br>"
 					  + "Time  : " + d.Timestamp.toLocaleTimeString([], { year: '2-digit', month: '2-digit',day: '2-digit', hour: '2-digit', minute:'2-digit'})  + "<br>"
 						+ "Value: " + d.Value.toFixed(2) + " (cmp)")
-			.style("left", (d3.mouse(this)[0] + 50) + "px")
-			.style("top", (d3.mouse(this)[1] + 480) + "px")
+			.style("left", (d3.mouse(this)[0] + 800) + "px")
+			.style("top", (d3.mouse(this)[1] + 200) + "px")
 	}
 	function mouseleave() {
 		heatTip
@@ -256,4 +178,89 @@ function draw_heatmap(data) {
 			.style("opacity", 1)
 	}
 
+
+	// //=============================legend ============================
+	//create value scale for the legend
+	var valueScale = d3.scaleLinear()
+		.domain([0, 2600])
+		.range([0, heatWidth]);
+
+	//Calculate the variables for the temp gradient
+	var numStops = 3;
+	valueRange = valueScale.domain();
+	valueRange[2] = valueRange[1] - valueRange[0];
+	valuePoint = [];
+	for(var i = 0; i < numStops; i++) {
+		valuePoint.push(i * valueRange[2]/(numStops-1) + valueRange[0]);
+	}//for i
+
+	// console.log(d3.range(numStops));
+	// console.log(valueScale( valuePoint[i] ));
+	var legendColor =  d3.scaleLinear()
+		.domain([0, 1300, 2600])
+		// .range(["#bdb7d6", "#948DB3", "#605885", "#433B67"])
+		// .range(['#a50026','#d73027','#f46d43','#fdae61','#fee08b','#d9ef8b','#a6d96a','#66bd63','#1a9850','#006837'])
+		.range(colors);
+	//create the gradient
+	var svgLegend = d3.select("#heatmapLegend").append("defs")
+		.append("linearGradient")
+		.attr("id", "legend-heatmap")
+		.attr("x1", "0%").attr("y1", "0%")
+		.attr("x2", "100%").attr("y2", "0%")
+		.selectAll("stop")
+		.data(d3.range(numStops))
+		.enter().append("stop")
+		.attr("offset", function(d,i) {
+			return valueScale( valuePoint[i] )/heatWidth;
+		})
+		.attr("stop-color", function(d,i) {
+			return legendColor( valuePoint[i] );
+		});
+	// debugger
+	// draw legend
+	var legendWidth = Math.min(heatWidth * 0.8, 400);
+
+	// var legend = svgHeat.selectAll(".legend")
+	//     .data([0].concat(heatColor.quantiles()), function(d) { return d; });
+
+	var legend = svgLegend.append("g")
+		.attr("class", "legendWapper")
+		.attr("transform", "translate(" + (heatWidth/2) + "," + (40) + ")");
+
+	legend.append("rect")
+		.attr("class", "legendRect")
+		.attr("x", -legendWidth/2)
+		.attr("y", 0)
+		.attr("width", legendWidth)
+		.attr("height", 10)
+		.style("fill", "url(#legend-heatmap)");
+
+	legend.append("text")
+		.attr("class", "mono")
+		.text(function(d) { return "≥ " + Math.round(d); })
+		.attr("x", 0)
+		.attr("y", -10)
+		.style("text-anchor", "middle")
+		.text("Radiation Values (cmp)");
+
+	// legend.exit().remove();
+
+	//Set scale of x axis for legend
+	var xLegend = d3.scaleLinear()
+		.range([-legendWidth/2, legendWidth/2])
+		.domain([ 0, 2600] );
+
+	//Define x-axis for legend
+	var xAxisLegend = d3.axisBottom(xLegend)
+		.ticks(6);
+	//.tickFormat(formatPercent)
+
+
+	//draw X axis for legend
+	legend.append("g")
+		.attr("class", "axis--legend")
+		.attr("transform", "translate(0," + (10) + ")")
+		.call(xAxisLegend);
+
 }
+

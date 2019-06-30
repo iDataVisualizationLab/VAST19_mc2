@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
 <head>
-    <title>Map</title>
+    <title>VAST Mini Challenge II</title>
 </head>
 
 <style>
@@ -197,8 +197,8 @@
             <input type="checkbox" name="userIdSelect" id="allId">Select All user IDs<br>
         </div>
         <!--<svg width="200", height="400">-->
-            <!---->
-            <!--&lt;!&ndash;<g class="legendIcon"></g>&ndash;&gt;-->
+        <!---->
+        <!--&lt;!&ndash;<g class="legendIcon"></g>&ndash;&gt;-->
         <!--</svg>-->
     </div>
 
@@ -240,7 +240,7 @@
         var mbfilename = "data/mobileMaxValue/mobile" + i + ".csv";
         mbfilelist.push(d3.csv(mbfilename));
     }
-console.log(mbfilelist);
+    console.log(mbfilelist);
 
     Promise.all(filelist).then(files => {
         Promise.all( tsfilelist ).then( tsfiles => {
@@ -259,6 +259,8 @@ console.log(mbfilelist);
                     mbfiles[j].forEach(f => {
                         f.Timestamp = parse(f.Timestamp);
                         f.Value = +f.Value;
+                        f.Long = +f.Long;
+                        f.Lat = +f.Lat;
                     })
                     mbdata.push(mbfiles[j]);
                 }
@@ -274,6 +276,7 @@ console.log(mbfilelist);
                 //draw initial heatmap and timeseries
                 draw_heatmap(alldata[index - 1]);
                 drawTimeSeries(tsfiles[index - 1]);
+                // draw_mobile_location(mddata[index -1]);
 
                 const mapTip = d3.select("#map")
                     .append("div")
@@ -282,40 +285,58 @@ console.log(mbfilelist);
 
                 d3.json('data/StHimark.geojson').then(geojson => {
 
-                    let width = 500, height = 500;
-                    let projection = d3.geoEquirectangular().scale(1).translate([0, 0]);
+                    const width = 500, height = 500;
+                    const projection = d3.geoEquirectangular().scale(1).translate([0, 0]);
 
-                    let geoPath = d3.geoPath()
+                    const geoPath = d3.geoPath()
                         .projection(projection);
 
                     //Scaling and translating.
-                    let b = geoPath.bounds(geojson),
+                    const b = geoPath.bounds(geojson),
                         s = .95 / Math.max((b[1][0] - b[0][0]) / width, (b[1][1] - b[0][1]) / height),
                         t = [(width - s * (b[1][0] + b[0][0])) / 2, (height - s * (b[1][1] + b[0][1])) / 2];
 
                     projection.scale(s).translate(t);
 
                     // some variables for later usage
-                    let regionNameList = ['Palace Hills', 'Northwest', 'Old Town', 'Safe Town', 'Southwest', 'Downtown', 'Wilson Forest', 'Scenic Vista', 'Broadview', 'Chapparal', 'Terrapin Springs', 'Pepper Mill', 'Cheddarford', 'Easton', 'Weston', 'Southton', 'Oak Willow', 'East Parton', 'West Parton'];
-                    let hospitalLocation = [{Lat: 0.180960, Long: -119.959400}, {
-                        Lat: 0.153120,
-                        Long: -119.915900
-                    }, {Lat: 0.151090, Long: -119.909520}, {Lat: 0.121800, Long: -119.904300}, {
-                        Lat: 0.134560,
-                        Long: 119.883420
-                    }, {Lat: 0.182990, Long: -119.855580}, {Lat: 0.041470, Long: -119.828610}, {
-                        Lat: 0.065250,
-                        Long: -119.744800
-                    }];
-                    let radiationStation = [{Lat: 0.162679, Long: -119.784825}];
-                    let mobileSensors = [];
+                    const regionNameList =
+                        ['Palace Hills',
+                        'Northwest',
+                        'Old Town',
+                        'Safe Town',
+                        'Southwest',
+                        'Downtown',
+                        'Wilson Forest',
+                        'Scenic Vista',
+                        'Broadview',
+                        'Chapparal',
+                        'Terrapin Springs',
+                        'Pepper Mill',
+                        'Cheddarford',
+                        'Easton',
+                        'Weston',
+                        'Southton',
+                        'Oak Willow',
+                        'East Parton',
+                        'West Parton'];
+                    const hospitalLocation =
+                        [{Lat: 0.180960, Long: -119.959400},
+                        {Lat: 0.153120, Long: -119.915900},
+                        {Lat: 0.151090, Long: -119.909520},
+                        {Lat: 0.121800, Long: -119.904300},
+                        {Lat: 0.134560, Long: -119.883420},
+                        {Lat: 0.182990, Long: -119.855580},
+                        {Lat: 0.041470, Long: -119.828610},
+                        {Lat: 0.065250, Long: -119.744800}];
+                    const radiationStation = [{Lat: 0.162679, Long: -119.784825}];
+                    const mobileSensors = [];
                     for (let i = 1; i < 51; i++) {
                         mobileSensors.push(i);
                     }
 
                     // draw map
                     function draw_map(geojson) {
-                        let mapSvg = d3.select('#map g.map')
+                        const mapSvg = d3.select('#map g.map')
                             .selectAll('path')
                             .data(geojson.features);
 
@@ -331,16 +352,16 @@ console.log(mbfilelist);
                             .on("mousemove", mousemove)
                             .on("mouseleave", mouseleave)
                             .on("click", d => {
-                                // d3.selectAll("id").classed("unselected",true);
-                                // d3.select(this).classed("selected",true);
+                                // d3.selectAll("path").classed("unselected",true);
+                                d3.select("#"+"d.id").classed("selected",true);
                                 for (const region of regionNameList) {
                                     const index = regionNameList.indexOf(region);
                                     if (d.properties.Nbrhood === region) {
                                         draw_heatmap(alldata[index]);
                                         drawTimeSeries(tsfiles[index]);
-
                                     }
                                 }
+                                // toggleHeatmap();
                             })
 
                         //add region names to map
@@ -374,23 +395,43 @@ console.log(mbfilelist);
                                 .attr("xlink:href", "Icon/meter.svg")
                                 .attr("transform", d => {
                                     return "translate(" + projection([d.Long, d.Lat]) + ")";
-                                })
-                                .attr("cx", d => {
-                                    return projection([d.Long, d.Lat])[0];
-                                })
-                                .attr("cy", function (d) {
-                                    return projection([d.Long, d.Lat])[1];
-                                })
+                                });
+
                             // .on("mouseover",d=>{
                             //     d3.select(".statIcon")
                             //         .html("Static: " + d["Sensor-id"])
                             // });
                         });
 
-
+                        //plot initial mobile locations
+                        mapSvg
+                            .data(mbdata[0])// set mobile sensor 1 as initial data
+                            .enter()
+                            .append("circle")
+                            .attr("class","dots")
+                            .attr("cx", d=> {
+                                return projection([d.Long, d.Lat])[0];
+                            })
+                            .attr("cy", function(d) {
+                                return projection([d.Long, d.Lat])[1];
+                            })
+                            .attr("r", "3")
+                            .style("fill", "#31a354")
+                            .style("opacity",0.5);
+debugger
                         //plot hospitals on map
                         mapSvg.enter()
                             .data(hospitalLocation)
+                            // .append("circle")
+                            // .attr("id",d=>"static"+d["Sensor-id"])
+                            // .attr("cx", d=> {
+                            //     return projection([d.Long, d.Lat])[0];
+                            // })
+                            // .attr("cy", function(d) {
+                            //     return projection([d.Long, d.Lat])[1];
+                            // })
+                            // .attr("r", "5px")
+                            // .style("fill", "white");
                             .append("image")
                             .attr("class", "hospIcon")
                             .attr("width", 15)
@@ -398,13 +439,8 @@ console.log(mbfilelist);
                             .attr("xlink:href", "Icon/hospital.svg")
                             .attr("transform", d => {
                                 return "translate(" + projection([d.Long, d.Lat]) + ")";
-                            })
-                            .attr("cx", d => {
-                                return projection([d.Long, d.Lat])[0];
-                            })
-                            .attr("cy", function (d) {
-                                return projection([d.Long, d.Lat])[1];
-                            })
+                            });
+
 
                         //plot radiation station on map
                         mapSvg.enter()
@@ -416,13 +452,8 @@ console.log(mbfilelist);
                             .attr("xlink:href", "Icon/radiation.svg")
                             .attr("transform", d => {
                                 return "translate(" + projection([d.Long, d.Lat]) + ")";
-                            })
-                            .attr("cx", d => {
-                                return projection([d.Long, d.Lat])[0];
-                            })
-                            .attr("cy", function (d) {
-                                return projection([d.Long, d.Lat])[1];
                             });
+
 
                         // add map legend
                         let iconFiles = [{"Neuclear station": "Icon/radiation.svg"}, {"Hospital": "Icon/hospital.svg"}, {"Static sensor": "Icon/meter.svg"}];
@@ -450,6 +481,19 @@ console.log(mbfilelist);
                 })
 
                 // where helper functions go
+
+                function toggleHeatmap(){
+                    let blocks = d3.select(".heatmapBlock");
+                    for(let i=0; i < blocks.length; i++ ){
+                        if(blocks[i].style.display == "block"){
+                            blocks[i].style.display = "none";
+                            return;
+                        }
+                        blocks[i].style.display = "block";
+                    }
+
+                }
+
 
                 function removeWhitespace(str) {
                     return str.replace(/\s+/g, '');
