@@ -61,6 +61,8 @@
         border-color:black;
         fill:green;
     }
+
+
     /*heatmap*/
     #heatmap{
         float:right;
@@ -148,28 +150,39 @@
         stroke-width: 1px;
     }
 
-    .tstooltip {
-        font-weight: normal;
-    }
+    /*.tstooltip {*/
+        /*font-weight: normal;*/
+    /*}*/
 
     .brush .extent {
         stroke: #FFF;
         shape-rendering: crispEdges;
     }
+    /*.tstooltip {*/
+        /*position: absolute;*/
+        /*color: #000000;*/
+        /*z-index: 1000;*/
+        /*background: rgba(255, 255, 255, 0.5);*/
+        /*padding: 5px 10px;*/
+        /*border-radius: 5px;*/
+        /*font-size: 10px;*/
+        /*width: 180px;*/
+        /*border: 1px solid;*/
+        /*-webkit-transform: translate(0, -50%);*/
+        /*transform: translate(0, -50%);*/
+        /*pointer-events: none;*/
+    /*}*/
     .tstooltip {
         position: absolute;
-        color: #000000;
-        z-index: 1000;
-        background: rgba(255, 255, 255, 0.5);
-        padding: 5px 10px;
-        border-radius: 5px;
-        font-size: 10px;
-        width: 180px;
-        border: 1px solid;
-        -webkit-transform: translate(0, -50%);
-        transform: translate(0, -50%);
+        text-align: center;
+        padding: 5px;
+        font: 12px sans-serif;
+        background: black;
+        color: white;
+        border: 1px;
+        border-radius: 4px;
         pointer-events: none;
-    }
+    /*}*/
 </style>
 
 <body>
@@ -281,7 +294,7 @@
                 const mapTip = d3.select("#map")
                     .append("div")
                     .style("opacity", 0)
-                    .attr("class", "tooltip");
+                    .attr("class", "tstooltip");
 
                 d3.json('data/StHimark.geojson').then(geojson => {
 
@@ -349,7 +362,7 @@
                             .classed("unselected", d => d.properties.Nbrhood !== "Palace Hills")
                             .classed("selected", d => d.properties.Nbrhood === "Palace Hills")
                             .on("mouseover", mouseover)
-                            .on("mousemove", mousemove)
+                            // .on("mousemove", mousemove)
                             .on("mouseleave", mouseleave)
                             .on("click", d => {
                                 // d3.selectAll("path").classed("unselected",true);
@@ -403,7 +416,14 @@
                             // });
                         });
 
+
+
                         //plot initial mobile locations
+                        const dotTip = d3.select("#map")
+                            .append("div")
+                            .style("opacity", 0)
+                            .attr("class", "tstooltip");
+
                         mapSvg
                             .data(mbdata[0])// set mobile sensor 1 as initial data
                             .enter()
@@ -417,8 +437,26 @@
                             })
                             .attr("r", "3")
                             .style("fill", "#31a354")
-                            .style("opacity",0.5);
-debugger
+                            .style("opacity",.8)
+                            .on("mouseover", d=>{
+                                dotTip.transition()
+                                    .duration(200)
+                                    .style("opacity","1");
+                                dotTip
+                                .html("Time: " + d.Timestamp.toLocaleTimeString([], { year: '2-digit', month: '2-digit',day: '2-digit', hour: '2-digit', minute:'2-digit'})  + "<br>"
+                                    + "Value  : " + d.Value.toFixed(2) + " (cmp)")
+                                // .style("left", (d3.mouse(this)[0] + 0) + "px")
+                                // .style("top", (d3.mouse(this)[1]) + 0 + "px");})
+                                .style("left", d3.select(this).attr("cx") + "px")
+                                .style("top", d3.select(this).attr("cy") + "px");})
+                            .on("mouseout",()=>{
+                                dotTip.transition()
+                                    .duration(200)
+                                    .style("opacity","0");});
+
+
+
+
                         //plot hospitals on map
                         mapSvg.enter()
                             .data(hospitalLocation)
@@ -500,27 +538,27 @@ debugger
                 }
 
                 function mouseover() {
-                    mapTip
-                        .transition()
-                        .duration(500)
-                        .style("opacity", 1)
+                    // mapTip
+                    //     .transition()
+                    //     .duration(200)
+                    //     .style("opacity", 1)
                     d3.select(this)
                     // .style("stroke", "black")
                         .style("opacity", 0.5)
                 }
 
-                function mousemove(d) {
-                    mapTip
-                        .html("Region: " + d.properties.Nbrhood + "<br>"
-                            + "ID  : " + d.properties.Id)
-                        .style("left", (d3.mouse(this)[0] + 30) + "px")
-                        .style("top", (d3.mouse(this)[1]) + 20 + "px")
-                }
+                // function mousemove(d) {
+                //     mapTip
+                //         .html("Region: " + d.properties.Nbrhood + "<br>"
+                //             + "ID  : " + d.properties.Id)
+                //         .style("left", (d3.mouse(this)[0] + 30) + "px")
+                //         .style("top", (d3.mouse(this)[1]) + 20 + "px")
+                // }
 
                 function mouseleave() {
                     mapTip
                         .transition()
-                        .duration(500)
+                        .duration(200)
                         .style("opacity", 0)
                     d3.select(this)
                     // .style("stroke", "black")
