@@ -44,67 +44,71 @@ var svgTs = d3.select("#timeSeries").append("svg")
             .attr("transform", "translate(" + tsMargin.left + "," + tsMargin.top + ")");
 
 // 59 Custom colors, 50 mobile, 9 static
-colorScheme =
-[
-  "rgb(110, 64, 170)",
-  "rgb(123, 63, 174)",
-  "rgb(138, 62, 178)",
-  "rgb(152, 61, 179)",
-  "rgb(167, 60, 179)",
-  "rgb(181, 60, 177)",
-  "rgb(195, 61, 173)",
-  "rgb(209, 62, 168)",
-  "rgb(221, 63, 162)",
-  "rgb(233, 66, 154)",
-  "rgb(243, 69, 145)",
-  "rgb(251, 73, 135)",
-  "rgb(255, 79, 124)",
-  "rgb(255, 85, 113)",
-  "rgb(255, 92, 102)",
-  "rgb(255, 100, 91)",
-  "rgb(255, 109, 81)",
-  "rgb(255, 119, 71)",
-  "rgb(255, 129, 63)",
-  "rgb(255, 140, 56)",
-  "rgb(250, 151, 51)",
-  "rgb(242, 162, 47)",
-  "rgb(234, 174, 46)",
-  "rgb(224, 186, 47)",
-  "rgb(214, 197, 50)",
-  "rgb(205, 208, 55)",
-  "rgb(195, 218, 63)",
-  "rgb(186, 227, 73)",
-  "rgb(179, 236, 84)",
-  "rgb(167, 241, 89)",
-  "rgb(150, 243, 87)",
-  "rgb(133, 245, 87)",
-  "rgb(116, 246, 90)",
-  "rgb(100, 247, 95)",
-  "rgb(85, 246, 101)",
-  "rgb(71, 245, 110)",
-  "rgb(59, 242, 119)",
-  "rgb(49, 239, 130)",
-  "rgb(40, 234, 141)",
-  "rgb(34, 229, 153)",
-  "rgb(29, 222, 164)",
-  "rgb(26, 214, 176)",
-  "rgb(25, 206, 186)",
-  "rgb(26, 197, 196)",
-  "rgb(28, 187, 205)",
-  "rgb(32, 177, 212)",
-  "rgb(38, 167, 218)",
-  "rgb(44, 156, 222)",
-  "rgb(51, 145, 225)",
-  "rgb(58, 134, 225)",
-  "rgb(66, 124, 224)",
-  "rgb(74, 113, 221)",
-  "rgb(82, 104, 216)",
-  "rgb(89, 94, 209)",
-  "rgb(95, 86, 201)",
-  "rgb(101, 78, 192)",
-  "rgb(106, 70, 181)",
-  "rgb(110, 64, 170)"
-]
+colorScheme = ["#1f77b4","#aec7e8","#ff7f0e","#ffbb78","#2ca02c","#98df8a","#d62728","#ff9896","#9467bd","#c5b0d5","#8c564b","#c49c94",
+"#e377c2","#f7b6d2","#7f7f7f"," #c7c7c7","#bcbd22","#dbdb8d","#17becf","#9edae5","#1f77b4","#aec7e8","#ff7f0e","#ffbb78","#2ca02c","#98df8a","#d62728","#ff9896","#9467bd","#c5b0d5","#8c564b","#c49c94",
+    "#e377c2","#f7b6d2","#7f7f7f"," #c7c7c7","#bcbd22","#dbdb8d","#17becf","#9edae5","#1f77b4","#aec7e8","#ff7f0e","#ffbb78","#2ca02c","#98df8a","#d62728","#ff9896","#9467bd","#c5b0d5","#8c564b","#c49c94",
+    "#e377c2","#f7b6d2","#7f7f7f"," #c7c7c7","#bcbd22","#dbdb8d","#17becf","#9edae5"]
+// colorScheme =
+// [
+//   "rgb(110, 64, 170)",
+//   "rgb(123, 63, 174)",
+//   "rgb(138, 62, 178)",
+//   "rgb(152, 61, 179)",
+//   "rgb(167, 60, 179)",
+//   "rgb(181, 60, 177)",
+//   "rgb(195, 61, 173)",
+//   "rgb(209, 62, 168)",
+//   "rgb(221, 63, 162)",
+//   "rgb(233, 66, 154)",
+//   "rgb(243, 69, 145)",
+//   "rgb(251, 73, 135)",
+//   "rgb(255, 79, 124)",
+//   "rgb(255, 85, 113)",
+//   "rgb(255, 92, 102)",
+//   "rgb(255, 100, 91)",
+//   "rgb(255, 109, 81)",
+//   "rgb(255, 119, 71)",
+//   "rgb(255, 129, 63)",
+//   "rgb(255, 140, 56)",
+//   "rgb(250, 151, 51)",
+//   "rgb(242, 162, 47)",
+//   "rgb(234, 174, 46)",
+//   "rgb(224, 186, 47)",
+//   "rgb(214, 197, 50)",
+//   "rgb(205, 208, 55)",
+//   "rgb(195, 218, 63)",
+//   "rgb(186, 227, 73)",
+//   "rgb(179, 236, 84)",
+//   "rgb(167, 241, 89)",
+//   "rgb(150, 243, 87)",
+//   "rgb(133, 245, 87)",
+//   "rgb(116, 246, 90)",
+//   "rgb(100, 247, 95)",
+//   "rgb(85, 246, 101)",
+//   "rgb(71, 245, 110)",
+//   "rgb(59, 242, 119)",
+//   "rgb(49, 239, 130)",
+//   "rgb(40, 234, 141)",
+//   "rgb(34, 229, 153)",
+//   "rgb(29, 222, 164)",
+//   "rgb(26, 214, 176)",
+//   "rgb(25, 206, 186)",
+//   "rgb(26, 197, 196)",
+//   "rgb(28, 187, 205)",
+//   "rgb(32, 177, 212)",
+//   "rgb(38, 167, 218)",
+//   "rgb(44, 156, 222)",
+//   "rgb(51, 145, 225)",
+//   "rgb(58, 134, 225)",
+//   "rgb(66, 124, 224)",
+//   "rgb(74, 113, 221)",
+//   "rgb(82, 104, 216)",
+//   "rgb(89, 94, 209)",
+//   "rgb(95, 86, 201)",
+//   "rgb(101, 78, 192)",
+//   "rgb(106, 70, 181)",
+//   "rgb(110, 64, 170)"
+// ]
 var color = d3.scaleOrdinal().range(colorScheme);
 
 // var tsfilelist = [];
@@ -157,7 +161,7 @@ function drawTimeSeries(regionData){
       visible:true
     }
   });
-
+debugger
   var greyBtn = "#d7d7d7";
 
   //yMin, yMax
@@ -357,7 +361,7 @@ function drawTimeSeries(regionData){
         });
 
   legend.append("text")
-     .attr("x", tsWidth + (tsMargin.right/3) + 20)
+     .attr("x", tsWidth + (tsMargin.right/3) )
      .attr("y", (d, i) => (i + 1) * legendSpace + 4 )
      .attr("fill", "#5d5d5d")
      .text(d => d.name);
@@ -430,34 +434,34 @@ function getColorTs(name){
   }else{
     switch(id) {
       case 1:
-        result = 50;
+        result = 1;
         break;
       case 4:
-        result = 51;
+        result = 2;
         break;
       case 6:
-        result = 52;
+        result = 2;
         break;
       case 9:
-        result = 53;
+        result = 4;
         break;
       case 11:
-        result = 54;
+        result = 5;
         break;
       case 12:
-        result = 55;
+        result = 6;
         break;
       case 13:
-        result = 56;
+        result = 7;
         break;
       case 14:
-        result = 57;
+        result = 8;
         break;
       case 15:
-        result = 58;
+        result = 9;
         break;
       default:
-        result = 58;
+        result = 10;
     }
   }
   return colorScheme[result];
