@@ -1,8 +1,8 @@
 var filelist = [];
 for ( i = 1; i < 20; i ++ )
 {
-    // var filename = "data/aggDataHeatmap/Region" + i + ".csv";
-    var filename = "data/aggTimeByReg/region" + i + ".csv";
+    var filename = "data/aggDataHeatmap/Region" + i + ".csv";
+    // var filename = "data/aggTimeByReg/region" + i + ".csv";
 
     filelist.push(d3.csv(filename));
 }
