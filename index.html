@@ -5,6 +5,9 @@
 </head>
 
 <style>
+    body{
+        font-family:sans-serif;
+    }
     /*.header{*/
     /*}*/
     /*map*/
@@ -65,7 +68,7 @@
 
     /*heatmap*/
     #heatmap{
-        float:right;
+        float:left;
         width: 45%;
         height: 800px;
         margin:auto;
@@ -81,8 +84,10 @@
 
     /*time series*/
     #timeSeries{
+        float:left;
         /*clear:left;*/
         width:50%;
+        margin:auto;
     }
     .line {
         fill: none;
@@ -189,6 +194,10 @@
 <div class="header">
     <h2>VAST Mini Challenge 2: Citizen Science to the Rescue</h2>
 </div>
+<div id="heatmap"></div>
+
+<div id="timeSeries"></div>
+
 <div id="map">
     <svg width="550px" height="450px">
         <!--<div id="mapLegend">-->
@@ -199,33 +208,26 @@
         <g class="map"></g>
     </svg>
 
-    <div id="controlContainer">
-        <!--<h4>Control</h4>-->
-        <div id="mobileSelector">
-            <h4>Select mobile sensor</h4>
-            <input type="checkbox" name="mobileSelect" id="allMobile" onclick=selectAllMobile(this) checked="true">Select All mobile sensors
-        </div>
-        <div class="userIdSelector">
-            <h4>Select user ID</h4>
-            <input type="checkbox" name="userIdSelect" id="allId">Select All user IDs<br>
-        </div>
-        <!--<svg width="200", height="400">-->
-        <!---->
-        <!--&lt;!&ndash;<g class="legendIcon"></g>&ndash;&gt;-->
-        <!--</svg>-->
-    </div>
+    <!--<div id="controlContainer">-->
+        <!--&lt;!&ndash;<h4>Control</h4>&ndash;&gt;-->
+        <!--<div id="mobileSelector">-->
+            <!--<h4>Select mobile sensor</h4>-->
+            <!--<input type="checkbox" name="mobileSelect" id="allMobile" onclick=selectAllMobile(this) checked="true">Select All mobile sensors-->
+        <!--</div>-->
+        <!--&lt;!&ndash;<div class="userIdSelector">&ndash;&gt;-->
+            <!--&lt;!&ndash;<h4>Select user ID</h4>&ndash;&gt;-->
+            <!--&lt;!&ndash;<input type="checkbox" name="userIdSelect" id="allId">Select All user IDs<br>&ndash;&gt;-->
+        <!--&lt;!&ndash;</div>&ndash;&gt;-->
+    <!--</div>-->
 
-    <div id="slider">
-        <h4>slider</h4>
-    </div>
 
 </div>
 
 
 
 
-<div id="heatmap"></div>
-<div id="timeSeries"></div>
+
+
 
 <script src="https://d3js.org/d3.v5.min.js"></script>
 <script src="https://unpkg.com/d3-simple-slider"></script>
