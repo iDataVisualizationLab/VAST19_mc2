@@ -245,8 +245,8 @@ debugger
 var time = ["04/06","04/07","04/08", "04/09", "04/10"]
 var timeLabel = d3.select("#timeLabel").append("svg")
 	.attr("width",heatWidth)
-	.attr("height",15)
-	.attr("transform", "translate(0," + (10) + ")")
+	.attr("height",18)
+	.attr("transform", "translate(0," + (5) + ")")
 	.append("g");
 timeLabel.selectAll("g")
 	.data(time)
@@ -260,8 +260,8 @@ timeLabel.selectAll("g")
 	// .attr("x", heatHeight - 25)
 	// .attr("y", (d,i) => -i * cellSize + 4)
 	.attr("x",(d,i)=> i * 240)
-	.attr("y",0)
-	.style("font-size", 18)
+	.attr("y",10)
+	.style("font-size", 13)
 	.style("text-anchor", "start");
 	// .attr("transform", (d,i) => "translate(" + cellSize/2 + ", 0) rotate(90)")
 	// .attr("class", d=>d)
