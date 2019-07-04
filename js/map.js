@@ -6,7 +6,27 @@ for ( i = 1; i < 20; i ++ )
 
     filelist.push(d3.csv(filename));
 }
-
+// some variables for later usage
+const regionNameList =
+    ['Palace Hills',
+        'Northwest',
+        'Old Town',
+        'Safe Town',
+        'Southwest',
+        'Downtown',
+        'Wilson Forest',
+        'Scenic Vista',
+        'Broadview',
+        'Chapparal',
+        'Terrapin Springs',
+        'Pepper Mill',
+        'Cheddarford',
+        'Easton',
+        'Weston',
+        'Southton',
+        'Oak Willow',
+        'East Parton',
+        'West Parton'];
 // var tsfilelist = [];
 // for ( i = 1; i < 20; i ++ )
 // {
@@ -89,27 +109,7 @@ Promise.all(filelist).then(files => {
 
                 projection.scale(s).translate(t);
 
-                // some variables for later usage
-                const regionNameList =
-                    ['Palace Hills',
-                        'Northwest',
-                        'Old Town',
-                        'Safe Town',
-                        'Southwest',
-                        'Downtown',
-                        'Wilson Forest',
-                        'Scenic Vista',
-                        'Broadview',
-                        'Chapparal',
-                        'Terrapin Springs',
-                        'Pepper Mill',
-                        'Cheddarford',
-                        'Easton',
-                        'Weston',
-                        'Southton',
-                        'Oak Willow',
-                        'East Parton',
-                        'West Parton'];
+
                 const hospitalLocation =
                     [{Lat: 0.180960, Long: -119.959400},
                         {Lat: 0.153120, Long: -119.915900},
@@ -127,7 +127,7 @@ Promise.all(filelist).then(files => {
 
                 // draw map
                 function draw_map(geojson) {
-                    const mapSvg = d3.select('#map g.map')
+                    const mapSvg = d3.select('#map g#regMap')
                         .selectAll('path')
                         .data(geojson.features);
 
@@ -135,31 +135,15 @@ Promise.all(filelist).then(files => {
                     mapSvg.enter()
                         .append('path')
                         .attr('d', geoPath)
-                        // .attr("class","geoPath")
+                        .attr("class","geoPath")
                         .attr("id", d => removeWhitespace(d.properties.Nbrhood))
-                        .classed("unselected", d => d.properties.Nbrhood !== "Palace Hills")
-                        .classed("selected", d => d.properties.Nbrhood === "Palace Hills")
+                        // .attr("class", "regionPath")
+                        // .classed("unselected", d => d.properties.Nbrhood !== "Palace Hills")
+                        // .classed("selected", d => d.properties.Nbrhood === "Palace Hills")
                         .on("mouseover", mouseover)
                         // .on("mousemove", mousemove)
                         .on("mouseleave", mouseleave)
-                        .on("click", d => {
-                            // d3.selectAll("path").classed("unselected",true);
-                            // d3.select("#"+"d.id").classed("selected",true);
-
-                            // toggleHeatmap("heatmap" + (index + 1));
-                            for (const region of regionNameList) {
-                                const index = regionNameList.indexOf(region);
-
-
-                                if (d.properties.Nbrhood === region) {
-                                    draw_heatmap(alldata[index],index+1);
-                                    // drawTimeSeries(tsfiles[index]);
-                                }
-                            }
-
-
-
-                        })
+                        .on("click", d=>click(d));
 
                     //add region names to map
                     mapSvg.enter()
@@ -338,6 +322,37 @@ Promise.all(filelist).then(files => {
                 d3.select(this)
                 // .style("stroke", "black")
                     .style("opacity", 0.5)
+            }
+
+            function click(d) {
+
+                // d3.select(this)
+                // // .style("stroke", "black")
+                // .style("opacity", 0.5)
+
+
+                // d3.select(this).attr("class","selected");
+
+                // d3.select(this).style("stroke", "green");
+                d3.selectAll("path").classed("selected",false).style("fill","lightgoldenrodyellow");
+
+                d3.select("#" + removeWhitespace(d.properties.Nbrhood)).attr("class","selected");
+                d3.select("#" + removeWhitespace(d.properties.Nbrhood)).style("fill", "green");
+
+                // d3.selectAll(".geoPath").style("fill","lightgoldenrodyellow");
+                // d3.selectAll(".selected").style("stroke", "green");
+
+                // border-color:black;
+                // fill:green;
+
+                // toggleHeatmap("heatmap" + (index + 1));
+                for (const region of regionNameList) {
+                    const index = regionNameList.indexOf(region);
+                    if (d.properties.Nbrhood === region) {
+                        draw_heatmap(alldata[index],index+1);
+                        // drawTimeSeries(tsfiles[index]);
+                    }
+                }
             }
 
             // function mousemove(d) {
