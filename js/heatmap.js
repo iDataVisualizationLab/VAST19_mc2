@@ -88,8 +88,17 @@ debugger
 		.style("text-anchor", "head")
 		.attr("transform", "translate(0," + cellSize/1.1 + ")")
 		.attr("class", d => d);
-
-
+    var regionLabel = d3.select("#" + "heatmap" + index)
+		.append("svg")
+		.attr("width","50")
+		.attr("height","20")
+		.attr("transform",	"translate(" + 1250 + "," + (-(heatHeight/2+20)) + ")")
+	regionLabel
+		.append("text")
+		.text("Region" + index)
+		.attr("font-size",10)
+		.attr("x", 0)
+		.attr("y", 10);
 
 	var heatMap = svgHeat.selectAll(".cmp")
 		 // .data(data.filter(d=>{return d.Value>0}))
