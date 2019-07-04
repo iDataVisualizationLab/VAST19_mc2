@@ -1,16 +1,16 @@
 
 var parse = d3.timeParse("%Y-%m-%d %H:%M:%S");
 // set the dimensions and margins of the graph
-var heatMargin = {top: 5, right: 100, bottom: 0, left: 10};
+var heatMargin = {top: 5, right: 100, bottom: 0, left: 20};
 // var heatWidth = Math.max(Math.min(window.innerWidth, 1000), 500) - heatMargin.left - heatMargin.right - 20;
-var heatWidth = 800 - heatMargin.left - heatMargin.right;
+var heatWidth = 1400 - heatMargin.left - heatMargin.right;
 
 //set the colors
 // var colors = ['#f7f7f7','#d1e5f0','#b2182b'];
 // var colors = [ "#e6e6e6", "#9dbee6",  "#e61e1a"];
-var colors = [ "#e6e6e6" ,"#c8dce6", "#afcae6", "#9dbee6","#e6b061", "#e6852f", "#e61e1a","#ca0020"];
+var colors = [ "#e6e6e6" ,"#afcae6", "#9dbee6","#e6d49c",  "#e6852f", "#e61e1a","#ca0020"];
 
-//[,"#e6e6d8",  "#e6d49c",,] "#e6531a",
+["#e6e6d8",  "#e6531a",,"#e6b061","#c8dce6",]
 //main function to update heatmap
 function draw_heatmap(data,index) {
 
@@ -18,11 +18,11 @@ function draw_heatmap(data,index) {
 	var sensor;
 	var sensorList = d3.map(data, d => d["Sensor-id"]).keys();
 	var mobileList = sensorList.filter(d => d.split("-")[0] === "mobile")
-													.sort((a,b) => {
-														var x = +a.split("-")[1],
-																y = +b.split("-")[1];
-														return(x < y)? -1:1;
-													});
+		.sort((a,b) => {
+		var x = +a.split("-")[1],
+			y = +b.split("-")[1];
+		return(x < y)? -1:1;
+	});
 	var staticList = sensorList.filter(d => d.split("-")[0] === "static");
 	if (staticList.length != 0 ){
     staticList.sort((a,b) => {
@@ -36,9 +36,12 @@ function draw_heatmap(data,index) {
 	}
 
 	var times = d3.map(data,d=>d.Timestamp).keys();
+
 	// timesList = times.forEach(d => d.toLocaleString());
 
 
+
+debugger
 	// var cellSize = heatWidth/times.length;
 	var cellSize = 5;
 
@@ -54,53 +57,46 @@ function draw_heatmap(data,index) {
 
 	var svgHeat = d3.select("#heatmap")
 		.append("div")
-		.attr("id", "heatmap"+ (index + 1))
+		.attr("id", "heatmap"+ index)
 		.style("display", "block")
 		.append("svg")
 		// .style("display", "block")
-		.attr("width", heatWidth + heatMargin.left + heatMargin.right)
+		.attr("width", heatWidth + heatMargin.left + heatMargin.right )
 		.attr("height", heatHeight + heatMargin.top + heatMargin.bottom)
 		.attr("class","heatmapBlock")
 		.append("g")
-		.attr("transform",
-			"translate(" + heatMargin.left + "," + heatMargin.top + ")");
+		// .attr("transform",
+		// 	"translate(" + heatMargin.left + "," + heatMargin.top + ")");
 
 	// define color scale for heatmap
 	var heatColor = d3.scaleLinear()
 		// .domain([0, d3.max(data, function(d) {return d.Value; })/2, d3.max(data, function(d) {return d.Value; })])
-		.domain([0,250,550,900,1500,2000,3000])
+		.domain([0,250,550,900,1500,2000,2500])
 		// .range(["#bdb7d6", "#948DB3", "#605885", "#433B67"])
 		// .range(['#a50026','#d73027','#f46d43','#fdae61','#fee08b','#d9ef8b','#a6d96a','#66bd63','#1a9850','#006837'])
 		.range(colors);
 
+	// var sensorLabels = svgHeat.selectAll(".sensorLabel")
 	var sensorLabels = svgHeat.selectAll(".sensorLabel")
 		.data(sensors)
 		.enter().append("text")
 		.text( d => d)
-		.attr("x", heatWidth + 15)
+		.attr("x",1210)
 		.attr("y", (d,i) => i * cellSize)
+		.style("font-size","7px")
 		// .attr("font-size",5)
 		.style("text-anchor", "head")
-		.attr("transform", "translate(0," + cellSize/1.5 + ")")
+		.attr("transform", "translate(0," + cellSize/1.1 + ")")
 		.attr("class", d => d);
-debugger
-	// var timeLabels = svgHeat.selectAll(".timeLabel")
-	// 	.data(times)
-	// 	.enter().append("text")
-	// 	.style("font-size", 75 + "%")
-	// 	.text( d => {
-	// 		var da = new Date(d);
-	// 		return da.toLocaleTimeString([], { year: '2-digit', month: '2-digit',day: '2-digit', hour: '2-digit', minute:'2-digit'});
-	// 		})
-	// 	.attr("x", heatHeight - 25)
-	// 	.attr("y", (d,i) => -i * cellSize + 4)
-	// 	.style("text-anchor", "head")
-	// 	.attr("transform", (d,i) => "translate(" + cellSize/2 + ", 0) rotate(90)")
-	// 	.attr("class", d=> d.toLocaleString());
+
+
 
 	var heatMap = svgHeat.selectAll(".cmp")
-		 .data(data.filter(d=>{return d.Value>0}))
+		 // .data(data.filter(d=>{return d.Value>0}))
 		// .data(data)
+		.data(data.sort(function (a, b) {
+			return a.Timestamp - b.Timestamp
+		}))
 		 .enter().append("rect")
 		 .attr("x", d => times.indexOf(d.Timestamp.toString()) * cellSize)
 		 .attr("y", d => sensors.indexOf(d["Sensor-id"]) * cellSize)
@@ -109,12 +105,11 @@ debugger
 		 .attr("height", cellSize)
 		 .style("stroke", "grey")
 		 .style("stroke-opacity", 0.6)
+		 .style("display", d=>{return d == null ? "none" : null;})
 		 .style("fill", d => heatColor(d["Value"]))
 		 .on("mouseover", mouseover)
 		 .on("mousemove", mousemove)
-		 .on("mouseleave", mouseleave)
-		 .append("text")
-		 .text();
+		 .on("mouseleave", mouseleave);
 
 
 
@@ -149,12 +144,12 @@ debugger
 	}
 
 
-
+}
 
 	// //=============================legend ============================
 	//create value scale for the legend
 	var valueScale = d3.scaleLinear()
-		.domain([0, 2500])
+		.domain([0,500,1000,1500,2000,3000, 5000])
 		.range([0, heatWidth]);
 
 	//Calculate the variables for the temp gradient
@@ -191,14 +186,14 @@ debugger
 		});
 	// debugger
 	// draw legend
-	var legendWidth = Math.min(heatWidth * 0.8, 400);
+	var legendWidth = Math.min(heatWidth * 0.8, 100);
 
 	// var legend = svgHeat.selectAll(".legend")
 	//     .data([0].concat(heatColor.quantiles()), function(d) { return d; });
 
 	var legend = svgLegend.append("g")
-		.attr("class", "legendWapper")
-		.attr("transform", "translate(" + (heatWidth/2) + "," + (40) + ")");
+		.attr("class", "legendWapper");
+		// .attr("transform", "translate(" + (heatWidth/2) + "," + (40) + ")");
 
 	legend.append("rect")
 		.attr("class", "legendRect")
@@ -207,6 +202,7 @@ debugger
 		.attr("width", legendWidth)
 		.attr("height", 10)
 		.style("fill", "url(#legend-heatmap)");
+
 
 	legend.append("text")
 		.attr("class", "mono")
@@ -235,5 +231,42 @@ debugger
 		.attr("transform", "translate(0," + (10) + ")")
 		.call(xAxisLegend);
 
-}
 
+//======= draw time label ========
+var time = ["04/06","04/07","04/08", "04/09", "04/10"]
+var timeLabel = d3.select("#timeLabel").append("svg")
+	.attr("width",heatWidth)
+	.attr("height",15)
+	.attr("transform", "translate(0," + (10) + ")")
+	.append("g");
+timeLabel.selectAll("g")
+	.data(time)
+	.enter().append("text")
+	.text(d=>d)
+	// .text( d => {
+	// 	var da = new Date(d);
+	// 	return da.toLocaleTimeString([], { year: '2-digit', month: '2-digit',day: '2-digit', hour: '2-digit', minute:'2-digit'});
+	// })
+
+	// .attr("x", heatHeight - 25)
+	// .attr("y", (d,i) => -i * cellSize + 4)
+	.attr("x",(d,i)=> i * 240)
+	.attr("y",0)
+	.style("font-size", 18)
+	.style("text-anchor", "start");
+	// .attr("transform", (d,i) => "translate(" + cellSize/2 + ", 0) rotate(90)")
+	// .attr("class", d=>d)
+debugger
+
+
+// var sensorLabels = svgHeat.selectAll(".sensorLabel")
+// 	.data(sensors)
+// 	.enter().append("text")
+// 	.text( d => d)
+// 	.attr("x", heatWidth + 100)
+// 	.attr("y", (d,i) => i * cellSize)
+// 	.style("font-size","7px")
+// 	// .attr("font-size",5)
+// 	.style("text-anchor", "head")
+// 	.attr("transform", "translate(0," + cellSize/1.5 + ")")
+// 	.attr("class", d => d);
