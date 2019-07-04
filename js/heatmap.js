@@ -245,8 +245,9 @@ debugger
 var time = ["04/06","04/07","04/08", "04/09", "04/10"]
 var timeLabel = d3.select("#timeLabel").append("svg")
 	.attr("width",heatWidth)
-	.attr("height",18)
-	.attr("transform", "translate(0," + (5) + ")")
+	.attr("height",25)
+	// .attr("transform", "translate(0," + (-5) + ")")
+	.attr("background","white")
 	.append("g");
 timeLabel.selectAll("g")
 	.data(time)
