@@ -18,7 +18,7 @@
         display:inline-block;
         /*float:left;*/
     }
-    #map .map path {
+    #map #regMap path{
         fill: lightgoldenrodyellow;
         stroke: #bbbbbb;
     }
@@ -57,6 +57,7 @@
         /*.inactive{*/
         /*fill: lightgrey*/
         /*}*/
+
     .unselected{
         fill:lightgoldenrodyellow;
     }
@@ -71,7 +72,7 @@
     /*heatmap*/
     #heatmap{
         float:left;
-        width: 70%;
+        width: 45%;
         height: 850px;
         margin:auto;
         padding: 10px;
@@ -214,7 +215,7 @@
         <svg width = 70 height = 70>
             <g class="legendGroup"></g>
         </svg>
-        <g class="map"></g>
+        <g id="regMap"></g>
     </svg>
 
     <!--<div id="controlContainer">-->
