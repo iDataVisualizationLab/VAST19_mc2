@@ -64,13 +64,15 @@
         border-color:black;
         fill:green;
     }
-
+    #timeLabel{
+        position:sticky;
+    }
 
     /*heatmap*/
     #heatmap{
         float:left;
-        width: 45%;
-        height: 800px;
+        width: 70%;
+        height: 850px;
         margin:auto;
         padding: 10px;
         border-style: solid;
@@ -86,7 +88,7 @@
     #timeSeries{
         float:left;
         /*clear:left;*/
-        width:50%;
+        width:80%;
         margin:auto;
     }
     .line {
@@ -194,7 +196,14 @@
 <div class="header">
     <h2>VAST Mini Challenge 2: Citizen Science to the Rescue</h2>
 </div>
-<div id="heatmap"></div>
+
+<div id="heatmap">
+    <div id="timeLabel"></div>
+
+</div>
+
+<!--<div id="heatmapLegend"></div>-->
+<div id="floatPanel"></div>
 
 <div id="timeSeries"></div>
 
@@ -234,6 +243,7 @@
 <script src="js/map.js"></script>
 <script src="js/heatmap.js"></script>
 <script src="js/ts.js"></script>
+<!--<script src="js/test.js"></script>-->
 
 <script>
 
