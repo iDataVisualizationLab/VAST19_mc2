@@ -8,9 +8,9 @@ var heatWidth = 1400 - heatMargin.left - heatMargin.right;
 //set the colors
 // var colors = ['#f7f7f7','#d1e5f0','#b2182b'];
 // var colors = [ "#e6e6e6", "#9dbee6",  "#e61e1a"];
-var colors = [ "#e6e6e6" ,"#afcae6", "#9dbee6","#e6d49c",  "#e6852f", "#e61e1a","#ca0020"];
+var colors = ["#e6e6e6" ,"#9dbee6",   "#e6852f", "#e61e1a","#ca0020"];
 
-["#e6e6d8",  "#e6531a",,"#e6b061","#c8dce6",]
+["#e6e6d8",   "#e6531a",,"#e6b061","#c8dce6",,"#e6d49c","#afcae6",]
 //main function to update heatmap
 function draw_heatmap(data,index) {
 
@@ -48,7 +48,7 @@ debugger
 	var heatHeight = cellSize * (sensors.length + 2);
 
 	//append heat map svg
-	// d3.select("#heatmap").selectAll("*").remove();
+	// d3.select("#"+ "heatmap" + index).selectAll("*").remove();
 	
 	var heatTip = d3.select("#heatmap")
 		.append("div")
@@ -149,7 +149,7 @@ debugger
 	// //=============================legend ============================
 	//create value scale for the legend
 	var valueScale = d3.scaleLinear()
-		.domain([0,500,1000,1500,2000,3000, 5000])
+		.domain([0,300, 500,1000,1500,2000,3000, 5000])
 		.range([0, heatWidth]);
 
 	//Calculate the variables for the temp gradient

@@ -262,7 +262,7 @@ Promise.all(filelist).then(files => {
 
 
                     // add map legend
-                    let iconFiles = [{"Neuclear station": "Icon/radiation.svg"}, {"Hospital": "Icon/hospital.svg"}, {"Static sensor": "Icon/meter.svg"}];
+                    let iconFiles = [{"Neuclear plant": "Icon/radiation.svg"}, {"Hospital": "Icon/hospital.svg"}, {"Static sensor": "Icon/meter.svg"}];
                     let legendSvg = d3.select("#map g.legendGroup");
                     legendSvg.selectAll("image")
                         .data(iconFiles)
@@ -273,12 +273,14 @@ Promise.all(filelist).then(files => {
                         .attr("xlink:href", d => Object.values(d))
                         .attr("y", (d, i) => i * 15)
                         .attr("class", "mapLegend");
-                    // legendSvg.selectAll("text")
-                    //     .append("text")
-                    //     .text(d=>Object.keys(d))
-                    //     .attr("font-size",10)
-                    //     .attr("x", 30)
-                    //     .attr("y",(d,i)=>i*15);
+                    legendSvg.selectAll("text")
+                        .data(iconFiles)
+                        .enter()
+                        .append("text")
+                        .text(d=>Object.keys(d))
+                        .attr("font-size",10)
+                        .attr("x", 15)
+                        .attr("y",(d,i)=>10 + i*15);
                     debugger
 
                 }
