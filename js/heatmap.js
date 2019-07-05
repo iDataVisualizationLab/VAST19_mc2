@@ -1,4 +1,4 @@
-
+var hHeight;
 var parse = d3.timeParse("%Y-%m-%d %H:%M:%S");
 // set the dimensions and margins of the graph
 var heatMargin = {top: 5, right: 100, bottom: 0, left: 20};
@@ -46,7 +46,7 @@ debugger
 	var cellSize = 5;
 
 	var heatHeight = cellSize * (sensors.length + 2);
-
+	hHeight = heatHeight;
 	//append heat map svg
 	// d3.select("#"+ "heatmap" + index).selectAll("*").remove();
 	
@@ -58,6 +58,7 @@ debugger
 	var svgHeat = d3.select("#heatmap")
 		.append("div")
 		.attr("id", "heatmap"+ index)
+		// .classed("selected",true)
 		.style("display", "block")
 		.append("svg")
 		// .style("display", "block")
@@ -67,7 +68,7 @@ debugger
 		.append("g")
 		// .attr("transform",
 		// 	"translate(" + heatMargin.left + "," + heatMargin.top + ")");
-
+	d3.select("#" + "heatmap" + (index)).classed("selected",true);
 	// define color scale for heatmap
 	var heatColor = d3.scaleLinear()
 		// .domain([0, d3.max(data, function(d) {return d.Value; })/2, d3.max(data, function(d) {return d.Value; })])
@@ -102,18 +103,19 @@ debugger
 
 	var heatMap = svgHeat.selectAll(".cmp")
 		 // .data(data.filter(d=>{return d.Value>0}))
-		// .data(data)
-		.data(data.sort(function (a, b) {
-			return a.Timestamp - b.Timestamp
-		}))
+		.data(data)
+		// .data(data.sort(function (a, b) {
+		// 	return a.Timestamp - b.Timestamp
+		// }))
 		 .enter().append("rect")
 		 .attr("x", d => times.indexOf(d.Timestamp.toString()) * cellSize)
 		 .attr("y", d => sensors.indexOf(d["Sensor-id"]) * cellSize)
 		 .attr("class", "cmp bordered")
 		 .attr("width", cellSize)
 		 .attr("height", cellSize)
-		 .style("stroke", "grey")
-		 .style("stroke-opacity", 0.6)
+		 .style("stroke", "black")
+		 // .style("stroke-opacity", d=>(+d["value_count"]/360))
+		 .style("stroke-width", d=>(+d["value_count"] / 1000 + 0.1 ))
 		 .style("display", d=>{return d == null ? "none" : null;})
 		 .style("fill", d => heatColor(d["Value"]))
 		 .on("mouseover", mouseover)
@@ -138,7 +140,8 @@ debugger
 		heatTip
 			.html( "Sensor: " + d["Sensor-id"] + "<br>"
 					  + "Time  : " + d.Timestamp.toLocaleTimeString([], { year: '2-digit', month: '2-digit',day: '2-digit', hour: '2-digit', minute:'2-digit'})  + "<br>"
-						+ "Value: " + d.Value.toFixed(2) + " (cmp)")
+						+ "Value: " + d.Value.toFixed(2) + " (cmp)" + "<br>"
+						+ "Number of readings:" + d["value_count"])
 			.style("left", (d3.mouse(this)[0] + 80) + "px")
 			.style("top", (d3.mouse(this)[1] + 200) + "px")
 	}
@@ -245,9 +248,9 @@ debugger
 var time = ["04/06","04/07","04/08", "04/09", "04/10"]
 var timeLabel = d3.select("#timeLabel").append("svg")
 	.attr("width",heatWidth)
-	.attr("height",25)
-	// .attr("transform", "translate(0," + (-5) + ")")
-	.attr("background","white")
+	.attr("height",20)
+	.attr("transform", "translate(0," + (10) + ")")
+	// .attr("background","white")
 	.append("g");
 timeLabel.selectAll("g")
 	.data(time)
