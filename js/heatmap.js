@@ -140,7 +140,9 @@ debugger
 		heatTip
 			.html( "Sensor: " + d["Sensor-id"] + "<br>"
 					  + "Time  : " + d.Timestamp.toLocaleTimeString([], { year: '2-digit', month: '2-digit',day: '2-digit', hour: '2-digit', minute:'2-digit'})  + "<br>"
-						+ "Value: " + d.Value.toFixed(2) + " (cmp)" + "<br>"
+						+ "Max: " + d.Value.toFixed(2) + " (cmp)" + "<br>"
+						+ "Min:" + d["value_min"].toFixed(2) + "<br>"
+						+ "Mean:" + d["value_mean"].toFixed(2) + "<br>"
 						+ "Number of readings:" + d["value_count"])
 			.style("left", (d3.mouse(this)[0] + 80) + "px")
 			.style("top", (d3.mouse(this)[1] + 200) + "px")
