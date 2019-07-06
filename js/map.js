@@ -47,8 +47,12 @@ d3.csv("data/allSensorReadings.csv").then(data=>{
     data.forEach(d=>{
         d.Timestamp = parse(d.Timestamp);
         d.Value = +d.Value;
+        d["value_count"] = +d["value_count"];
+        d["value_mean"] = +d["value_mean"];
+        d["value_min"] = +d["value_min"];
     })
-    // drawTimeSeries(data);
+    drawTimeSeries(data.filter(d=>d.Value < 5000));
+    // draw_line(data.filter(d=>d.Value < 5000));
 
 
 
@@ -62,6 +66,9 @@ Promise.all(filelist).then(files => {
                 files[i].forEach(d => {
                     d.Timestamp = parse(d.Timestamp);
                     d.Value = +d.Value;
+                    d["value_count"] = +d["value_count"];
+                    d["value_mean"] = +d["value_mean"];
+                    d["value_min"] = +d["value_min"];
                 })
                 alldata.push(files[i]);
             }
@@ -137,14 +144,16 @@ Promise.all(filelist).then(files => {
                         .attr('d', geoPath)
                         .attr("class","geoPath")
                         .attr("id", d => removeWhitespace(d.properties.Nbrhood))
-                        // .attr("class", "regionPath")
-                        // .classed("unselected", d => d.properties.Nbrhood !== "Palace Hills")
-                        // .classed("selected", d => d.properties.Nbrhood === "Palace Hills")
+                        // // .attr("class", "regionPath")
+                        // .classed("active", d => d.properties.Nbrhood !== "Palace Hills")
+                        // .classed("inactive", d => d.properties.Nbrhood === "Palace Hills")
                         .on("mouseover", mouseover)
                         // .on("mousemove", mousemove)
                         .on("mouseleave", mouseleave)
                         .on("click", d=>click(d));
-
+                    // $(".geoPath").click(()=>{
+                        // $(this).toggleClass("selected");
+                    // })
                     //add region names to map
                     mapSvg.enter()
                         .append("svg:text")
@@ -262,7 +271,7 @@ Promise.all(filelist).then(files => {
 
 
                     // add map legend
-                    let iconFiles = [{"Neuclear plant": "Icon/radiation.svg"}, {"Hospital": "Icon/hospital.svg"}, {"Static sensor": "Icon/meter.svg"}];
+                    let iconFiles = [{"Nuclear plant": "Icon/radiation.svg"}, {"Hospital": "Icon/hospital.svg"}, {"Static sensor": "Icon/meter.svg"}];
                     let legendSvg = d3.select("#map g.legendGroup");
                     legendSvg.selectAll("image")
                         .data(iconFiles)
@@ -290,27 +299,23 @@ Promise.all(filelist).then(files => {
 
             // where helper functions go
 
-            function toggleHeatmap(id){
-                const selected = document.getElementById(id);
-                if(!selected) return true;
-                if(selected.style.display == "none"){
-                    selected.style.display = "block";
+            function toggleHeatmap(region){
+                let selected_heatmap = d3.select("#heatmap").select("#" + "heatmap" + (regionNameList.indexOf(region)+1)); // select the heatmap that is selected
+                let selected_region = d3.selectAll("path").select("#" + removeWhitespace(region));
+                let unselected = selected_heatmap.classed("hidden",true);
+                if(!unselected){
+                    // selected_heatmap.style("display","block");
+                    selected_heatmap.classed("visible",true);
+
                 }else{
-                    selected.style.display = "none";
+                    // selected_heatmap.style("display","none");
+                    selected_heatmap.classed("hidden",true)
                 }
-              return true;
-                // let selected = document.getElementById("")
-                // let blocks = d3.select(".heatmapBlock");
-                // for(let i=0; i < blocks.length; i++ ){
-                //     if(blocks[i].style.display == "block"){
-                //         blocks[i].style.display = "none";
-                //         return;
-                //     }
-                //     blocks[i].style.display = "block";
-                // }
+                // selected_heatmap.classed("unselected",!unselected);
+                selected_region.classed("unselected",!unselected);
+                selected_region.classed("selected",unselected);
 
             }
-
 
             function removeWhitespace(str) {
                 return str.replace(/\s+/g, '');
@@ -326,35 +331,33 @@ Promise.all(filelist).then(files => {
                     .style("opacity", 0.5)
             }
 
+
+
             function click(d) {
 
-                // d3.select(this)
-                // // .style("stroke", "black")
-                // .style("opacity", 0.5)
 
 
-                // d3.select(this).attr("class","selected");
+                d3.selectAll("#regMap path").classed("selected",false).style("fill","lightgrey");
+                d3.select("#" + removeWhitespace(d.properties.Nbrhood)).attr("class","selected").style('fill',"#2171b5");
 
-                // d3.select(this).style("stroke", "green");
-                d3.selectAll("path").classed("selected",false).style("fill","lightgoldenrodyellow");
+                // let selected = d3.select("#" + "heatmap" + (regionNameList.indexOf(region)+1))
+                // selected.classed("selected",!selected.classed("selected"));
 
-                d3.select("#" + removeWhitespace(d.properties.Nbrhood)).attr("class","selected");
-                d3.select("#" + removeWhitespace(d.properties.Nbrhood)).style("fill", "green");
-
-                // d3.selectAll(".geoPath").style("fill","lightgoldenrodyellow");
-                // d3.selectAll(".selected").style("stroke", "green");
-
-                // border-color:black;
-                // fill:green;
 
                 // toggleHeatmap("heatmap" + (index + 1));
                 for (const region of regionNameList) {
                     const index = regionNameList.indexOf(region);
                     if (d.properties.Nbrhood === region) {
+
                         draw_heatmap(alldata[index],index+1);
+                        // d3.select("#" + "heatmap" + (regionNameList.indexOf(region)+1)).attr("class","visible");
+
                         // drawTimeSeries(tsfiles[index]);
+                        // toggleHeatmap(d.properties.Nbrhood);
                     }
                 }
+
+
             }
 
             // function mousemove(d) {
