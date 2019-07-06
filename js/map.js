@@ -43,13 +43,14 @@ const regionNameList =
 // console.log(mbfilelist);
 
 // load data for time series
-d3.csv("data/allSensorReadings.csv").then(data=>{
+d3.csv("data/allSensorReadings_minMax.csv").then(data=>{
     data.forEach(d=>{
-        d.Timestamp = parse(d.Timestamp);
+        d.Timestamp = tsParseTime(d.Timestamp);
         d.Value = +d.Value;
         d["value_count"] = +d["value_count"];
         d["value_mean"] = +d["value_mean"];
         d["value_min"] = +d["value_min"];
+        d.visible = true;
     })
     drawTimeSeries(data.filter(d=>d.Value < 5000));
     // draw_line(data.filter(d=>d.Value < 5000));
