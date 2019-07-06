@@ -10,6 +10,7 @@
     <script>
         $( function() {
             $( "#map" ).draggable();
+            $("#controlPanel").draggable();
         } );
     </script>
 
@@ -28,11 +29,12 @@
         height: 500px;
         margin:auto;
         display:inline-block;
-        background:#c8dce6;
-
+        cursor:pointer;
         /*float:left;*/
     }
-
+    .geoPath{
+        fill:lightgrey;
+    }
     /*#map{*/
         /*width: 500px;*/
         /*height: 500px;*/
@@ -42,8 +44,16 @@
     /*}*/
 
     #map #regMap path{
-        fill: lightgoldenrodyellow;
+        fill: lightgray;
         stroke: #bbbbbb;
+    }
+
+    #controlPanel{
+        width:500px;
+        height:300px;
+        margin:auto;
+        display:inline-block;
+        cursor:pointer;
     }
 
     /*#controlContainer{*/
@@ -77,13 +87,19 @@
         /*fill: lightgrey*/
         /*}*/
 
-    .unselected{
-        fill:lightgoldenrodyellow;
+    /*.unselected{*/
+        /*fill:lightgrey;*/
+    /*}*/
+    /*.selected{*/
+        /*border-color:black;*/
+        /*fill:darkgrey;*/
+    /*}*/
+
+    .hidden{
+        display:none;
     }
-    .selected{
-        border-color:black;
-        fill:green;
-    }
+
+
     #timeLabel{
         position:sticky;
     }
@@ -101,8 +117,15 @@
         border-color: lightgrey;
         overflow:auto;
     }
-    .hidden{
-        display:none;
+
+
+    .sticky{
+        position: -webkit-sticky;
+        position: sticky;
+        top: 0;
+        background-color: white;
+        /*padding: 50px;*/
+        /*font-size: 20px;*/
     }
 
 
@@ -187,30 +210,42 @@
         stroke: #FFF;
         shape-rendering: crispEdges;
     }
-    /*.tstooltip {*/
-        /*position: absolute;*/
-        /*color: #000000;*/
-        /*z-index: 1000;*/
-        /*background: rgba(255, 255, 255, 0.5);*/
-        /*padding: 5px 10px;*/
-        /*border-radius: 5px;*/
-        /*font-size: 10px;*/
-        /*width: 180px;*/
-        /*border: 1px solid;*/
-        /*-webkit-transform: translate(0, -50%);*/
-        /*transform: translate(0, -50%);*/
-        /*pointer-events: none;*/
-    /*}*/
     .tstooltip {
         position: absolute;
-        text-align: center;
-        padding: 5px;
-        font: 12px sans-serif;
-        background: black;
-        color: white;
-        border: 1px;
-        border-radius: 4px;
+        color: #000000;
+        z-index: 1000;
+        background: rgba(255, 255, 255, 0.5);
+        padding: 5px 10px;
+        border-radius: 5px;
+        font-size: 10px;
+        width: 180px;
+        border: 1px solid;
+        -webkit-transform: translate(0, -50%);
+        transform: translate(0, -50%);
         pointer-events: none;
+    }
+    /*.tstooltip {*/
+        /*position: absolute;*/
+        /*text-align: center;*/
+        /*padding: 5px;*/
+        /*font: 12px sans-serif;*/
+        /*background: black;*/
+        /*color: white;*/
+        /*border: 1px;*/
+        /*border-radius: 4px;*/
+        /*pointer-events: none;*/
+    /*}*/
+
+
+    /*.unselected {*/
+        /*fill: lightgoldenrodyellow;*/
+    /*}*/
+
+    .visible{
+        display:block;
+    }
+    .tsLegend{
+        font: 12px sans-serif;
     }
 </style>
 
@@ -220,24 +255,39 @@
 </div>
 
 <div id="heatmap">
-    <div id="timeLabel"></div>
+    <div id="timeLabel" class="sticky"></div>
 
 </div>
 
 <!--<div id="heatmapLegend"></div>-->
 <!--<div id="floatPanel" class="ui-widget-content">-->
 
-    <div id="map" class="ui-widget-content">
-        <svg width="550px" height="450px">
-            <!--<div id="mapLegend">-->
-            <!--</div>-->
-            <svg width = 100 height = 70>
-                <g class="legendGroup"></g>
-            </svg>
-            <g id="regMap"></g>
+<div id="map" class="ui-widget-content">
+    <svg width="550px" height="450px">
+        <!--<div id="mapLegend">-->
+        <!--</div>-->
+        <svg width = 100 height = 70>
+            <g class="legendGroup"></g>
         </svg>
-    </div>
+        <g id="regMap"></g>
+    </svg>
+</div>
 
+<div id="controlPanel" class="ui-widget-content">
+    <div id="colorLegend">
+
+    </div>
+    <div id="selectMobile">
+
+        <input type="checkbox" name="mobileSelect" id="allMobile" onclick=selectAllMobile(this)>Select All mobile sensors
+    </div>
+    <div id="selectStatic">
+        <input type="checkbox" name="staticSelect" id="allStatic" onclick=selectAllStatic(this)>Select All static sensors
+    </div>
+    <div id="selectAll">
+        <input type="checkbox" name="staticSelect" id="allSensor" onclick=selectAllStatic(this)>Select All sensors
+    </div>
+</div>
 <!--</div>-->
 
 <div id="timeSeries"></div>
@@ -256,6 +306,7 @@
 <script src="js/heatmap.js"></script>
 <script src="js/ts.js"></script>
 <!--<script src="js/test.js"></script>-->
+<!--<script src="js/dot.js"></script>-->
 
 <script>
 
