@@ -43,7 +43,7 @@ const regionNameList =
 // console.log(mbfilelist);
 
 // load data for time series
-d3.csv("data/allSensorReadings_minMax.csv").then(data=>{
+d3.csv("data/allSensorReadings.csv").then(data=>{
     data.forEach(d=>{
         d.Timestamp = tsParseTime(d.Timestamp);
         d.Value = +d.Value;
@@ -59,9 +59,10 @@ d3.csv("data/allSensorReadings_minMax.csv").then(data=>{
 
 
 Promise.all(filelist).then(files => {
+    // d3.csv("../data/times.csv").then(d=>{d.time = parse(d.time)
     // Promise.all( tsfilelist ).then( tsfiles => {
         // Promise.all(mbfilelist).then( mbfiles=> {
-            var index = 1;
+            var index = 7;
             var alldata = [];
             for (let i = 0; i < files.length; i++) {
                 files[i].forEach(d => {
@@ -93,7 +94,7 @@ Promise.all(filelist).then(files => {
 
 
             //draw initial heatmap and timeseries
-            draw_heatmap(alldata[index - 1],1);
+            draw_heatmap(alldata[index - 1],7);
             // drawTimeSeries(tsfiles[index - 1]);
             // draw_mobile_location(mddata[index -1]);
 
@@ -380,7 +381,6 @@ Promise.all(filelist).then(files => {
             }
 
         // });
+        });
     // });
-});
-
 });
