@@ -34,9 +34,24 @@ var tsxAxis = d3.axisBottom(tsxScale)
 // Define the line
 var line = d3.line()
     .x(d => tsxScale(d.Timestamp))
-    .y(d => tsyScale(d.Value))
+    .y(d => tsyScale(d.value_mean))
     .curve(d3.curveLinear)
-    .defined(d => !isNaN(d.Value));// Hiding line value for missing data
+    .defined(d => !isNaN(d.value_mean));// Hiding line value for missing data
+
+//define the min-max area
+var upperArea = d3.area()
+    .curve(d3.curveCardinal)
+    .x(d => tsxScale(d.Timestamp))
+    // .x (function (d) { return x(d.Timestamp); })
+    .y0(function (d) { return tsyScale(d.Value); })
+    .y1(function (d) { return tsyScale(d.value_mean); });
+
+var lowerArea = d3.area()
+    .curve(d3.curveCardinal)
+    .x(d => tsxScale(d.Timestamp))
+    // .x (function (d) { return x(d.Timestamp) ; })
+    .y0(function (d) { return tsyScale(d.value_mean); })
+    .y1(function (d) { return tsyScale(d.value_min); });
 
 var svgTs = d3.select("#timeSeries").append("svg")
     .attr("width", tsWidth + tsMargin.left + tsMargin.right)
@@ -257,6 +272,36 @@ function drawTimeSeries(regionData){
         .style("display", "none")
         .attr("class", "tstooltip")
 
+// define areas
+    var upperAreas = svgTs.selectAll(".area-group")
+        .data(dataset)
+        .enter()
+        .append("g")
+        .attr("clip-path", "url(#clip)")
+        .attr("class", "area-group")
+
+    var lowerAreas = svgTs.selectAll(".area-group")
+        .data(dataset)
+        .enter()
+        .append("g")
+        .attr("clip-path", "url(#clip)")
+        .attr("class", "area-group")
+        // .attr("id", d=> "area-group-" + d.key);
+
+    upperAreas.append("path")
+        .attr("class", "u-area")
+        .attr("d", d => d.visible? upperArea(d.values) : null)
+        .style("fill", d=>getColorTs(d.key))
+        .attr("id", d=>"u-area-" + d.key)
+        .on("click",d=>{ return d.visible = ! d.visible;});
+
+    lowerAreas.append("path")
+        .attr("class", "l-area")
+        .attr("d", d => d.visible? lowerArea(d.values) : null)
+        .style("fill", d=>getColorTs(d.key))
+        .attr("id", d=>"l-area-" + d.key)
+        .on("click",d=>{ return d.visible = ! d.visible;});
+
 
 // Draw Line
     var lines = svgTs.selectAll(".line-group")
@@ -271,7 +316,37 @@ function drawTimeSeries(regionData){
         .attr("class", "line")
         .attr("d", d => d.visible? line(d.values) : null)
         .style("stroke", d => getColorTs(d.key))
+        // .style("fill-opacity", 0.5)
         .attr("id", d => "lin-" + d.key)
+        .on("click", (d, i)=>{
+            // area.append("path")
+            //     .attr("d",area)
+            //     .attr("fill", getColorTs(d.key))
+
+            d.visible = ! d.visible;
+
+            // //Update axis
+            // maxY = findMaxY(dataset) + 100;
+            // minY = findMinY(dataset) + 5;
+            // tsyScale.domain([minY, maxY]).nice();
+            // svgTs.select(".y.axis")
+            //     .transition()
+            //     .call(tsyAxis);
+
+            // draw_area();
+
+            // Update graph
+            upperAreas.select("path")
+                .transition()
+                .attr("d", d=> d.visible? upperArea(d.values) : null);
+            lowerAreas.select("path")
+                .transition()
+                .attr("d", d=> d.visible? upperArea(d.values) : null);
+            // legend.select("rect")
+            //     .transition()
+            //     .attr("fill", d => d.visible? getColorTs(d.key) : greyBtn);
+
+        })
         .on("mouseover", function(d) {
             d3.selectAll('.line').style("opacity", 0.2);
             d3.select(this).style("opacity", 1).style("stroke-width", "2px");
@@ -282,7 +357,7 @@ function drawTimeSeries(regionData){
             var x0 = tsxScale.invert(d3.mouse(this)[0]),
                 x1 = d3.timeMinute.every(10).round(x0),
                 i = bisectDate(d.values, x1);
-            focus.attr("transform", "translate(" + tsxScale(x1) + "," + tsyScale(d.values[i].Value) + ")"); // Find position
+            focus.attr("transform", "translate(" + tsxScale(x1) + "," + tsyScale(d.values[i].value_mean) + ")"); // Find position
             focus.style("display", null);
             focus.selectAll("circle")
                 .attr("fill", getColorTs(d.key));
@@ -292,7 +367,7 @@ function drawTimeSeries(regionData){
             tooltip.style("display", null)
                 .html( "Sensor: " + d.key + "<br>"
                     +  "Time  : " + d.values[i].Timestamp.toLocaleTimeString([], { year: '2-digit', month: '2-digit',day: '2-digit', hour: '2-digit', minute:'2-digit'})  + "<br>"
-                    +  "Value : " + d.values[i].Value.toFixed(2) +  " (CPM)" )
+                    +  "Value : " + d.values[i].value_mean.toFixed(2) +  " (CPM)" )
                 .style("left", (d3.mouse(this)[0]+70) + "px")
                 .style("top", (d3.mouse(this)[1]) + "px");
         })
@@ -332,7 +407,9 @@ function drawTimeSeries(regionData){
             svgTs.select(".y.axis")
                 .transition()
                 .call(tsyAxis);
-//
+
+            // draw_area();
+
             // Update graph
             lines.select("path")
                 .transition()
@@ -340,6 +417,14 @@ function drawTimeSeries(regionData){
             legend.select("rect")
                 .transition()
                 .attr("fill", d => d.visible? getColorTs(d.key) : greyBtn);
+
+            // upperArea.select("path")
+            //     .transition()
+            //     .attr("d", d=> d.visible? upperArea(d.values) : null);
+            // lowerArea.select("path")
+            //     .transition()
+            //     .attr("d", d=> d.visible? upperArea(d.values) : null);
+
         })
         .on("mouseover", function(d) {
             d3.select(this)
@@ -491,3 +576,11 @@ function findMinY(data) {
     });
     return d3.min(minYValues);
 }
+
+function selectAllMobile(){
+    d3.select(".line").select("#")
+};
+
+
+
+
