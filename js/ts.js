@@ -59,17 +59,21 @@ var svgTs = d3.select("#timeSeries").append("svg")
     .append("g")
     .attr("transform", "translate(" + tsMargin.left + "," + tsMargin.top + ")");
 
+var greyBtn = "#d7d7d7";
+
 // 59 Custom colors, 50 mobile, 9 static
-colorScheme = ["#1f77b4","#aec7e8","#ff7f0e","#ffbb78","#2ca02c","#98df8a","#d62728","#ff9896","#9467bd","#c5b0d5","#8c564b","#c49c94",
-    "#e377c2","#f7b6d2","#7f7f7f"," #c7c7c7","#bcbd22","#dbdb8d","#17becf","#9edae5","#1f77b4","#aec7e8","#ff7f0e","#ffbb78","#2ca02c","#98df8a","#d62728","#ff9896","#9467bd","#c5b0d5","#8c564b","#c49c94",
-    "#e377c2","#f7b6d2","#7f7f7f"," #c7c7c7","#bcbd22","#dbdb8d","#17becf","#9edae5","#1f77b4","#aec7e8","#ff7f0e","#ffbb78","#2ca02c","#98df8a","#d62728","#ff9896","#9467bd","#c5b0d5","#8c564b","#c49c94",
-    "#e377c2","#f7b6d2","#7f7f7f"," #c7c7c7","#bcbd22","#dbdb8d","#17becf","#9edae5"]
+var colorScheme = ["#1f77b4","#aec7e8","#ff7f0e","#ffbb78","#2ca02c","#98df8a","#d62728","#ff9896","#9467bd","#c5b0d5",
+    "#8c564b","#c49c94", "#e377c2","#f7b6d2","#bcbd22","#dbdb8d","#17becf","#9edae5", "#393b79","#6b6ecf",
+    "#637939","#b5cf6b","#843c39","#d6616b","#7b4173","#ce6dbd","#5254a3","#8ca252","#9c9ede","#cedb9c",
+    "#ff7f0e","#ffbb78","#2ca02c","#98df8a", "#d62728","#ff9896","#9467bd","#c5b0d5","#8c564b", "#c49c94",
+    "#e377c2","#f7b6d2","#bcbd22","#dbdb8d","#17becf","#9edae5", "#1f77b4","#aec7e8", "#ff7f0e","#ffbb78",
+    "#2ca02c","#98df8a","#d62728","#ff9896","#9467bd","#c5b0d5","#8c564b","#c49c94","#e377c2","#f7b6d2"]
 
 var color = d3.scaleOrdinal().range(colorScheme);
 
 function drawTimeSeries(regionData){
     let dataset = d3.nest().key(d => d["Sensor-id"]).entries(regionData);
-    var greyBtn = "#d7d7d7";
+
 
     var yMin = d3.min(dataset, d => d3.min(d.values, v => v.Value)),
         yMax = d3.max(dataset, d => d3.max(d.values, v => v.Value)) + 100;
@@ -241,10 +245,12 @@ function drawTimeSeries(regionData){
                 .style("opacity", 1);
             tooltip
                 .html( "Sensor: " + d.key + "<br>"
-                    +  "Time  : " + d.values[i].Timestamp.toLocaleTimeString([], { year: '2-digit', month: '2-digit',day: '2-digit', hour: '2-digit', minute:'2-digit'})  + "<br>"
-                    +  "Value : " + d.values[i].value_mean.toFixed(2) +  " (cpm)" )
-                .style("left", (d3.mouse(this)[0]+70) + "px")
-                .style("top", (d3.mouse(this)[1]) + "px");
+                    +  "Time: " + d.values[i].Timestamp.toLocaleTimeString([], { year: '2-digit', month: '2-digit',day: '2-digit', hour: '2-digit', minute:'2-digit'})  + "<br>"
+                    +  "Mean: " + d.values[i].value_mean.toFixed(2) +  " (cpm)" + "<br>"
+                    +  "Max: " + d.values[i].Value.toFixed(2) + "(cpm)" + "<br>"
+                    +  "Min: " + d.values[i].value_min.toFixed(2) + "(cpm)" + "<br>")
+                .style("left", (d3.event.pageX) + "px")
+                .style("top", (d3.event.pageY) + "px");
         })
         .on("mouseout", function() {
             d3.selectAll('.line').style("opacity", 1);
@@ -466,5 +472,11 @@ function selectAllMobile(){
 };
 
 
+function clearAll(){
+    d3.selectAll("path.line").remove();
+    d3.selectAll("path.area").remove();
+    d3.selectAll("rect.legend-box").style("fill",null );
 
+
+}
 
