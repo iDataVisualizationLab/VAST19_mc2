@@ -162,30 +162,30 @@ function drawTimeSeries(regionData){
         .attr("class", "tstooltip")
 
 // define areas
-    var upperAreas = svgTs.selectAll(".area-group")
+    var upperAreas = svgTs.selectAll(".u-area-group")
         .data(dataset)
         .enter()
         .append("g")
         .attr("clip-path", "url(#clip)")
-        .attr("class", "area-group")
+        .attr("class", "u-area-group")
 
-    var lowerAreas = svgTs.selectAll(".area-group")
+    var lowerAreas = svgTs.selectAll(".l-area-group")
         .data(dataset)
         .enter()
         .append("g")
         .attr("clip-path", "url(#clip)")
-        .attr("class", "area-group")
+        .attr("class", "l-area-group")
         // .attr("id", d=> "area-group-" + d.key);
 
     upperAreas.append("path")
-        .attr("class", "area")
+        .attr("class", "u-area")
         .attr("d", d => d.visible? upperArea(d.values) : null)
         .style("fill", d=>getColorTs(d.key))
         .attr("id", d=>"u-area-" + d.key)
         .on("click",d=>{ return d.visible = ! d.visible;});
 
     lowerAreas.append("path")
-        .attr("class", "area")
+        .attr("class", "l-area")
         .attr("d", d => d.visible? lowerArea(d.values) : null)
         .style("fill", d=>getColorTs(d.key))
         .attr("id", d=>"l-area-" + d.key)
@@ -217,9 +217,12 @@ function drawTimeSeries(regionData){
             lowerAreas.select("#l-area-" + d.key)
                 .transition()
                 .attr("d", d=> d.visible? upperArea(d.values) : null);
-            // legend.select("rect")
-            //     .transition()
-            //     .attr("fill", d => d.visible? getColorTs(d.key) : greyBtn);
+
+            // if(d.visible){
+            //     plot_dots("d");
+            // }else{
+            //     null;
+            // }
 
         })
         .on("mouseover", function(d) {
@@ -345,6 +348,7 @@ function drawTimeSeries(regionData){
         .attr("fill", "#5d5d5d")
         .style("font-size","11")
         .text(d => d.key);
+        // .on("click",d=>plot_dots(d));
 
     //For brusher of the slider bar at the bottom
     function brushing() {
@@ -389,6 +393,52 @@ function drawTimeSeries(regionData){
         lines.select(".line-group path")
             .transition()
             .attr("d", d => d.visible ? line(d.values) : null);
+        upperAreas.select(".u-area-group path")
+            .transition()
+            .attr("d", d => d.visible ? upperArea(d.values) : null);
+        lowerAreas.select(".l-area-group path")
+            .transition()
+            .attr("d", d => d.visible ? lowerArea(d.values) : null);
+
+    }
+    function plot_dots(d){
+        const dotTip = d3.select("#map")
+            .append("div")
+            .style("opacity", 0)
+            .attr("class", "tstooltip");
+
+        d3.select('#map g#regMap')
+            .selectAll('path')
+            .data(dataset.filter(f=>f.key === d.key ))// set mobile sensor 1 as initial data
+            .enter()
+            .append("circle")
+            .attr("class","dots")
+            .attr("cx", d=> {
+                return projection([d.Long, d.Lat])[0];
+            })
+            .attr("cy", function(d) {
+                return projection([d.Long, d.Lat])[1];
+            })
+            .attr("r", "3")
+            .style("fill", "#31a354")
+            .style("opacity",.8)
+            .on("mouseover", d=>{
+                dotTip.transition()
+                    .duration(200)
+                    .style("opacity","1");
+                dotTip
+                    .html("Time: " + d.Timestamp.toLocaleTimeString([], { year: '2-digit', month: '2-digit',day: '2-digit', hour: '2-digit', minute:'2-digit'})  + "<br>"
+                        + "Value  : " + d.Value.toFixed(2) + " (cmp)")
+                    // .style("left", (d3.mouse(this)[0] + 0) + "px")
+                    // .style("top", (d3.mouse(this)[1]) + 0 + "px");})
+                    .style("left", d3.select(this).attr("cx") + "px")
+                    .style("top", d3.select(this).attr("cy") + "px");})
+            .on("mouseout",()=>{
+                dotTip.transition()
+                    .duration(200)
+                    .style("opacity","0");});
+
+
 
     }
 
@@ -466,16 +516,18 @@ function findMinY(data) {
 }
 
 function selectAllMobile(){
-    // for(let i )
-    // mobileIds =
-    // d3.select(".line").select("#")
+
+    d3.selectAll(".line")
+        .transition()
+        .attr("d", d => d.visible ? line(d.values) : null);
+
 };
 
 
 function clearAll(){
     d3.selectAll("path.line").remove();
     d3.selectAll("path.area").remove();
-    d3.selectAll("rect.legend-box").style("fill",null );
+    d3.selectAll("rect.legend-box").style("opacity",1 );
 
 
 }
