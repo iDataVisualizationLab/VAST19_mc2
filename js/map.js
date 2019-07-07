@@ -3,7 +3,6 @@ for ( i = 1; i < 20; i ++ )
 {
     // var filename = "data/aggDataHeatmap/Region" + i + ".csv";
     var filename = "data/aggTimeByReg/region" + i + ".csv";
-
     filelist.push(d3.csv(filename));
 }
 // some variables for later usage
@@ -43,16 +42,16 @@ const regionNameList =
 // console.log(mbfilelist);
 
 // load data for time series
-d3.csv("data/allSensorReadings.csv").then(data=>{
+d3.csv("data/allSensorReadings_minMax.csv").then(data=>{
     data.forEach(d=>{
-        d.Timestamp = tsParseTime(d.Timestamp);
+        d.Timestamp = parse(d.Timestamp);
         d.Value = +d.Value;
         d["value_count"] = +d["value_count"];
         d["value_mean"] = +d["value_mean"];
         d["value_min"] = +d["value_min"];
         d.visible = true;
     })
-    drawTimeSeries(data.filter(d=>d.Value < 5000));
+    // drawTimeSeries(data.filter(d=>d.Value < 5000));
     // draw_line(data.filter(d=>d.Value < 5000));
 
 
@@ -106,7 +105,7 @@ Promise.all(filelist).then(files => {
             d3.json('data/StHimark.geojson').then(geojson => {
 
                 const width = 500, height = 500;
-                const projection = d3.geoEquirectangular().scale(1).translate([0, 0]);
+                var projection = d3.geoEquirectangular().scale(1).translate([0, 0]);
 
                 const geoPath = d3.geoPath()
                     .projection(projection);
@@ -136,7 +135,7 @@ Promise.all(filelist).then(files => {
 
                 // draw map
                 function draw_map(geojson) {
-                    const mapSvg = d3.select('#map g#regMap')
+                    var mapSvg = d3.select('#map g#regMap')
                         .selectAll('path')
                         .data(geojson.features);
 
@@ -147,10 +146,10 @@ Promise.all(filelist).then(files => {
                         .attr("class","geoPath")
                         .attr("id", d => removeWhitespace(d.properties.Nbrhood))
                         // // .attr("class", "regionPath")
-                        // .classed("active", d => d.properties.Nbrhood !== "Palace Hills")
-                        // .classed("inactive", d => d.properties.Nbrhood === "Palace Hills")
+                        .classed("unselected", d => d.properties.Nbrhood !== "Palace Hills")
+                        .classed("selected", d => d.properties.Nbrhood === "Palace Hills")
                         .on("mouseover", mouseover)
-                        // .on("mousemove", mousemove)
+                        .on("mousemove", mousemove)
                         .on("mouseleave", mouseleave)
                         .on("click", d=>click(d));
                     // $(".geoPath").click(()=>{
@@ -194,8 +193,6 @@ Promise.all(filelist).then(files => {
                         //         .html("Static: " + d["Sensor-id"])
                         // });
                     });
-
-
 
                     // //plot initial mobile locations
                     // const dotTip = d3.select("#map")
@@ -297,25 +294,28 @@ Promise.all(filelist).then(files => {
                 }
 
                 draw_map(geojson);
+                drawTimeSeries(data.filter(d=>d.Value < 5000));
             })
 
             // where helper functions go
 
             function toggleHeatmap(region){
-                let selected_heatmap = d3.select("#heatmap").select("#" + "heatmap" + (regionNameList.indexOf(region)+1)); // select the heatmap that is selected
-                let selected_region = d3.selectAll("path").select("#" + removeWhitespace(region));
-                let unselected = selected_heatmap.classed("hidden",true);
-                if(!unselected){
-                    // selected_heatmap.style("display","block");
-                    selected_heatmap.classed("visible",true);
-
-                }else{
-                    // selected_heatmap.style("display","none");
-                    selected_heatmap.classed("hidden",true)
-                }
-                // selected_heatmap.classed("unselected",!unselected);
-                selected_region.classed("unselected",!unselected);
-                selected_region.classed("selected",unselected);
+                let displayed = d3.select("#" + "heatmap" + (regionNameList.indexOf(region)+1))
+                displayed.classed("displayed",!displayed.classed("displayed"));
+                // let selected_heatmap = d3.select("#heatmap").select("#" + "heatmap" + (regionNameList.indexOf(region)+1)); // select the heatmap that is selected
+                // let selected_region = d3.selectAll("path").select("#" + removeWhitespace(region));
+                // let unselected = selected_heatmap.classed("hidden",true);
+                // if(!unselected){
+                //     // selected_heatmap.style("display","block");
+                //     selected_heatmap.classed("visible",true);
+                //
+                // }else{
+                //     // selected_heatmap.style("display","none");
+                //     selected_heatmap.classed("hidden",true)
+                // }
+                // // selected_heatmap.classed("unselected",!unselected);
+                // selected_region.classed("unselected",!unselected);
+                // selected_region.classed("selected",unselected);
 
             }
 
@@ -337,24 +337,16 @@ Promise.all(filelist).then(files => {
 
             function click(d) {
 
-
-
-                d3.selectAll("#regMap path").classed("selected",false).style("fill","lightgrey");
+                // d3.selectAll("#regMap path").classed("selected",false).style("fill","lightgrey");
                 d3.select("#" + removeWhitespace(d.properties.Nbrhood)).attr("class","selected").style('fill',"#2171b5");
-
-                // let selected = d3.select("#" + "heatmap" + (regionNameList.indexOf(region)+1))
-                // selected.classed("selected",!selected.classed("selected"));
 
 
                 // toggleHeatmap("heatmap" + (index + 1));
-                for (const region of regionNameList) {
-                    const index = regionNameList.indexOf(region);
+                for (let region of regionNameList) {
+                    let index = regionNameList.indexOf(region);
                     if (d.properties.Nbrhood === region) {
-
                         draw_heatmap(alldata[index],index+1);
-                        // d3.select("#" + "heatmap" + (regionNameList.indexOf(region)+1)).attr("class","visible");
-
-                        // drawTimeSeries(tsfiles[index]);
+                        // d3.select("#" + "heatmap" + (regionNameList.indexOf(region)+1)).classed("displayed",true);
                         // toggleHeatmap(d.properties.Nbrhood);
                     }
                 }
@@ -362,13 +354,13 @@ Promise.all(filelist).then(files => {
 
             }
 
-            // function mousemove(d) {
-            //     mapTip
-            //         .html("Region: " + d.properties.Nbrhood + "<br>"
-            //             + "ID  : " + d.properties.Id)
-            //         .style("left", (d3.mouse(this)[0] + 30) + "px")
-            //         .style("top", (d3.mouse(this)[1]) + 20 + "px")
-            // }
+            function mousemove(d) {
+                mapTip
+                    .html("Region: " + d.properties.Nbrhood + "<br>"
+                        + "ID  : " + d.properties.Id)
+                    .style("left", (d3.mouse(this)[0] + 30) + "px")
+                    .style("top", (d3.mouse(this)[1]) + 20 + "px")
+            }
 
             function mouseleave() {
                 mapTip

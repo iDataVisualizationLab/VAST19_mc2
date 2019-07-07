@@ -5,7 +5,13 @@ var heatMargin = {top: 5, right: 100, bottom: 0, left: 20};
 // var heatWidth = Math.max(Math.min(window.innerWidth, 1000), 500) - heatMargin.left - heatMargin.right - 20;
 var heatWidth = 1400 - heatMargin.left - heatMargin.right;
 
-//set the colors
+var times;
+d3.csv("data/times.csv").then(d=>{
+	times = parse(d);
+	console.log(times);
+});
+
+ //set the colors
 // var colors = ['#f7f7f7','#d1e5f0','#b2182b'];
 // var colors = [ "#e6e6e6", "#9dbee6",  "#e61e1a"];
 var colors = ["#e6e6e6" ,"#9dbee6",   "#e6852f", "#e61e1a","#ca0020"];
@@ -14,32 +20,38 @@ var colors = ["#e6e6e6" ,"#9dbee6",   "#e6852f", "#e61e1a","#ca0020"];
 //main function to update heatmap
 function draw_heatmap(data,index) {
 
-	// Labels of row and columns
-	var sensor;
-	var sensorList = d3.map(data, d => d["Sensor-id"]).keys();
-	var mobileList = sensorList.filter(d => d.split("-")[0] === "mobile")
-		.sort((a,b) => {
-		var x = +a.split("-")[1],
-			y = +b.split("-")[1];
-		return(x < y)? -1:1;
-	});
-	var staticList = sensorList.filter(d => d.split("-")[0] === "static");
-	if (staticList.length != 0 ){
-    staticList.sort((a,b) => {
-                var x = +a.split("-")[1],
-                    y = +b.split("-")[1];
-                return(x < y)? -1:1;
-    });
-		sensors = mobileList.concat(staticList);
-	}else {
-		sensors = mobileList;
-	}
+	// // Labels of row and columns
+	// var sensor;
+	// var sensorList = d3.map(data, d => d["Sensor-id"]).keys();
+	// var mobileList = sensorList.filter(d => d.split("-")[0] === "mobile")
+	// 	.sort((a,b) => {
+	// 	var x = +a.split("-")[1],
+	// 		y = +b.split("-")[1];
+	// 	return(x < y)? -1:1;
+	// });
+	// var staticList = sensorList.filter(d => d.split("-")[0] === "static");
+	// if (staticList.length != 0 ){
+    // staticList.sort((a,b) => {
+    //             var x = +a.split("-")[1],
+    //                 y = +b.split("-")[1];
+    //             return(x < y)? -1:1;
+    // });
+	// 	sensors = mobileList.concat(staticList);
+	// }else {
+	// 	sensors = mobileList;
+	// }
 
+	// get sensors list
+	var sensors = d3.map(data,d=>d["Sensor-id"]).keys();
+
+	// get timestamps
 	var times = d3.map(data,d=>d.Timestamp).keys();
+	times.sort((a,b)=>a.Timestamp - b.Timestamp);
+	// var times = d2.nest().key(d=>d.Timestamp)
+	// d3.nest().key(d => d["Sensor-id"]).entries(regionData);
 
-	// timesList = times.forEach(d => d.toLocaleString());
 
-
+	var x = d3.scaleBand().range([0,1200]).domain(times)
 
 debugger
 	// var cellSize = heatWidth/times.length;
@@ -68,7 +80,9 @@ debugger
 		.append("g")
 		// .attr("transform",
 		// 	"translate(" + heatMargin.left + "," + heatMargin.top + ")");
-	d3.select("#" + "heatmap" + (index)).classed("selected",true);
+
+	d3.select("#" + "heatmap" + (index)).classed("displayed",true);
+
 	// define color scale for heatmap
 	var heatColor = d3.scaleLinear()
 		// .domain([0, d3.max(data, function(d) {return d.Value; })/2, d3.max(data, function(d) {return d.Value; })])
@@ -109,6 +123,7 @@ debugger
 		// }))
 		 .enter().append("rect")
 		 .attr("x", d => times.indexOf(d.Timestamp.toString()) * cellSize)
+		// .attr("x",d=>)
 		 .attr("y", d => sensors.indexOf(d["Sensor-id"]) * cellSize)
 		 .attr("class", "cmp bordered")
 		 .attr("width", cellSize)
@@ -141,11 +156,11 @@ debugger
 			.html( "Sensor: " + d["Sensor-id"] + "<br>"
 					  + "Time  : " + d.Timestamp.toLocaleTimeString([], { year: '2-digit', month: '2-digit',day: '2-digit', hour: '2-digit', minute:'2-digit'})  + "<br>"
 						+ "Max: " + d.Value.toFixed(2) + " (cmp)" + "<br>"
-						+ "Min:" + d["value_min"].toFixed(2) + "<br>"
-						+ "Mean:" + d["value_mean"].toFixed(2) + "<br>"
+						+ "Min:" + d["value_min"].toFixed(2)+ " (cmp)" + "<br>"
+						+ "Mean:" + d["value_mean"].toFixed(2) + " (cmp)" + "<br>"
 						+ "Number of readings:" + d["value_count"])
-			.style("left", (d3.mouse(this)[0] + 80) + "px")
-			.style("top", (d3.mouse(this)[1] + 200) + "px")
+			.style("left",  (d3.event.pageX) + "px")
+			.style("top", (d3.event.pageY)  + "px");
 	}
 	function mouseleave() {
 		heatTip

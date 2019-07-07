@@ -345,11 +345,24 @@ function drawTimeSeries(regionData){
     legend.append("text")
         .attr("x", tsWidth + (tsMargin.right/3) )
         .attr("y", (d, i) => (i + 1) * legendSpace + 4 )
+        .attr("class", "legend-text")
         .attr("fill", "#5d5d5d")
         .style("font-size","11")
-        .text(d => d.key);
-        // .on("click",d=>plot_dots(d));
+        .text(d => d.key)
+        .on("click",d=>{
+            d.visible = !d.visible;
+            legend.select("text")
+                .transition()
+                .attr("fill", d => d.visible? getColorTs(d.key) :"#5d5d5d");
+            if(d.visible){
+                plot_dots(d.key);
+            }else{
+                // remove_dots(d.key);
+            }
+            // plot_dots(d.key);
 
+        });
+debugger
     //For brusher of the slider bar at the bottom
     function brushing() {
         tsxScale.domain(!d3.event.selection ? tsxScale2.domain() : d3.event.selection.map(tsxScale2.invert)); // If brush is empty then reset the tsxScale domain to default, if not then make it the brush extent
@@ -401,26 +414,27 @@ function drawTimeSeries(regionData){
             .attr("d", d => d.visible ? lowerArea(d.values) : null);
 
     }
-    function plot_dots(d){
+    function plot_dots(sensor){
         const dotTip = d3.select("#map")
             .append("div")
             .style("opacity", 0)
             .attr("class", "tstooltip");
 
-        d3.select('#map g#regMap')
-            .selectAll('path')
-            .data(dataset.filter(f=>f.key === d.key ))// set mobile sensor 1 as initial data
+        plot = d3.select('#map g#regMap')
+            .selectAll('path');
+
+        plot.data(dataset.filter(f=>f.key === sensor ))// set mobile sensor 1 as initial data
             .enter()
             .append("circle")
             .attr("class","dots")
             .attr("cx", d=> {
-                return projection([d.Long, d.Lat])[0];
+                return projection([d.values[i].Long, d.values[i].Lat])[0];
             })
             .attr("cy", function(d) {
-                return projection([d.Long, d.Lat])[1];
+                return projection([d.values[i].Long, d.values[i].Lat])[1];
             })
             .attr("r", "3")
-            .style("fill", "#31a354")
+            .style("fill", "white")
             .style("opacity",.8)
             .on("mouseover", d=>{
                 dotTip.transition()
