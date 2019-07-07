@@ -35,13 +35,6 @@
     .geoPath{
         fill:lightgrey;
     }
-    /*#map{*/
-        /*width: 500px;*/
-        /*height: 500px;*/
-        /*padding: 0.5em;*/
-        /*background-opacity:0.5;*/
-
-    /*}*/
 
     #map #regMap path{
         fill: lightgray;
@@ -55,15 +48,6 @@
         display:inline-block;
         cursor:pointer;
     }
-
-    /*#controlContainer{*/
-        /*width:40%;*/
-        /*hight:50%;*/
-        /*display:inline-block;*/
-        /*margin:auto;*/
-        /*!*background:lightgoldenrodyellow;*!*/
-    /*}*/
-
 
     div.tooltip {
         position:absolute;
@@ -79,32 +63,20 @@
         transform:translate(0,-50%);
         pointer-events:none;
     }
-    .radIcon .hospIcon .
-        /*.active {*/
-        /*fill: green;*/
-        /*}*/
-        /*.inactive{*/
-        /*fill: lightgrey*/
-        /*}*/
 
-    /*.unselected{*/
-        /*fill:lightgrey;*/
-    /*}*/
-    /*.selected{*/
-        /*border-color:black;*/
-        /*fill:darkgrey;*/
-    /*}*/
-
-    .hidden{
-        display:none;
+    .unselected{
+        fill:lightgrey;
     }
+    .selected{
+        border-color:black;
+        fill:#2171b5;
+    }
+
 
 
     #timeLabel{
         position:sticky;
     }
-
-
 
     /*heatmap*/
     #heatmap{
@@ -117,7 +89,13 @@
         border-color: lightgrey;
         overflow:auto;
     }
+    .displayed{
+        display:block;
+    }
 
+    .hidden{
+        display:none;
+    }
 
     .sticky{
         position: -webkit-sticky;
@@ -127,6 +105,8 @@
         /*padding: 50px;*/
         /*font-size: 20px;*/
     }
+
+
 
 
     /*time series*/
@@ -139,6 +119,7 @@
     .line {
         fill: none;
         stroke-width: 1.5px;
+        cursor:pointer;
     }
 
     .axis path,
@@ -153,10 +134,6 @@
         stroke-dasharray: 1.5;
         stroke-opacity: .5;
     }
-
-    /* .x.axis path, .x.axis1 path {
-      display: none;
-    } */
 
     .axis--grid .domain {
         fill: #bfbfbf;
@@ -182,25 +159,12 @@
         stroke-width: 0.5px;
     }
 
-    .area.above {
-        opacity: 0.75;
-        fill: #91bfdb;
-        pointer-events: none;
-    }
-    .area.below {
-        opacity: 0.75;
-        fill: #fc8d59;
-        pointer-events: none;
-    }
-
     .u-area{
         fill-opacity: 0.3;
     }
-
     .l-area{
         fill-opacity: 0.3;
     }
-
     .legend-box {
         cursor: pointer;
     }
@@ -210,9 +174,6 @@
         stroke-width: 1px;
     }
 
-    /*.tstooltip {*/
-        /*font-weight: normal;*/
-    /*}*/
 
     .brush .extent {
         stroke: #FFF;
@@ -243,18 +204,12 @@
         /*border-radius: 4px;*/
         /*pointer-events: none;*/
     /*}*/
-
-
-    /*.unselected {*/
-        /*fill: lightgoldenrodyellow;*/
-    /*}*/
-
-    .visible{
-        display:block;
-    }
     .tsLegend{
         font: 12px sans-serif;
     }
+
+
+
 </style>
 
 <body>
@@ -287,14 +242,18 @@
     </div>
     <div id="selectMobile">
 
-        <input type="checkbox" name="mobileSelect" id="allMobile" onclick=selectAllMobile(this)>Select All mobile sensors
+        <input type="checkbox" name="mobileSelect" id="allMobile" onclick=selectAllMobile()>Select all mobile sensors
     </div>
     <div id="selectStatic">
-        <input type="checkbox" name="staticSelect" id="allStatic" onclick=selectAllStatic(this)>Select All static sensors
+        <input type="checkbox" name="staticSelect" id="allStatic" onclick=selectAllStatic()>Select all static sensors
     </div>
     <div id="selectAll">
-        <input type="checkbox" name="staticSelect" id="allSensor" onclick=selectAllStatic(this)>Select All sensors
+        <input type="checkbox" name="allSelect" id="allSensor" onclick=selectAll()>Select all sensors
     </div>
+    <div >
+        <input type="button" id="clearAll" value="Clear chart" onclick="clearAll()"/>
+    </div>
+
 </div>
 <!--</div>-->
 
