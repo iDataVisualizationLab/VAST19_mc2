@@ -26,6 +26,7 @@ const regionNameList =
         'Oak Willow',
         'East Parton',
         'West Parton'];
+var projectionTs;
 // var tsfilelist = [];
 // for ( i = 1; i < 20; i ++ )
 // {
@@ -61,7 +62,7 @@ Promise.all(filelist).then(files => {
     // d3.csv("../data/times.csv").then(d=>{d.time = parse(d.time)
     // Promise.all( tsfilelist ).then( tsfiles => {
         // Promise.all(mbfilelist).then( mbfiles=> {
-            var index = 7;
+            var index = 1;
             var alldata = [];
             for (let i = 0; i < files.length; i++) {
                 files[i].forEach(d => {
@@ -73,27 +74,11 @@ Promise.all(filelist).then(files => {
                 })
                 alldata.push(files[i]);
             }
-            // var mbdata =[];
-            // for (let j = 0; j < mbfiles.length; j++) {
-            //     mbfiles[j].forEach(f => {
-            //         f.Timestamp = parse(f.Timestamp);
-            //         f.Value = +f.Value;
-            //         f.Long = +f.Long;
-            //         f.Lat = +f.Lat;
-            //     })
-            //     mbdata.push(mbfiles[j]);
-            // }
-            // console.log(mbdata[0]);
+            // var times = d3.map(alldata[0],d=>d.Timestamp).keys();
 
-            // const heatmapIds = [];
-            // for (let i = 1; i < 20; i++) {
-            //     heatmapIds.push("region" + i + "heatmap");
-            // }
-            // console.log(heatmapIds);
+            //draw initial heatmap
+            draw_heatmap(alldata[index - 1],1);
 
-
-            //draw initial heatmap and timeseries
-            draw_heatmap(alldata[index - 1],7);
             // drawTimeSeries(tsfiles[index - 1]);
             // draw_mobile_location(mddata[index -1]);
 
@@ -117,6 +102,7 @@ Promise.all(filelist).then(files => {
 
                 projection.scale(s).translate(t);
 
+                projectionTs = projection;
 
                 const hospitalLocation =
                     [{Lat: 0.180960, Long: -119.959400},
@@ -143,10 +129,11 @@ Promise.all(filelist).then(files => {
                     mapSvg.enter()
                         .append('path')
                         .attr('d', geoPath)
-                        .attr("class","geoPath")
+                        // .attr("class","geoPath")
                         .attr("id", d => removeWhitespace(d.properties.Nbrhood))
                         // // .attr("class", "regionPath")
-                        .classed("unselected", d => d.properties.Nbrhood !== "Palace Hills")
+
+                        .classed("unselected", true)
                         .classed("selected", d => d.properties.Nbrhood === "Palace Hills")
                         .on("mouseover", mouseover)
                         .on("mousemove", mousemove)
@@ -337,11 +324,16 @@ Promise.all(filelist).then(files => {
 
             function click(d) {
 
+                // d3.select("#" + removeWhitespace(d.properties.Nbrhood)).classed("unselected", !classed("unselected"));
+                // d3.select("#" + removeWhitespace(d.properties.Nbrhood)).classed("selected", !classed("selected"));
+
                 // d3.selectAll("#regMap path").classed("selected",false).style("fill","lightgrey");
-                d3.select("#" + removeWhitespace(d.properties.Nbrhood)).attr("class","selected").style('fill',"#2171b5");
+                // d3.select("#" + removeWhitespace(d.properties.Nbrhood)).class("class","selected").style('fill',"#2171b5");
 
-
+                // $(this).toggleClass("selected");
                 // toggleHeatmap("heatmap" + (index + 1));
+                let thisElm = d3.select("#" + removeWhitespace(d.properties.Nbrhood));
+                thisElm.classed("selected", function() { return !this.classList.contains("selected"); });
                 for (let region of regionNameList) {
                     let index = regionNameList.indexOf(region);
                     if (d.properties.Nbrhood === region) {
