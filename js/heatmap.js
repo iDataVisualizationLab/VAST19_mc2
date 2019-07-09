@@ -5,67 +5,68 @@ var heatMargin = {top: 5, right: 100, bottom: 0, left: 20};
 // var heatWidth = Math.max(Math.min(window.innerWidth, 1000), 500) - heatMargin.left - heatMargin.right - 20;
 var heatWidth = 1400 - heatMargin.left - heatMargin.right;
 
-var times;
-d3.csv("data/times.csv").then(d=>{
-	times = parse(d);
-	console.log(times);
-});
+// d3.csv("data/times.csv").then(d=>{
+// 	times = parse(d);
+// 	console.log(times);
+// });
 
  //set the colors
 // var colors = ['#f7f7f7','#d1e5f0','#b2182b'];
 // var colors = [ "#e6e6e6", "#9dbee6",  "#e61e1a"];
 var colors = ["#e6e6e6" ,"#9dbee6",   "#e6852f", "#e61e1a","#ca0020"];
 
-["#e6e6d8",   "#e6531a",,"#e6b061","#c8dce6",,"#e6d49c","#afcae6",]
+//["#e6e6d8",   "#e6531a",,"#e6b061","#c8dce6",,"#e6d49c","#afcae6",]
 //main function to update heatmap
+// get timestamps
+let startTime = new Date('2020-04-06 00:00:00');
+let endTime = new Date('2020-04-11 00:00:00');
+let step = 1000 * 60 * 30;
+let times = [];
+let prevDate = startTime;
+while (true) {
+	let theDate = new Date(prevDate.getTime() + step);
+	if (theDate < endTime) {
+		times.push(theDate);
+	} else {
+		break;
+	}
+	prevDate = theDate;
+}
+times = times.map(d => d.toString());
+
 function draw_heatmap(data,index) {
-
-	// // Labels of row and columns
-	// var sensor;
-	// var sensorList = d3.map(data, d => d["Sensor-id"]).keys();
-	// var mobileList = sensorList.filter(d => d.split("-")[0] === "mobile")
-	// 	.sort((a,b) => {
-	// 	var x = +a.split("-")[1],
-	// 		y = +b.split("-")[1];
-	// 	return(x < y)? -1:1;
-	// });
-	// var staticList = sensorList.filter(d => d.split("-")[0] === "static");
-	// if (staticList.length != 0 ){
-    // staticList.sort((a,b) => {
-    //             var x = +a.split("-")[1],
-    //                 y = +b.split("-")[1];
-    //             return(x < y)? -1:1;
-    // });
-	// 	sensors = mobileList.concat(staticList);
-	// }else {
-	// 	sensors = mobileList;
-	// }
-
 	// get sensors list
 	var sensors = d3.map(data,d=>d["Sensor-id"]).keys();
+	// var times = d3.map(data,d=>d.Timestamp).keys();
+	// times.sort((a,b)=>a.Timestamp - b.Timestamp);
 
-	// get timestamps
-	var times = d3.map(data,d=>d.Timestamp).keys();
-	times.sort((a,b)=>a.Timestamp - b.Timestamp);
-	// var times = d2.nest().key(d=>d.Timestamp)
+
 	// d3.nest().key(d => d["Sensor-id"]).entries(regionData);
 
 
-	var x = d3.scaleBand().range([0,1200]).domain(times)
+	// var x = d3.scaleBand().range([0,1200]).domain(times);
 
-debugger
 	// var cellSize = heatWidth/times.length;
 	var cellSize = 5;
 
 	var heatHeight = cellSize * (sensors.length + 2);
 	hHeight = heatHeight;
-	//append heat map svg
+
 	// d3.select("#"+ "heatmap" + index).selectAll("*").remove();
 	
 	var heatTip = d3.select("#heatmap")
 		.append("div")
 		.style("opacity", 0)
 		.attr("class", "tooltip");
+
+	let theDiv = d3.select("#heatmap"+index);
+	if(!theDiv.empty()){
+		//Remove it and exit
+		theDiv.remove();
+		//Don't draw any more
+		return;
+
+	}
 
 	var svgHeat = d3.select("#heatmap")
 		.append("div")
@@ -92,6 +93,8 @@ debugger
 		.range(colors);
 
 	// var sensorLabels = svgHeat.selectAll(".sensorLabel")
+
+	// add sensor labels
 	var sensorLabels = svgHeat.selectAll(".sensorLabel")
 		.data(sensors)
 		.enter().append("text")
@@ -103,11 +106,13 @@ debugger
 		.style("text-anchor", "head")
 		.attr("transform", "translate(0," + cellSize/1.1 + ")")
 		.attr("class", d => d);
+
+	// add region label
     var regionLabel = d3.select("#" + "heatmap" + index)
 		.append("svg")
 		.attr("width","50")
 		.attr("height","20")
-		.attr("transform",	"translate(" + 1250 + "," + (-(heatHeight/2+20)) + ")")
+		.attr("transform",	"translate(" + 1245 + "," + (-(heatHeight/2+20)) + ")")
 	regionLabel
 		.append("text")
 		.text("Region" + index)
@@ -115,6 +120,7 @@ debugger
 		.attr("x", 0)
 		.attr("y", 10);
 
+    // draw heat map rects
 	var heatMap = svgHeat.selectAll(".cmp")
 		 // .data(data.filter(d=>{return d.Value>0}))
 		.data(data)
@@ -123,7 +129,7 @@ debugger
 		// }))
 		 .enter().append("rect")
 		 .attr("x", d => times.indexOf(d.Timestamp.toString()) * cellSize)
-		// .attr("x",d=>)
+		 // .attr("x",d=>x(d.Timestamp))
 		 .attr("y", d => sensors.indexOf(d["Sensor-id"]) * cellSize)
 		 .attr("class", "cmp bordered")
 		 .attr("width", cellSize)
@@ -133,6 +139,7 @@ debugger
 		 .style("stroke-width", d=>(+d["value_count"] / 1000 + 0.1 ))
 		 .style("display", d=>{return d == null ? "none" : null;})
 		 .style("fill", d => heatColor(d["Value"]))
+
 		 .on("mouseover", mouseover)
 		 .on("mousemove", mousemove)
 		 .on("mouseleave", mouseleave);
