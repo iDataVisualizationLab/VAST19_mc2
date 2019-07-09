@@ -37,7 +37,6 @@
     }
 
     #map #regMap path{
-        fill: lightgray;
         stroke: #bbbbbb;
     }
 
@@ -242,13 +241,13 @@
     </div>
     <div id="selectMobile">
 
-        <input type="checkbox" name="mobileSelect" id="allMobile" onclick=selectAllMobile()>Select all mobile sensors
+        <input type="checkbox"  id="allMobile" onclick=selectAllMobile()>Select all mobile sensors
     </div>
     <div id="selectStatic">
-        <input type="checkbox" name="staticSelect" id="allStatic" onclick=selectAllStatic()>Select all static sensors
+        <input type="checkbox" id="allStatic" onclick=selectAllStatic()>Select all static sensors
     </div>
     <div id="selectAll">
-        <input type="checkbox" name="allSelect" id="allSensor" onclick=selectAll()>Select all sensors
+        <input type="checkbox" id="allSensor" onclick=selectAll()>Select all sensors
     </div>
     <div >
         <input type="button" id="clearAll" value="Clear chart" onclick="clearAll()"/>
