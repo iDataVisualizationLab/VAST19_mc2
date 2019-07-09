@@ -1,89 +1,100 @@
 
+/*time series*/
+#timeSeries{
+    float:left;
+    /*clear:left;*/
+    width:80%;
+    margin:auto;
+}
 .line {
-  fill: none;
-  stroke-width: 1.5px;
+    fill: none;
+    stroke-width: 1.5px;
+    cursor:pointer;
 }
 
 .axis path,
 .axis line {
-  fill: none;
-  stroke: #5d5d5d;
-  shape-rendering: crispEdges;
+    fill: none;
+    stroke: #5d5d5d;
+    shape-rendering: crispEdges;
 }
 
 .axis .tick line {
-  stroke: #bfbfbf;
-	stroke-dasharray: 1.5;
-	stroke-opacity: .5;
+    stroke: #bfbfbf;
+    stroke-dasharray: 1.5;
+    stroke-opacity: .5;
 }
 
-/* .x.axis path, .x.axis1 path {
-  display: none;
-} */
-
 .axis--grid .domain {
-  fill: #bfbfbf;
-  opacity: 0.75;
-  stroke: none;
+    fill: #bfbfbf;
+    opacity: 0.75;
+    stroke: none;
 }
 
 .axis--x .domain,
 .axis--grid .tick line {
-  stroke: #fff;
-  stroke-dasharray: 0;
-  stroke-width: 1px;
+    stroke: #fff;
+    stroke-dasharray: 0;
+    stroke-width: 1px;
 }
 
 .axis--x .tick line {
-  stroke: #bfbfbf;
-  stroke-dasharray: 0;
-  stroke-opacity: 1;
+    stroke: #bfbfbf;
+    stroke-dasharray: 0;
+    stroke-opacity: 1;
 }
 
 .axis--grid .tick--minor line {
-  stroke-opacity: .5;
-  stroke-width: 0.5px;
+    stroke-opacity: .5;
+    stroke-width: 0.5px;
 }
 
-.area.above {
-    opacity: 0.75;
-    fill: #91bfdb;
-    pointer-events: none;
+.u-area{
+    fill-opacity: 0.3;
 }
-.area.below {
-    opacity: 0.75;
-    fill: #fc8d59;
-    pointer-events: none;
+.l-area{
+    fill-opacity: 0.3;
 }
-
 .legend-box {
-  cursor: pointer;
+    cursor: pointer;
 }
 
 #mouse-tracker {
-  stroke: #bfbfbf;
-  stroke-width: 1px;
+    stroke: #bfbfbf;
+    stroke-width: 1px;
 }
 
-.tstooltip {
-  font-weight: normal;
-}
 
 .brush .extent {
-  stroke: #FFF;
-  shape-rendering: crispEdges;
+    stroke: #FFF;
+    shape-rendering: crispEdges;
 }
 .tstooltip {
-    position:absolute;
+    position: absolute;
     color: #000000;
-    z-index:1000;
-    background:rgba(255,255,255,0.5);
-    padding:5px 10px;
-    border-radius:5px;
-    font-size:10px;
-    width:180px;
-    border:1px solid;
-    -webkit-transform:translate(0,-50%);
-    transform:translate(0,-50%);
-    pointer-events:none;
+    z-index: 1000;
+    background: rgba(255, 255, 255, 0.5);
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 10px;
+    width: 180px;
+    border: 1px solid;
+    -webkit-transform: translate(0, -50%);
+    transform: translate(0, -50%);
+    pointer-events: none;
 }
+/*.tstooltip {*/
+/*position: absolute;*/
+/*text-align: center;*/
+/*padding: 5px;*/
+/*font: 12px sans-serif;*/
+/*background: black;*/
+/*color: white;*/
+/*border: 1px;*/
+/*border-radius: 4px;*/
+/*pointer-events: none;*/
+/*}*/
+.tsLegend{
+    font: 12px sans-serif;
+}
+

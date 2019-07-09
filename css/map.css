@@ -1,20 +1,47 @@
 #map{
-    width: 770px;
-    height: 660px;
-    background-color: white;
-    /* position: fixed; */
+    /*float:left;*/
+    width: 500px;
+    height: 500px;
+    margin:auto;
+    display:inline-block;
+    cursor:pointer;
+    /*float:left;*/
+}
+.geoPath{
+    fill:lightgrey;
 }
 
-#dot{
-  padding-left: 20px;
-  padding-top: 25px;
-  cursor: pointer;
+#map #regMap path{
+    stroke: #bbbbbb;
 }
 
-path{
-  stroke-width:1px;
+#controlPanel{
+    width:500px;
+    height:300px;
+    margin:auto;
+    display:inline-block;
+    cursor:pointer;
 }
 
-.text-labels {
-   font-weight: 1000;
+div.tooltip {
+    position:absolute;
+    color: #000000;
+    z-index:1000;
+    background:rgba(255,255,255,0.5);
+    padding:5px 10px;
+    border-radius:5px;
+    font-size:10px;
+    width:180px;
+    border:1px solid;
+    -webkit-transform:translate(0,-50%);
+    transform:translate(0,-50%);
+    pointer-events:none;
+}
+
+.unselected{
+    fill:lightgrey;
+}
+.selected{
+    border-color:black;
+    fill:#2171b5;
 }
