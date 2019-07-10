@@ -31,27 +31,37 @@ var tsxAxis = d3.axisBottom(tsxScale)
         .tickSize(-tsWidth)
         .tickFormat(d3.format(".2f"));
 
-// Define the line
+// Define the lines
 var line = d3.line()
     .x(d => tsxScale(d.Timestamp))
     .y(d => tsyScale(d.value_mean))
-    .curve(d3.curveLinear)
-    .defined(d => !isNaN(d.value_mean));// Hiding line value for missing data
+    .curve(d3.curveLinear);
+    // .defined(d => !isNaN(d.value_mean));// Hiding line value for missing data
+var maxLine = d3.line()
+    .x(d => tsxScale(d.Timestamp))
+    .y(d => tsyScale(d.Value))
+    .curve(d3.curveLinear);
 
-//define the min-max area
+var minLine = d3.line()
+    .x(d => tsxScale(d.Timestamp))
+    .y(d => tsyScale(d.value_min))
+    .curve(d3.curveLinear);
+
+
+// //define the min-max area
 var upperArea = d3.area()
     .curve(d3.curveCardinal)
     .x(d => tsxScale(d.Timestamp))
     // .x (function (d) { return x(d.Timestamp); })
-    .y0(function (d) { return tsyScale(d.Value); })
-    .y1(function (d) { return tsyScale(d.value_mean); });
+    .y0(function (d) { return tsyScale(d.value_mean); })
+    .y1(function (d) { return tsyScale(d.Value); });
 
 var lowerArea = d3.area()
     .curve(d3.curveCardinal)
     .x(d => tsxScale(d.Timestamp))
     // .x (function (d) { return x(d.Timestamp) ; })
-    .y0(function (d) { return tsyScale(d.value_mean); })
-    .y1(function (d) { return tsyScale(d.value_min); });
+    .y0(function (d) { return tsyScale(d.value_min); })
+    .y1(function (d) { return tsyScale(d.value_mean); });
 
 var svgTs = d3.select("#timeSeries").append("svg")
     .attr("width", tsWidth + tsMargin.left + tsMargin.right)
@@ -71,17 +81,18 @@ var colorScheme = ["#1f77b4","#aec7e8","#ff7f0e","#ffbb78","#2ca02c","#98df8a","
 
 var color = d3.scaleOrdinal().range(colorScheme);
 
-function drawTimeSeries(regionData){
+
+
+// function to draw time series
+function drawTimeSeries(regionData) {
     let dataset = d3.nest().key(d => d["Sensor-id"]).entries(regionData);
-
-
-    var yMin = d3.min(dataset, d => d3.min(d.values, v => v.Value)),
+    var yMin = d3.min(dataset, d => d3.min(d.values, v => v.value_min)),
         yMax = d3.max(dataset, d => d3.max(d.values, v => v.Value)) + 100;
 
     // console.log(yMin);
     // console.log(yMax);
 
-    tsxScale.domain(d3.extent(regionData, d=>d.Timestamp));
+    tsxScale.domain(d3.extent(regionData, d => d.Timestamp));
     tsyScale.domain([yMin, yMax]);
     // Setting a duplicate xdomain for burshing reference
     tsxScale2.domain(tsxScale.domain());
@@ -110,7 +121,7 @@ function drawTimeSeries(regionData){
         .attr("height", tsHeight);
 
     var brush = d3.brushX()
-        .extent([[0,0], [tsWidth, tsHeight2]])
+        .extent([[0, 0], [tsWidth, tsHeight2]])
         .on("brush", brushing)
         .on("end", brushended);
 
@@ -175,21 +186,55 @@ function drawTimeSeries(regionData){
         .append("g")
         .attr("clip-path", "url(#clip)")
         .attr("class", "l-area-group")
-        // .attr("id", d=> "area-group-" + d.key);
+    // .attr("id", d=> "area-group-" + d.key);
 
     upperAreas.append("path")
         .attr("class", "u-area")
-        .attr("d", d => d.visible? upperArea(d.values) : null)
-        .style("fill", d=>getColorTs(d.key))
-        .attr("id", d=>"u-area-" + d.key)
-        .on("click",d=>{ return d.visible = ! d.visible;});
+        .attr("d", d => d.visible ? upperArea(d.values) : null)
+        .style("fill", d => getColorTs(d.key))
+        .attr("id", d => "u-area-" + d.key)
+        .on("click", d => {
+            return d.visible = !d.visible;
+        });
 
     lowerAreas.append("path")
         .attr("class", "l-area")
-        .attr("d", d => d.visible? lowerArea(d.values) : null)
-        .style("fill", d=>getColorTs(d.key))
-        .attr("id", d=>"l-area-" + d.key)
-        .on("click",d=>{ return d.visible = ! d.visible;});
+        .attr("d", d => d.visible ? lowerArea(d.values) : null)
+        .style("fill", d => getColorTs(d.key))
+        .attr("id", d => "l-area-" + d.key)
+        .on("click", d => {
+            return d.visible = !d.visible;
+        });
+// draw min, max lines
+    var maxLines = svgTs.selectAll(".max-line-group")
+        .data(dataset)
+        .enter()
+        .append("g")
+        .attr("clip-path", "url(#clip)")
+        .attr("class", "max-line-group")
+        .attr("id", d => "maxlinegrp-" + d.key);
+
+    maxLines.append("path")
+        .attr("class", "max-line")
+        .attr("d", d => d.visible ? maxLine(d.values) : null)
+        .style("stroke", d => getColorTs(d.key))
+        .style("fill-opacity", 0)
+        .attr("id", d => "maxline-" + d.key)
+
+    var minLines = svgTs.selectAll(".min-line-group")
+        .data(dataset)
+        .enter()
+        .append("g")
+        .attr("clip-path", "url(#clip)")
+        .attr("class", "min-line-group")
+        .attr("id", d => "minlinegrp-" + d.key);
+
+    minLines.append("path")
+        .attr("class", "min-line")
+        .attr("d", d => d.visible ? minLine(d.values) : null)
+        .style("stroke", d => getColorTs(d.key))
+        .style("fill-opacity", 0)
+        .attr("id", d => "minline-" + d.key)
 
 
 // Draw Line
@@ -203,21 +248,26 @@ function drawTimeSeries(regionData){
 
     lines.append("path")
         .attr("class", "line")
-        .attr("d", d => d.visible? line(d.values) : null)
+        .attr("d", d => d.visible ? line(d.values) : null)
         .style("stroke", d => getColorTs(d.key))
         // .style("fill-opacity", 0.5)
         .attr("id", d => "lin-" + d.key)
-        .on("click", (d, i)=>{
+        .on("click", (d, i) => {
 
-            d.visible = ! d.visible;
+            d.visible = !d.visible;
             // Update graph
             upperAreas.select("#u-area-" + d.key)
                 .transition()
-                .attr("d", d=> d.visible? upperArea(d.values) : null);
+                .attr("d", d => d.visible ? upperArea(d.values) : null);
             lowerAreas.select("#l-area-" + d.key)
                 .transition()
-                .attr("d", d=> d.visible? upperArea(d.values) : null);
-
+                .attr("d", d => d.visible ? upperArea(d.values) : null);
+            maxLines.select("#maxline-" + d.key)
+                .transition()
+                .attr("d",d=>d.visible? maxLine(d.values):null);
+            minLines.select("#minline-" + d.key)
+                .transition()
+                .attr("d", d=>d.visible? minLine(d.values):null);
             // if(d.visible){
             //     plot_dots("d");
             // }else{
@@ -225,7 +275,7 @@ function drawTimeSeries(regionData){
             // }
 
         })
-        .on("mouseover", function(d) {
+        .on("mouseover", function (d) {
             d3.selectAll('.line').style("opacity", 0.2);
             d3.select(this).style("opacity", 1).style("stroke-width", "2px");
             d3.selectAll(".legend").style("opacity", 0.2);
@@ -247,15 +297,21 @@ function drawTimeSeries(regionData){
                 .duration(200)
                 .style("opacity", 1);
             tooltip
-                .html( "Sensor: " + d.key + "<br>"
-                    +  "Time: " + d.values[i].Timestamp.toLocaleTimeString([], { year: '2-digit', month: '2-digit',day: '2-digit', hour: '2-digit', minute:'2-digit'})  + "<br>"
-                    +  "Mean: " + d.values[i].value_mean.toFixed(2) +  " (cpm)" + "<br>"
-                    +  "Max: " + d.values[i].Value.toFixed(2) + "(cpm)" + "<br>"
-                    +  "Min: " + d.values[i].value_min.toFixed(2) + "(cpm)" + "<br>")
+                .html("Sensor: " + d.key + "<br>"
+                    + "Time: " + d.values[i].Timestamp.toLocaleTimeString([], {
+                        year: '2-digit',
+                        month: '2-digit',
+                        day: '2-digit',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    }) + "<br>"
+                    + "Mean: " + d.values[i].value_mean.toFixed(2) + " (cpm)" + "<br>"
+                    + "Max: " + d.values[i].Value.toFixed(2) + "(cpm)" + "<br>"
+                    + "Min: " + d.values[i].value_min.toFixed(2) + "(cpm)" + "<br>")
                 .style("left", (d3.event.pageX) + "px")
                 .style("top", (d3.event.pageY) + "px");
         })
-        .on("mouseout", function() {
+        .on("mouseout", function () {
             d3.selectAll('.line').style("opacity", 1);
             d3.select(this).style("stroke-width", "1.5px");
             d3.selectAll(".legend").style("opacity", 1);
@@ -266,7 +322,7 @@ function drawTimeSeries(regionData){
         });
 
     // Draw legend
-    var legendSpace = tsHeight/(dataset.length + 1);
+    var legendSpace = tsHeight / (dataset.length + 1);
     var legend = svgTs.selectAll('.legend')
         .data(dataset)
         .enter()
@@ -277,12 +333,12 @@ function drawTimeSeries(regionData){
     legend.append("rect")
         .attr("width", 10)
         .attr("height", 10)
-        .attr("x", tsWidth + (tsMargin.right/3) - 25)
+        .attr("x", tsWidth + (tsMargin.right / 3) - 25)
         .attr("y", (d, i) => (i + 1) * legendSpace - 4)
-        .attr("fill", d => d.visible? getColorTs(d.key) : greyBtn)
+        .attr("fill", d => d.visible ? getColorTs(d.key) : greyBtn)
         .attr("class", "legend-box")
         .on("click", (d, i) => {
-            d.visible = ! d.visible;
+            d.visible = !d.visible;
 
             //Update axis
             maxY = findMaxY(dataset) + 100;
@@ -292,35 +348,36 @@ function drawTimeSeries(regionData){
                 .transition()
                 .call(tsyAxis);
 
-            // draw_area();
 
             // Update graph
             lines.select("path")
                 .transition()
-                .attr("d", d=> d.visible? line(d.values) : null);
+                .attr("d", d => d.visible ? line(d.values) : null);
+            // update legend
             legend.select("rect")
                 .transition()
-                .attr("fill", d => d.visible? getColorTs(d.key) : greyBtn);
-
-            upperAreas.select("#u-area-" + d.key)
-                .transition()
-                .attr("d", d=> {
-                    if(!d.visible){
-                        null;
-                    }
-                });
-            lowerAreas.select("#l-area-" + d.key)
-                .transition()
-                .attr("d", d=> {
-                    if (!d.visible) {
-                        null;
-                    }
-                });
+                .attr("fill", d => d.visible ? getColorTs(d.key) : greyBtn);
+            // // update upper area
+            // upperAreas.select("#u-area-" + d.key)
+            //     .transition()
+            //     .attr("d", d => {
+            //         if (!d.visible) {
+            //             null;
+            //         }
+            //     });
+            // // update
+            // lowerAreas.select("#l-area-" + d.key)
+            //     .transition()
+            //     .attr("d", d => {
+            //         if (!d.visible) {
+            //             null;
+            //         }
+            //     });
         })
-        .on("mouseover", function(d) {
+        .on("mouseover", function (d) {
             d3.select(this)
                 .transition()
-                .attr("fill", d =>getColorTs(d.key));
+                .attr("fill", d => getColorTs(d.key));
 
             d3.selectAll('.line').style("opacity", 0.2);
             // d3.select(this).style("opacity", 1).style("stroke-width", "2px");
@@ -328,10 +385,10 @@ function drawTimeSeries(regionData){
             d3.select("#lin-" + d.key).style("opacity", 1);
             d3.select("#leg-" + d.key).style("opacity", 1);
         })
-        .on("mouseout", function(d) {
+        .on("mouseout", function (d) {
             d3.select(this)
                 .transition()
-                .attr("fill", d => d.visible? getColorTs(d.key) : greyBtn);
+                .attr("fill", d => d.visible ? getColorTs(d.key) : greyBtn);
 
             d3.selectAll('.line').style("opacity", 1);
             d3.select(this).style("stroke-width", "1.5px");
@@ -343,26 +400,27 @@ function drawTimeSeries(regionData){
         });
 
     legend.append("text")
-        .attr("x", tsWidth + (tsMargin.right/3) )
-        .attr("y", (d, i) => (i + 1) * legendSpace + 4 )
+        .attr("x", tsWidth + (tsMargin.right / 3))
+        .attr("y", (d, i) => (i + 1) * legendSpace + 4)
         .attr("class", "legend-text")
         .attr("fill", "#5d5d5d")
-        .style("font-size","11")
+        .style("font-size", "11")
         .text(d => d.key)
-        .on("click",d=>{
+        .on("click", d => {
             d.visible = !d.visible;
             legend.select("text")
                 .transition()
-                .attr("fill", d => d.visible? getColorTs(d.key) :"#5d5d5d");
-            if(d.visible){
+                .attr("fill", d => d.visible ? getColorTs(d.key) : "#5d5d5d");
+            if (d.visible) {
                 plot_dots(d.key);
-            }else{
+            } else {
                 // remove_dots(d.key);
             }
             // plot_dots(d.key);
 
         });
-debugger
+    debugger
+
     //For brusher of the slider bar at the bottom
     function brushing() {
         tsxScale.domain(!d3.event.selection ? tsxScale2.domain() : d3.event.selection.map(tsxScale2.invert)); // If brush is empty then reset the tsxScale domain to default, if not then make it the brush extent
@@ -370,13 +428,12 @@ debugger
     }
 
     function brushended() {
-        if( !d3.event.sourceEvent) {
+        if (!d3.event.sourceEvent) {
             return; // Only transition after input;
         }
-        if( !d3.event.selection) {
+        if (!d3.event.selection) {
             tsxScale.domain(tsxScale2.domain());
-        }
-        else {
+        } else {
             var d0 = d3.event.selection.map(tsxScale2.invert),
                 d1 = d0.map(d3.timeHour.round);
             // If empty when rounded, use floor & ceil instead.
@@ -406,65 +463,107 @@ debugger
         lines.select(".line-group path")
             .transition()
             .attr("d", d => d.visible ? line(d.values) : null);
-        upperAreas.select(".u-area-group path")
-            .transition()
-            .attr("d", d => d.visible ? upperArea(d.values) : null);
-        lowerAreas.select(".l-area-group path")
-            .transition()
-            .attr("d", d => d.visible ? lowerArea(d.values) : null);
+        // upperAreas.select(".u-area-group path")
+        //     .transition()
+        //     .attr("d", d => d.visible ? upperArea(d.values) : null);
+        // lowerAreas.select(".l-area-group path")
+        //     .transition()
+        //     .attr("d", d => d.visible ? lowerArea(d.values) : null);
 
     }
-    function plot_dots(sensor){
+
+    function plot_dots(sensor) {
         const dotTip = d3.select("#map")
             .append("div")
             .style("opacity", 0)
             .attr("class", "tstooltip");
 
-        plot = d3.select('#map g#regMap')
+        let plot = d3.select('#map g#regMap')
             .selectAll('path');
 
-        plot.data(dataset.filter(f=>f.key === sensor ))// set mobile sensor 1 as initial data
+        plot.data(dataset.filter(f=>f.key === sensor ))
+        // plot.data(dataset.filter(f => f.key === "mobile-1"))
+
             .enter()
             .append("circle")
-            .attr("class","dots")
-            .attr("cx", d=> {
-                return projection([d.values[i].Long, d.values[i].Lat])[0];
+            .attr("class", "dots")
+            .attr("cx", d => {
+                return projectionTs([d.values[i].Long, d.values[i].Lat])[0];
             })
-            .attr("cy", function(d) {
-                return projection([d.values[i].Long, d.values[i].Lat])[1];
+            .attr("cy", function (d) {
+                return projectionTs([d.values[i].Long, d.values[i].Lat])[1];
             })
             .attr("r", "3")
             .style("fill", "white")
-            .style("opacity",.8)
-            .on("mouseover", d=>{
+            .style("opacity", .8)
+            .on("mouseover", d => {
                 dotTip.transition()
                     .duration(200)
-                    .style("opacity","1");
+                    .style("opacity", "1");
                 dotTip
-                    .html("Time: " + d.Timestamp.toLocaleTimeString([], { year: '2-digit', month: '2-digit',day: '2-digit', hour: '2-digit', minute:'2-digit'})  + "<br>"
+                    .html("Time: " + d.Timestamp.toLocaleTimeString([], {
+                            year: '2-digit',
+                            month: '2-digit',
+                            day: '2-digit',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        }) + "<br>"
                         + "Value  : " + d.Value.toFixed(2) + " (cmp)")
                     // .style("left", (d3.mouse(this)[0] + 0) + "px")
                     // .style("top", (d3.mouse(this)[1]) + 0 + "px");})
                     .style("left", d3.select(this).attr("cx") + "px")
-                    .style("top", d3.select(this).attr("cy") + "px");})
-            .on("mouseout",()=>{
+                    .style("top", d3.select(this).attr("cy") + "px");
+            })
+            .on("mouseout", () => {
                 dotTip.transition()
                     .duration(200)
-                    .style("opacity","0");});
-
+                    .style("opacity", "0");
+            });
 
 
     }
+debugger
 
-    // // select/clear all the lines
-    // var toggle = true;
-    // d3.select("input")
-    //     .on("click", function() {
-    //         d3.selectAll("path.line")
-    //             .style("opacity", +(toggle = !toggle))
-    //     })
+// control panel
+    var toggle = true;
+    d3.select("#allSensor")
+        .on("click", function () {
+            d3.selectAll(".line")
+                .style("opacity", +(toggle = !toggle))
+
+            d3.selectAll(".u-area")
+                .style("opacity", +(toggle = !toggle))
+            d3.selectAll("l-area")
+                .style("opacity", +(toggle = !toggle));
+        })
+
+
+    function selectAllMobile() {
+
+        d3.selectAll(".line")
+            .transition()
+            .attr("d", d => d.visible ? line(d.values) : null);
+
+    };
+
+
+    d3.select("input#cleaAll").on("click", () => {
+        d3.select("svgTs").selectAll(".line").remove();
+        d3.select("svgTs").selectAll(".u-area").remove();
+        d3.select("svgTs").selectAll(".l-area").remove();
+    });
+
+
+
+
 
 }
+
+
+
+
+
+
 
 function getColorTs(name){
     var sensor = name.split("-");
@@ -529,20 +628,17 @@ function findMinY(data) {
     return d3.min(minYValues);
 }
 
-function selectAllMobile(){
 
-    d3.selectAll(".line")
-        .transition()
-        .attr("d", d => d.visible ? line(d.values) : null);
-
-};
-
-
-function clearAll(){
-    d3.selectAll("path.line").remove();
-    d3.selectAll("path.area").remove();
-    d3.selectAll("rect.legend-box").style("opacity",1 );
+function selectAll(){
+    // d3.select("svgTs").selectAll(".line").style("opacity",1);
 
 
 }
 
+function clearAll() {
+    d3.select("svgTs").selectAll("*").remove();
+    // d3.selectAll("path.area").style("opacity", 0);
+    // d3.selectAll("rect.legend-box").style("fill",greyBtn );
+
+
+}

@@ -243,7 +243,7 @@ Promise.all(filelist).then(files => {
                         });
 
 
-                    //plot radiation station on map
+                    //plot nuclear station on map
                     mapSvg.enter()
                         .data(radiationStation)
                         .append("image")
@@ -285,27 +285,6 @@ Promise.all(filelist).then(files => {
             })
 
             // where helper functions go
-
-            function toggleHeatmap(region){
-                let displayed = d3.select("#" + "heatmap" + (regionNameList.indexOf(region)+1))
-                displayed.classed("displayed",!displayed.classed("displayed"));
-                // let selected_heatmap = d3.select("#heatmap").select("#" + "heatmap" + (regionNameList.indexOf(region)+1)); // select the heatmap that is selected
-                // let selected_region = d3.selectAll("path").select("#" + removeWhitespace(region));
-                // let unselected = selected_heatmap.classed("hidden",true);
-                // if(!unselected){
-                //     // selected_heatmap.style("display","block");
-                //     selected_heatmap.classed("visible",true);
-                //
-                // }else{
-                //     // selected_heatmap.style("display","none");
-                //     selected_heatmap.classed("hidden",true)
-                // }
-                // // selected_heatmap.classed("unselected",!unselected);
-                // selected_region.classed("unselected",!unselected);
-                // selected_region.classed("selected",unselected);
-
-            }
-
             function removeWhitespace(str) {
                 return str.replace(/\s+/g, '');
             }
@@ -323,27 +302,14 @@ Promise.all(filelist).then(files => {
 
 
             function click(d) {
-
-                // d3.select("#" + removeWhitespace(d.properties.Nbrhood)).classed("unselected", !classed("unselected"));
-                // d3.select("#" + removeWhitespace(d.properties.Nbrhood)).classed("selected", !classed("selected"));
-
-                // d3.selectAll("#regMap path").classed("selected",false).style("fill","lightgrey");
-                // d3.select("#" + removeWhitespace(d.properties.Nbrhood)).class("class","selected").style('fill',"#2171b5");
-
-                // $(this).toggleClass("selected");
-                // toggleHeatmap("heatmap" + (index + 1));
                 let thisElm = d3.select("#" + removeWhitespace(d.properties.Nbrhood));
                 thisElm.classed("selected", function() { return !this.classList.contains("selected"); });
                 for (let region of regionNameList) {
                     let index = regionNameList.indexOf(region);
                     if (d.properties.Nbrhood === region) {
-                        draw_heatmap(alldata[index],index+1);
-                        // d3.select("#" + "heatmap" + (regionNameList.indexOf(region)+1)).classed("displayed",true);
-                        // toggleHeatmap(d.properties.Nbrhood);
+                        draw_heatmap(alldata[index],index+1,);
                     }
                 }
-
-
             }
 
             function mousemove(d) {
@@ -364,7 +330,5 @@ Promise.all(filelist).then(files => {
                     .style("opacity", 1)
             }
 
-        // });
         });
-    // });
 });

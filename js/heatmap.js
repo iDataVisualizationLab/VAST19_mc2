@@ -34,7 +34,7 @@ while (true) {
 }
 times = times.map(d => d.toString());
 
-function draw_heatmap(data,index) {
+function draw_heatmap(data,index,value) {
 	// get sensors list
 	var sensors = d3.map(data,d=>d["Sensor-id"]).keys();
 
@@ -74,7 +74,7 @@ function draw_heatmap(data,index) {
 		// .attr("transform",
 		// 	"translate(" + heatMargin.left + "," + heatMargin.top + ")");
 
-	d3.select("#" + "heatmap" + (index)).classed("displayed",true);
+	// d3.select("#" + "heatmap" + (index)).classed("displayed",true);
 
 	// define color scale for heatmap
 	var heatColor = d3.scaleLinear()
@@ -174,6 +174,74 @@ function draw_heatmap(data,index) {
 		d3.select(this)
 		// .style("stroke", "black")
 			.style("opacity", 1)
+	}
+
+	// drop down change
+	//
+	// let value_data = {
+	// 	"Min value": data.map(d => d.value_min),
+	// 	"Mean value": data.map(d => d.value_mean),
+	// 	"Max value": data.map(d => d.Value)
+	// }
+	//
+	// console.log(value_data);
+	//
+	// let dropDown = d3.select("#updateHeatmap")
+	// 	.insert("select","svg")
+	// 	.on("change",dropDownChange)
+	//
+	// let dropDownChange = function(){
+	// 	let new_value = d3.select(this).property("value");
+	//
+	// 	update_values(new_value);
+	//
+	// }
+	// dropDown.selectAll("option")
+	// 	.data(value_data)
+	// 	.enter()
+	// 	.append("option")
+	// 	.attr("value",d=>d.key)
+	// 	.text(d=>d.key);
+	//
+	// function update_values(value){
+	// 	svgHeat
+	// 		.transition()
+	// 		.duration()
+	// 		.style("fill",d=>heatColor(value_data[value]));
+	//
+	// }
+
+	// let initial = update_value("Max value");
+	// let radioMax = d3.select("#maxValue").on("change",show_min())
+	// let radioMean = d3.select("#meanValue").on("change",show_mean());
+	// let radiomin = d3.select("#minValue").on("change",show_min());
+
+	let inputs = d3.selectAll("input");
+	inputs.on("change",()=>{
+		let inputValue = this.value;
+		if(inputValue === "Max Value" ) { show_max(); }
+		else if (inputValue === "Min Value") {show_min(); }
+		else{show_mean();}
+	})
+
+	function show_min(){
+		heatMap
+			.transition()
+			.duration(500)
+			.style("fill",d => heatColor(+d.value_min));
+	}
+
+	function show_mean(){
+		heatMap
+			.transition()
+			.duration(500)
+			.style("fill",d=>heatColor(+d.value_mean));
+	}
+	function show_max(){
+		heatMap
+			.transition()
+			.duration(500)
+			.style("fill",d => heatColor(+d.Value));
 	}
 
 
