@@ -2,11 +2,21 @@
 <meta charset="utf-8">
 <head>
     <title>VAST Mini Challenge II</title>
-
-    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-    <link rel="stylesheet" href="/resources/demos/style.css">
     <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <link rel="stylesheet" href="/resources/demos/style.css">
+    <link rel="stylesheet" href="css/heatmap.css">
+    <link rel="stylesheet" href="css/map.css">
+    <link rel="stylesheet" href="css/ts.css">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/controlPanel.css">
+
+
+
+
+
+
     <script>
         $( function() {
             $( "#map" ).draggable();
@@ -16,200 +26,6 @@
 
 </head>
 
-<style>
-    body{
-        font-family:sans-serif;
-    }
-    /*.header{*/
-    /*}*/
-    /*map*/
-    #map{
-        /*float:left;*/
-        width: 500px;
-        height: 500px;
-        margin:auto;
-        display:inline-block;
-        cursor:pointer;
-        /*float:left;*/
-    }
-    .geoPath{
-        fill:lightgrey;
-    }
-
-    #map #regMap path{
-        stroke: #bbbbbb;
-    }
-
-    #controlPanel{
-        width:500px;
-        height:300px;
-        margin:auto;
-        display:inline-block;
-        cursor:pointer;
-    }
-
-    div.tooltip {
-        position:absolute;
-        color: #000000;
-        z-index:1000;
-        background:rgba(255,255,255,0.5);
-        padding:5px 10px;
-        border-radius:5px;
-        font-size:10px;
-        width:180px;
-        border:1px solid;
-        -webkit-transform:translate(0,-50%);
-        transform:translate(0,-50%);
-        pointer-events:none;
-    }
-
-    .unselected{
-        fill:lightgrey;
-    }
-    .selected{
-        border-color:black;
-        fill:#2171b5;
-    }
-
-
-
-    #timeLabel{
-        position:sticky;
-    }
-
-    /*heatmap*/
-    #heatmap{
-        float:left;
-        width: 70%;
-        height: 850px;
-        margin:auto;
-        padding: 10px;
-        border-style: solid;
-        border-color: lightgrey;
-        overflow:auto;
-    }
-    .displayed{
-        display:block;
-    }
-
-    .hidden{
-        display:none;
-    }
-
-    .sticky{
-        position: -webkit-sticky;
-        position: sticky;
-        top: 0;
-        background-color: white;
-        /*padding: 50px;*/
-        /*font-size: 20px;*/
-    }
-
-
-
-
-    /*time series*/
-    #timeSeries{
-        float:left;
-        /*clear:left;*/
-        width:80%;
-        margin:auto;
-    }
-    .line {
-        fill: none;
-        stroke-width: 1.5px;
-        cursor:pointer;
-    }
-
-    .axis path,
-    .axis line {
-        fill: none;
-        stroke: #5d5d5d;
-        shape-rendering: crispEdges;
-    }
-
-    .axis .tick line {
-        stroke: #bfbfbf;
-        stroke-dasharray: 1.5;
-        stroke-opacity: .5;
-    }
-
-    .axis--grid .domain {
-        fill: #bfbfbf;
-        opacity: 0.75;
-        stroke: none;
-    }
-
-    .axis--x .domain,
-    .axis--grid .tick line {
-        stroke: #fff;
-        stroke-dasharray: 0;
-        stroke-width: 1px;
-    }
-
-    .axis--x .tick line {
-        stroke: #bfbfbf;
-        stroke-dasharray: 0;
-        stroke-opacity: 1;
-    }
-
-    .axis--grid .tick--minor line {
-        stroke-opacity: .5;
-        stroke-width: 0.5px;
-    }
-
-    .u-area{
-        fill-opacity: 0.3;
-    }
-    .l-area{
-        fill-opacity: 0.3;
-    }
-    .legend-box {
-        cursor: pointer;
-    }
-
-    #mouse-tracker {
-        stroke: #bfbfbf;
-        stroke-width: 1px;
-    }
-
-
-    .brush .extent {
-        stroke: #FFF;
-        shape-rendering: crispEdges;
-    }
-    .tstooltip {
-        position: absolute;
-        color: #000000;
-        z-index: 1000;
-        background: rgba(255, 255, 255, 0.5);
-        padding: 5px 10px;
-        border-radius: 5px;
-        font-size: 10px;
-        width: 180px;
-        border: 1px solid;
-        -webkit-transform: translate(0, -50%);
-        transform: translate(0, -50%);
-        pointer-events: none;
-    }
-    /*.tstooltip {*/
-        /*position: absolute;*/
-        /*text-align: center;*/
-        /*padding: 5px;*/
-        /*font: 12px sans-serif;*/
-        /*background: black;*/
-        /*color: white;*/
-        /*border: 1px;*/
-        /*border-radius: 4px;*/
-        /*pointer-events: none;*/
-    /*}*/
-    .tsLegend{
-        font: 12px sans-serif;
-    }
-
-
-
-</style>
 
 <body>
 <div class="header">
@@ -236,23 +52,21 @@
 </div>
 
 <div id="controlPanel" class="ui-widget-content">
-    <div id="colorLegend">
+    <div id="colorLegend"></div>
+    <div class="valueSelector" id="updateHeatmap">
+        <h4>Heatmap</h4>
+        <input type="radio" id="maxValue" name="valueChange" value="Max value" >Show max value<br>
+        <input type="radio" id="meanValue" name="valueChange" value="Mean value" >Show mean value<br>
+        <input type="radio" id="minValue" name="valueChange" value="Min value" >Show min value<br>
 
     </div>
-    <div id="selectMobile">
-
-        <input type="checkbox"  id="allMobile" onclick=selectAllMobile()>Select all mobile sensors
+    <div class="tsSelector">
+        <h4>Timeseries</h4>
+        <input type="checkbox"  id="allMobile" onclick=selectAllMobile()>Select all mobile sensors<br>
+        <input type="checkbox" id="allStatic" onclick=selectAllStatic()>Select all static sensors<br>
+        <input type="checkbox" id="allSensor" onclick=selectAll()>Select all sensors<br>
+        <input type="button" id="clearAll" value="Clear chart" onclick="clearAll()"/><br>
     </div>
-    <div id="selectStatic">
-        <input type="checkbox" id="allStatic" onclick=selectAllStatic()>Select all static sensors
-    </div>
-    <div id="selectAll">
-        <input type="checkbox" id="allSensor" onclick=selectAll()>Select all sensors
-    </div>
-    <div >
-        <input type="button" id="clearAll" value="Clear chart" onclick="clearAll()"/>
-    </div>
-
 </div>
 <!--</div>-->
 
@@ -271,7 +85,7 @@
 <script src="js/map.js"></script>
 <script src="js/heatmap.js"></script>
 <script src="js/ts.js"></script>
-<!--<script src="js/test.js"></script>-->
+<script src="js/controlPanel.js"></script>
 <!--<script src="js/dot.js"></script>-->
 
 <script>
