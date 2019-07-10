@@ -3,10 +3,7 @@
 //=============================legend for time series ============================
 //create value scale for the legend
 var valueScale = d3.scaleLinear()
-    // .domain([0,250,550,900,1500,2000,2500])
-    // .domain([0,250,500,750,1000,2000,2500])
     .domain([0,100,300,600,1000,1500,2100,2800])
-    // .domain([0,2800])
     .range([0, 300]);
 
 //Calculate the variables for the temp gradient
@@ -21,11 +18,11 @@ for(var i = 0; i < numStops; i++) {
 // console.log(d3.range(numStops));
 // console.log(valueScale( valuePoint[i] ));
 var legendColor =  d3.scaleLinear()
-    .domain([0,100,300,600,1000,1500,2100,2800])
+    .domain([0,600,1500,2100,2800])
     // .domain([0,2800])
 //     .domain([0,250,550,900,1500,2000,2500])
 //     .domain([0,100,300,600,1000,1500,2100,2800])
-    .range(colors);
+    .range(["#e6e6e6" ,"#9dbee6",   "#e6852f", "#e61e1a","#ca0020",'#67001f']);
 
 //create the gradient horizontally
 var svgLegend = d3.select("#colorLegend").append("svg")
@@ -40,12 +37,12 @@ svgLegend.append("g").append("defs")
     .attr("x2", "100%")
     .attr("y2", "0%")
     .selectAll("stop")
-    .data(d3.range(numStops))
+    // .data(d3.range(numStops))
     .data(legendColor.range())
     .enter().append("stop")
     .attr("offset", function(d,i) {
         // return valueScale( valuePoint[i] )/heatWidth;
-        return  i/(legendColor.range().length-1)
+        return  (i-0.25)/(legendColor.range().length  )
     })
     .attr("stop-color", function(d) {
         return d
@@ -85,7 +82,8 @@ var xLegend = d3.scaleLinear()
 
 //Define x-axis for legend
 var xAxisLegend = d3.axisBottom(xLegend)
-    .ticks(6);
+    .tickValues([0,100,300,600,1000,1500,2100,2800]);
+    // .ticks(6);
 //.tickFormat(formatPercent)
 
 
