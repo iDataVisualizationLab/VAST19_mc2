@@ -41,12 +41,14 @@ svgLegend.append("g").append("defs")
     .attr("y2", "0%")
     .selectAll("stop")
     .data(d3.range(numStops))
+    .data(legendColor.range())
     .enter().append("stop")
     .attr("offset", function(d,i) {
-        return valueScale( valuePoint[i] )/heatWidth;
+        // return valueScale( valuePoint[i] )/heatWidth;
+        return  i/(legendColor.range().length-1)
     })
-    .attr("stop-color", function(d,i) {
-        return legendColor( valuePoint[i] );
+    .attr("stop-color", function(d) {
+        return d
     });
 // debugger
 // draw legend
