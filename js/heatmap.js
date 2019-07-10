@@ -37,14 +37,6 @@ times = times.map(d => d.toString());
 function draw_heatmap(data,index) {
 	// get sensors list
 	var sensors = d3.map(data,d=>d["Sensor-id"]).keys();
-	// var times = d3.map(data,d=>d.Timestamp).keys();
-	// times.sort((a,b)=>a.Timestamp - b.Timestamp);
-
-
-	// d3.nest().key(d => d["Sensor-id"]).entries(regionData);
-
-
-	// var x = d3.scaleBand().range([0,1200]).domain(times);
 
 	// var cellSize = heatWidth/times.length;
 	var cellSize = 5;
@@ -86,13 +78,15 @@ function draw_heatmap(data,index) {
 
 	// define color scale for heatmap
 	var heatColor = d3.scaleLinear()
-		// .domain([0, d3.max(data, function(d) {return d.Value; })/2, d3.max(data, function(d) {return d.Value; })])
 		.domain([0,250,550,900,1500,2000,2500])
+		// .domain([0,100,300,600,1000,1500,2100,2800])
+		// .domain(d3.extent(data,d=>d.Value))
+		// .domain([0, d3.max(data, d=>d.Value)])
+		// .domain([0, d3.max(data, d=> d.Value)/3, d3.max(data, d=> d.Value)/2, 2500])
 		// .range(["#bdb7d6", "#948DB3", "#605885", "#433B67"])
 		// .range(['#a50026','#d73027','#f46d43','#fdae61','#fee08b','#d9ef8b','#a6d96a','#66bd63','#1a9850','#006837'])
 		.range(colors);
 
-	// var sensorLabels = svgHeat.selectAll(".sensorLabel")
 
 	// add sensor labels
 	var sensorLabels = svgHeat.selectAll(".sensorLabel")
@@ -101,7 +95,7 @@ function draw_heatmap(data,index) {
 		.text( d => d)
 		.attr("x",1210)
 		.attr("y", (d,i) => i * cellSize)
-		.style("font-size","7.5px")
+		.style("font-size","7px")
 		// .attr("font-size",5)
 		.style("text-anchor", "head")
 		.attr("transform", "translate(0," + cellSize/1.1 + ")")
@@ -139,8 +133,9 @@ function draw_heatmap(data,index) {
 		 .style("stroke", "black")
 		 // .style("stroke-opacity", d=>(+d["value_count"]/360))
 		 .style("stroke-width", d=>(+d["value_count"] / 1000 + 0.1 ))
-		 .style("display", d=>{return d == null ? "none" : null;})
+		 // .style("display", d=>{return d == null ? "none" : null;})
 		 .style("fill", d => heatColor(d["Value"]))
+		 // .style("fill","url(#legend-heatmap)")
 
 		 .on("mouseover", mouseover)
 		 .on("mousemove", mousemove)
