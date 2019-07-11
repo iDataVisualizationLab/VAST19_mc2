@@ -8,7 +8,7 @@
 
 #controlPanel{
     width:500px;
-    height:370px;
+    height:330px;
     margin:auto;
     display:inline-block;
     cursor:pointer;
@@ -19,7 +19,7 @@
 
 #mobileOptions{
     width:20%;
-    height:35%;
+    height:30%;
     float:left;
     margin:auto;
     border-style: solid;
