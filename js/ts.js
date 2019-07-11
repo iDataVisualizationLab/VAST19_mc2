@@ -35,33 +35,37 @@ var tsxAxis = d3.axisBottom(tsxScale)
 var line = d3.line()
     .x(d => tsxScale(d.Timestamp))
     .y(d => tsyScale(d.value_mean))
-    .curve(d3.curveLinear);
-    // .defined(d => !isNaN(d.value_mean));// Hiding line value for missing data
+    .curve(d3.curveLinear)
+    .defined(d => !isNaN(d.value_mean));// Hiding line value for missing data
 var maxLine = d3.line()
     .x(d => tsxScale(d.Timestamp))
     .y(d => tsyScale(d.Value))
-    .curve(d3.curveLinear);
+    .curve(d3.curveLinear)
+    .defined(d => !isNaN(d.Value));
 
 var minLine = d3.line()
     .x(d => tsxScale(d.Timestamp))
     .y(d => tsyScale(d.value_min))
-    .curve(d3.curveLinear);
+    .curve(d3.curveLinear)
+    .defined(d => !isNaN(d.value_min));
 
 
 // //define the min-max area
 var upperArea = d3.area()
-    .curve(d3.curveCardinal)
+    .curve(d3.curveBasis)
     .x(d => tsxScale(d.Timestamp))
     // .x (function (d) { return x(d.Timestamp); })
     .y0(function (d) { return tsyScale(d.value_mean); })
-    .y1(function (d) { return tsyScale(d.Value); });
+    .y1(function (d) { return tsyScale(d.Value); })
+    .defined(d => !isNaN(d.Value) && !isNaN(d.value_mean));;
 
 var lowerArea = d3.area()
-    .curve(d3.curveCardinal)
+    .curve(d3.curveBasis)
     .x(d => tsxScale(d.Timestamp))
     // .x (function (d) { return x(d.Timestamp) ; })
     .y0(function (d) { return tsyScale(d.value_min); })
-    .y1(function (d) { return tsyScale(d.value_mean); });
+    .y1(function (d) { return tsyScale(d.value_mean); })
+    .defined(d => !isNaN(d.value_mean)&& !isNaN(d.value_min));;
 
 var svgTs = d3.select("#timeSeries").append("svg")
     .attr("width", tsWidth + tsMargin.left + tsMargin.right)
@@ -249,6 +253,7 @@ function drawTimeSeries(regionData) {
     lines.append("path")
         .attr("class", "line")
         .attr("d", d => d.visible ? line(d.values) : null)
+        // .attr("d", d=> line(d.values))
         .style("stroke", d => getColorTs(d.key))
         // .style("fill-opacity", 0.5)
         .attr("id", d => "lin-" + d.key)
@@ -262,12 +267,12 @@ function drawTimeSeries(regionData) {
             lowerAreas.select("#l-area-" + d.key)
                 .transition()
                 .attr("d", d => d.visible ? upperArea(d.values) : null);
-            maxLines.select("#maxline-" + d.key)
-                .transition()
-                .attr("d",d=>d.visible? maxLine(d.values):null);
-            minLines.select("#minline-" + d.key)
-                .transition()
-                .attr("d", d=>d.visible? minLine(d.values):null);
+            // maxLines.select("#maxline-" + d.key)
+            //     .transition()
+            //     .attr("d",d=>d.visible? maxLine(d.values):null);
+            // minLines.select("#minline-" + d.key)
+            //     .transition()
+            //     .attr("d", d=>d.visible? minLine(d.values):null);
             // if(d.visible){
             //     plot_dots("d");
             // }else{
@@ -275,7 +280,7 @@ function drawTimeSeries(regionData) {
             // }
 
         })
-        .on("mouseover", function (d) {
+        .on("mouseover", function (d,i) {
             d3.selectAll('.line').style("opacity", 0.2);
             d3.select(this).style("opacity", 1).style("stroke-width", "2px");
             d3.selectAll(".legend").style("opacity", 0.2);
@@ -336,6 +341,7 @@ function drawTimeSeries(regionData) {
         .attr("x", tsWidth + (tsMargin.right / 3) - 25)
         .attr("y", (d, i) => (i + 1) * legendSpace - 4)
         .attr("fill", d => d.visible ? getColorTs(d.key) : greyBtn)
+        // .attr("fill", d =>  getColorTs(d.key))
         .attr("class", "legend-box")
         .on("click", (d, i) => {
             d.visible = !d.visible;
@@ -358,26 +364,26 @@ function drawTimeSeries(regionData) {
                 .transition()
                 .attr("fill", d => d.visible ? getColorTs(d.key) : greyBtn);
             // // update upper area
-            // upperAreas.select("#u-area-" + d.key)
-            //     .transition()
-            //     .attr("d", d => {
-            //         if (!d.visible) {
-            //             null;
-            //         }
-            //     });
-            // // update
-            // lowerAreas.select("#l-area-" + d.key)
-            //     .transition()
-            //     .attr("d", d => {
-            //         if (!d.visible) {
-            //             null;
-            //         }
-            //     });
+            upperAreas.select("#u-area-" + d.key)
+                .transition()
+                .attr("d", d => {
+                    if (!d.visible) {
+                        null;
+                    }
+                });
+            // update
+            lowerAreas.select("#l-area-" + d.key)
+                .transition()
+                .attr("d", d => {
+                    if (!d.visible) {
+                        null;
+                    }
+                });
         })
         .on("mouseover", function (d) {
-            d3.select(this)
-                .transition()
-                .attr("fill", d => getColorTs(d.key));
+            // d3.select(this)
+            //     .transition()
+            //     .attr("fill", d => getColorTs(d.key));
 
             d3.selectAll('.line').style("opacity", 0.2);
             // d3.select(this).style("opacity", 1).style("stroke-width", "2px");
@@ -386,12 +392,12 @@ function drawTimeSeries(regionData) {
             d3.select("#leg-" + d.key).style("opacity", 1);
         })
         .on("mouseout", function (d) {
-            d3.select(this)
-                .transition()
-                .attr("fill", d => d.visible ? getColorTs(d.key) : greyBtn);
+            // d3.select(this)
+            //     .transition()
+            //     .attr("fill", d => d.visible ? getColorTs(d.key) : greyBtn);
 
             d3.selectAll('.line').style("opacity", 1);
-            d3.select(this).style("stroke-width", "1.5px");
+            d3.select(this).style("stroke-width", "2px");
             d3.selectAll(".legend").style("opacity", 1);
             focus.style("display", "none");
 
@@ -463,17 +469,17 @@ function drawTimeSeries(regionData) {
         lines.select(".line-group path")
             .transition()
             .attr("d", d => d.visible ? line(d.values) : null);
-        // upperAreas.select(".u-area-group path")
-        //     .transition()
-        //     .attr("d", d => d.visible ? upperArea(d.values) : null);
-        // lowerAreas.select(".l-area-group path")
-        //     .transition()
-        //     .attr("d", d => d.visible ? lowerArea(d.values) : null);
+        upperAreas.select(".u-area-group path")
+            .transition()
+            .attr("d", d => d.visible ? upperArea(d.values) : null);
+        lowerAreas.select(".l-area-group path")
+            .transition()
+            .attr("d", d => d.visible ? lowerArea(d.values) : null);
 
     }
 
-    function plot_dots(sensor) {
-        const dotTip = d3.select("#map")
+    function plot_dots(sensorId) {
+        let dotTip = d3.select("#map")
             .append("div")
             .style("opacity", 0)
             .attr("class", "tstooltip");
@@ -481,7 +487,7 @@ function drawTimeSeries(regionData) {
         let plot = d3.select('#map g#regMap')
             .selectAll('path');
 
-        plot.data(dataset.filter(f=>f.key === sensor ))
+        plot.data(dataset.filter(f=>f.key === sensorId ))
         // plot.data(dataset.filter(f => f.key === "mobile-1"))
 
             .enter()
@@ -527,13 +533,13 @@ debugger
 // control panel
     var toggle = true;
     d3.select("#allSensor")
-        .on("click", function () {
-            d3.selectAll(".line")
+        .on("change", function () {
+            d3.selectAll(".line-group")
                 .style("opacity", +(toggle = !toggle))
 
-            d3.selectAll(".u-area")
+            d3.selectAll(".u-area-group")
                 .style("opacity", +(toggle = !toggle))
-            d3.selectAll("l-area")
+            d3.selectAll("l-area-group")
                 .style("opacity", +(toggle = !toggle));
         })
 
@@ -629,16 +635,17 @@ function findMinY(data) {
 }
 
 
-function selectAll(){
-    // d3.select("svgTs").selectAll(".line").style("opacity",1);
-
-
-}
-
-function clearAll() {
-    d3.select("svgTs").selectAll("*").remove();
-    // d3.selectAll("path.area").style("opacity", 0);
-    // d3.selectAll("rect.legend-box").style("fill",greyBtn );
-
-
-}
+// function selectAll(){
+//     d3.select("svgTs").selectAll("path.line")
+//         .style("stroke", d => getColorTs(d.key))
+//         .style("opacity", 1)
+//
+// }
+//
+// function clearAll() {
+//     d3.selectAll("path.line").remove();
+//     // d3.selectAll("path.area").style("opacity", 0);
+//     // d3.selectAll("rect.legend-box").style("fill",greyBtn );
+//
+//
+// }
