@@ -382,6 +382,7 @@ function drawTimeSeries(regionData) {
 
             if (d.visible) {
                 tsPlot(d.key);
+                // plot_dots(d.key);
             }else{
 
             }
@@ -482,49 +483,83 @@ function drawTimeSeries(regionData) {
 
     }
 debugger
-    function plot_dots(sensorId) {
+
+    function plot_dots(sensor) {
         let dotTip = d3.select("#map")
             .append("div")
             .style("opacity", 0)
             .attr("class", "tstooltip");
+    mapTs.data(dataset.filter(f=>f.key === sensor ))
+        .enter()
+        .append("circle")
+        .attr("class", "dots")
+        .attr("cx", (d,i) => {
+            return projectionTs([d.values[i].Long, d.values[i].Lat])[0];
+        })
+        .attr("cy", function (d,i) {
+            return projectionTs([d.values[i].Long, d.values[i].Lat])[1];
+        })
+        .attr("r", "3")
+        .style("fill", d=>getColorTs(d.key))
+        .style("opacity", .8)
+        .on("mouseover", (d,i) => {
+            dotTip.transition()
+                .duration(200)
+                .style("opacity", "1");
+            //
+            // heatTip
+            //     .html("Sensor: " + d.key + "<br>"
+            //         + "Time: " + d.values[i].Timestamp.toLocaleTimeString([], {
+            //             year: '2-digit',
+            //             month: '2-digit',
+            //             day: '2-digit',
+            //             hour: '2-digit',
+            //             minute: '2-digit'
+            //         }) + "<br>"
+            //         + "Mean: " + d.values[i].value_mean.toFixed(2) + " (cpm)" + "<br>"
+            //         + "Max: " + d.values[i].Value.toFixed(2) + "(cpm)" + "<br>"
+            //         + "Min: " + d.values[i].value_min.toFixed(2) + "(cpm)" + "<br>")
+            //     .style("left", (d3.mouse(this)[0] + 0) + "px")
+            //     .style("top", (d3.mouse(this)[1]) + 0 + "px")
+            //     // .style("left", d3.select(this).attr("cx") + "px")
+            //     // .style("top", d3.select(this).attr("cy") + "px");
 
-        mapTs.data(dataset.filter(f=>f.key === sensorId ))
-            .enter()
-            .append("circle")
-            .attr("class", "dots")
-            .attr("cx", (d,i) => {
-                return projectionTs([d.values[i].Long, d.values[i].Lat])[0];
-            })
-            .attr("cy", function (d,i) {
-                return projectionTs([d.values[i].Long, d.values[i].Lat])[1];
-            })
-            .attr("r", "3")
-            .style("fill", "white")
-            .style("opacity", .8)
-            .on("mouseover", d => {
-                dotTip.transition()
-                    .duration(200)
-                    .style("opacity", "1");
-                dotTip
-                    .html("Time: " + d.Timestamp.toLocaleTimeString([], {
-                            year: '2-digit',
-                            month: '2-digit',
-                            day: '2-digit',
-                            hour: '2-digit',
-                            minute: '2-digit'
-                        }) + "<br>"
-                        + "Value  : " + d.Value.toFixed(2) + " (cmp)")
-                    // .style("left", (d3.mouse(this)[0] + 0) + "px")
-                    // .style("top", (d3.mouse(this)[1]) + 0 + "px");})
-                    .style("left", d3.select(this).attr("cx") + "px")
-                    .style("top", d3.select(this).attr("cy") + "px");
-            })
-            .on("mouseout", () => {
-                dotTip.transition()
-                    .duration(200)
-                    .style("opacity", "0");
-            });
-    }
+            // heatTip
+            //     .transition()
+            //     .duration(100)
+            //     .style("opacity", 1)
+            //
+            // tooltip.transition()
+            //     .duration(200)
+            //     .style("opacity", 1);
+
+
+            dotTip
+                .html("Sensor: " + d.key + "<br>"
+                    + "Time: " + d.values[i].Timestamp.toLocaleTimeString([], {
+                        year: '2-digit',
+                        month: '2-digit',
+                        day: '2-digit',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    }) + "<br>"
+                    + "Mean: " + d.values[i].value_mean.toFixed(2) + " (cpm)" + "<br>"
+                    + "Max: " + d.values[i].Value.toFixed(2) + "(cpm)" + "<br>"
+                    + "Min: " + d.values[i].value_min.toFixed(2) + "(cpm)" + "<br>")
+                // .style("left", (d3.mouse(this)[0] + 0) + "px")
+                // .style("top", (d3.mouse(this)[1]) + 0 + "px");})
+                .style("left", d3.select(this).attr("cx") + "px")
+                .style("top", d3.select(this).attr("cy") + "px");
+        })
+        .on("mouseout", () => {
+            dotTip.transition()
+                .duration(200)
+                .style("opacity", "0");
+        });
+}
+
+
+
 
 // control panel
     var toggle = true;
@@ -602,6 +637,8 @@ function getColorTs(name){
     }
     return colorScheme[result];
 }
+
+
 
 function findMaxY(data) {
     var maxYValues = data.map( d => {

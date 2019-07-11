@@ -141,7 +141,7 @@ Promise.all(filelist).then(files => {
                         .on("mousemove", mousemove)
                         .on("mouseleave", mouseleave)
                         .on("click", d=>click(d));
-                    mapTs = mapSvg;
+
                     // $(".geoPath").click(()=>{
                         // $(this).toggleClass("selected");
                     // })
@@ -155,6 +155,7 @@ Promise.all(filelist).then(files => {
                         .attr("text-anchor", "middle")
                         .attr("font-size", "8pt");
 
+                    mapTs = mapSvg;
                     //load data for static sensors and plot them on to the map
                     d3.csv("data/StaticSensorLocations.csv").then(location => {
                         mapSvg.enter()
@@ -217,6 +218,11 @@ Promise.all(filelist).then(files => {
                         // if(d3.select("#leg-" + sensor).visible){
                         //     d3.select
                         // }
+                        let dotTip = d3.select("#map")
+                            .append("div")
+                            .style("opacity", 0)
+                            .attr("class", "tstooltip");
+
                         mapSvg
                             .data(data.filter(d=>d["Sensor-id"]===sensor))
                             .enter()
@@ -229,15 +235,25 @@ Promise.all(filelist).then(files => {
                                 return projection([d.Long, d.Lat])[1];
                             })
                             .attr("r", "3")
-                            .style("fill", d=>getColorTs(d.key))
+                            .style("fill", d=>getColorTs(d["Sensor-id"]))
                             .style("opacity",.8)
                             .on("mouseover", (d,i)=>{
                                 dotTip.transition()
                                     .duration(200)
                                     .style("opacity","1");
                                 dotTip
-                                    .html("Time: " + d.values[i].Timestamp.toLocaleTimeString([], { year: '2-digit', month: '2-digit',day: '2-digit', hour: '2-digit', minute:'2-digit'})  + "<br>"
-                                        + "Value  : " + d.values[i].Value.toFixed(2) + " (cmp)")
+                                    .html("Sensor:" +d["Sensor-id"] + "<br>"
+                                        + ""
+                                        + "Time: " + d.Timestamp.toLocaleTimeString([],
+                                            { year: '2-digit',
+                                                month: '2-digit'
+                                                ,day: '2-digit',
+                                                hour: '2-digit',
+                                                minute:'2-digit'})  + "<br>"
+                                        + "Max: " + d.Value.toFixed(2) + " (cmp)" + "<br>"
+                                        + "Mean:" + d.value_mean.toFixed(2) + " (cmp)" + "<br>"
+                                        + "Min: " + d.value_min.toFixed(2) + " (cmp)" + "<br>"
+                                    )
                                     // .style("left", (d3.mouse(this)[0] + 0) + "px")
                                     // .style("top", (d3.mouse(this)[1]) + 0 + "px");})
                                     .style("left", d3.select(this).attr("cx") + "px")
@@ -309,7 +325,7 @@ Promise.all(filelist).then(files => {
                         .attr("x", 15)
                         .attr("y",(d,i)=>10 + i*15);
 
-
+                    mapTs = mapSvg;
                 }
 
                 draw_map(geojson);
