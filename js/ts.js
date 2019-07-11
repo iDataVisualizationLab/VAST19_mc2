@@ -384,7 +384,7 @@ function drawTimeSeries(regionData) {
                 tsPlot(d.key);
                 // plot_dots(d.key);
             }else{
-
+                removePlot(d.key);
             }
         })
         .on("mouseover", function (d) {
@@ -484,6 +484,7 @@ function drawTimeSeries(regionData) {
     }
 debugger
 
+
     function plot_dots(sensor) {
         let dotTip = d3.select("#map")
             .append("div")
@@ -559,7 +560,10 @@ debugger
 }
 
 
+    function removePlot(sensor){
+        d3.selectAll(".dots-" + sensor).remove();
 
+}
 
 // control panel
     var toggle = true;
