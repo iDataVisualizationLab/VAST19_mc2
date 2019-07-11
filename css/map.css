@@ -6,6 +6,9 @@
     display:inline-block;
     cursor:pointer;
     /*float:left;*/
+    padding: 10px;
+    border-style: solid;
+    border-color: lightgrey;
 }
 .geoPath{
     fill:lightgrey;
@@ -15,13 +18,7 @@
     stroke: #bbbbbb;
 }
 
-#controlPanel{
-    width:500px;
-    height:300px;
-    margin:auto;
-    display:inline-block;
-    cursor:pointer;
-}
+
 
 div.tooltip {
     position:absolute;
