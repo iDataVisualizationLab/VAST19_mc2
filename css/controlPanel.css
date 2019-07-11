@@ -11,18 +11,29 @@
     height:330px;
     margin:auto;
     display:inline-block;
-    cursor:pointer;
+    cursor:move;
     padding: 10px;
     border-style: solid;
     border-color: lightgrey;
 }
 
-#mobileOptions{
-    width:20%;
-    height:30%;
-    float:left;
-    margin:auto;
-    border-style: solid;
-    border-color: lightgrey;
-    overflow:auto;
+.valueSelector{
+    cursor:default;
+}
+.tsSelector{
+    cursor:default;
+}
+/*#mobileOptions{*/
+    /*width:20%;*/
+    /*height:30%;*/
+    /*float:left;*/
+    /*margin:auto;*/
+    /*border-style: solid;*/
+    /*border-color: lightgrey;*/
+    /*overflow:auto;*/
+
+/*}*/
+
+#colorLegend{
+    cursor:default;
 }
