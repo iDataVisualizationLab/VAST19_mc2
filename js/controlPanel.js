@@ -27,7 +27,7 @@ var legendColor =  d3.scaleLinear()
 //create the gradient horizontally
 var svgLegend = d3.select("#colorLegend").append("svg")
     .attr("width",400)
-    .attr("height",100)
+    .attr("height",60)
 
 svgLegend.append("g").append("defs")
     .append("linearGradient")

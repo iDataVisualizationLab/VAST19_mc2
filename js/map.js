@@ -27,6 +27,8 @@ const regionNameList =
         'East Parton',
         'West Parton'];
 var projectionTs;
+var mapTs;
+var tsPlot;
 // var tsfilelist = [];
 // for ( i = 1; i < 20; i ++ )
 // {
@@ -139,6 +141,7 @@ Promise.all(filelist).then(files => {
                         .on("mousemove", mousemove)
                         .on("mouseleave", mouseleave)
                         .on("click", d=>click(d));
+                    mapTs = mapSvg;
                     // $(".geoPath").click(()=>{
                         // $(this).toggleClass("selected");
                     // })
@@ -181,43 +184,72 @@ Promise.all(filelist).then(files => {
                         // });
                     });
 
-                    // //plot initial mobile locations
-                    // const dotTip = d3.select("#map")
+
+
+                    //create checkboxes for each mobile sensors to plot them on the map
+                    // let dotTip = d3.select("#map")
                     //     .append("div")
                     //     .style("opacity", 0)
                     //     .attr("class", "tstooltip");
                     //
-                    // mapSvg
-                    //     .data(mbdata[0])// set mobile sensor 1 as initial data
-                    //     .enter()
-                    //     .append("circle")
-                    //     .attr("class","dots")
-                    //     .attr("cx", d=> {
-                    //         return projection([d.Long, d.Lat])[0];
-                    //     })
-                    //     .attr("cy", function(d) {
-                    //         return projection([d.Long, d.Lat])[1];
-                    //     })
-                    //     .attr("r", "3")
-                    //     .style("fill", "#31a354")
-                    //     .style("opacity",.8)
-                    //     .on("mouseover", d=>{
-                    //         dotTip.transition()
-                    //             .duration(200)
-                    //             .style("opacity","1");
-                    //         dotTip
-                    //             .html("Time: " + d.Timestamp.toLocaleTimeString([], { year: '2-digit', month: '2-digit',day: '2-digit', hour: '2-digit', minute:'2-digit'})  + "<br>"
-                    //                 + "Value  : " + d.Value.toFixed(2) + " (cmp)")
-                    //             // .style("left", (d3.mouse(this)[0] + 0) + "px")
-                    //             // .style("top", (d3.mouse(this)[1]) + 0 + "px");})
-                    //             .style("left", d3.select(this).attr("cx") + "px")
-                    //             .style("top", d3.select(this).attr("cy") + "px");})
-                    //     .on("mouseout",()=>{
-                    //         dotTip.transition()
-                    //             .duration(200)
-                    //             .style("opacity","0");});
+                    // let newData = d3.nest().key(d => d["Sensor-id"]).entries(data);
+                    //
+                    // let sensorOptions = d3.select("#mobileOptions");
+                    //    sensorOptions.selectAll("input")
+                    //         .data(newData.filter(d=>d.key !== "static-1" && d.key !== "static-4"&& d.key != "static-6" && d.key != "static-9" && d.key != "static-11" && d.key != "static-12" && d.key != "static-13" && d.key != "static-14" && d.key != "static-15"))
+                    //         .enter().append("label")
+                    //         .text(d=>d.key)
+                    //         .append("input")
+                    //         .attr("type","checkbox")
+                    //         .attr("class","mobile-selector")
+                    //         // .property("checked",d=>d["Sensor-id"]=="mobile-1")
+                    //         .attr("name","mobileSelection")
+                    //         .attr("id",d=>"box-" + d.key)
+                    //         .on("change",d=>plotDots(d.key))
+                    //         .append('text')
+                    //         .text(d=>d.key);
 
 
+
+                    debugger
+
+                    let plot = function plotDots(sensor){
+                        // if(d3.select("#leg-" + sensor).visible){
+                        //     d3.select
+                        // }
+                        mapSvg
+                            .data(data.filter(d=>d["Sensor-id"]===sensor))
+                            .enter()
+                            .append("circle")
+                            .attr("class","dots")
+                            .attr("cx", d=> {
+                                return projection([d.Long, d.Lat])[0];
+                            })
+                            .attr("cy", d=> {
+                                return projection([d.Long, d.Lat])[1];
+                            })
+                            .attr("r", "3")
+                            .style("fill", d=>getColorTs(d.key))
+                            .style("opacity",.8)
+                            .on("mouseover", (d,i)=>{
+                                dotTip.transition()
+                                    .duration(200)
+                                    .style("opacity","1");
+                                dotTip
+                                    .html("Time: " + d.values[i].Timestamp.toLocaleTimeString([], { year: '2-digit', month: '2-digit',day: '2-digit', hour: '2-digit', minute:'2-digit'})  + "<br>"
+                                        + "Value  : " + d.values[i].Value.toFixed(2) + " (cmp)")
+                                    // .style("left", (d3.mouse(this)[0] + 0) + "px")
+                                    // .style("top", (d3.mouse(this)[1]) + 0 + "px");})
+                                    .style("left", d3.select(this).attr("cx") + "px")
+                                    .style("top", d3.select(this).attr("cy") + "px");})
+                            .on("mouseout",()=>{
+                                dotTip.transition()
+                                    .duration(200)
+                                    .style("opacity","0");});
+
+                    }
+
+                    tsPlot = plot;
 
 
                     //plot hospitals on map
@@ -276,7 +308,7 @@ Promise.all(filelist).then(files => {
                         .attr("font-size",10)
                         .attr("x", 15)
                         .attr("y",(d,i)=>10 + i*15);
-                    debugger
+
 
                 }
 

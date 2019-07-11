@@ -278,7 +278,7 @@ function drawTimeSeries(regionData) {
             // }else{
             //     null;
             // }
-
+            plot_dots(d.key);
         })
         .on("mouseover", function (d,i) {
             d3.selectAll('.line').style("opacity", 0.2);
@@ -379,6 +379,12 @@ function drawTimeSeries(regionData) {
                         null;
                     }
                 });
+
+            if (d.visible) {
+                tsPlot(d.key);
+            }else{
+
+            }
         })
         .on("mouseover", function (d) {
             // d3.select(this)
@@ -412,20 +418,17 @@ function drawTimeSeries(regionData) {
         .attr("fill", "#5d5d5d")
         .style("font-size", "11")
         .text(d => d.key)
-        .on("click", d => {
-            d.visible = !d.visible;
-            legend.select("text")
-                .transition()
-                .attr("fill", d => d.visible ? getColorTs(d.key) : "#5d5d5d");
-            if (d.visible) {
-                plot_dots(d.key);
-            } else {
-                // remove_dots(d.key);
-            }
-            // plot_dots(d.key);
-
-        });
-    debugger
+        // .on("click", d => {
+        //     d.visible = !d.visible;
+        //     legend.select("text")
+        //         .transition()
+        //         .attr("fill", d => d.visible ? getColorTs(d.key) : "#5d5d5d");
+        //     if (d.visible) {
+        //         tsPlot(d.key);
+        //     }
+        //
+        //
+        // });
 
     //For brusher of the slider bar at the bottom
     function brushing() {
@@ -469,6 +472,7 @@ function drawTimeSeries(regionData) {
         lines.select(".line-group path")
             .transition()
             .attr("d", d => d.visible ? line(d.values) : null);
+
         upperAreas.select(".u-area-group path")
             .transition()
             .attr("d", d => d.visible ? upperArea(d.values) : null);
@@ -477,26 +481,21 @@ function drawTimeSeries(regionData) {
             .attr("d", d => d.visible ? lowerArea(d.values) : null);
 
     }
-
+debugger
     function plot_dots(sensorId) {
         let dotTip = d3.select("#map")
             .append("div")
             .style("opacity", 0)
             .attr("class", "tstooltip");
 
-        let plot = d3.select('#map g#regMap')
-            .selectAll('path');
-
-        plot.data(dataset.filter(f=>f.key === sensorId ))
-        // plot.data(dataset.filter(f => f.key === "mobile-1"))
-
+        mapTs.data(dataset.filter(f=>f.key === sensorId ))
             .enter()
             .append("circle")
             .attr("class", "dots")
-            .attr("cx", d => {
+            .attr("cx", (d,i) => {
                 return projectionTs([d.values[i].Long, d.values[i].Lat])[0];
             })
-            .attr("cy", function (d) {
+            .attr("cy", function (d,i) {
                 return projectionTs([d.values[i].Long, d.values[i].Lat])[1];
             })
             .attr("r", "3")
@@ -525,10 +524,7 @@ function drawTimeSeries(regionData) {
                     .duration(200)
                     .style("opacity", "0");
             });
-
-
     }
-debugger
 
 // control panel
     var toggle = true;
@@ -559,16 +555,7 @@ debugger
         d3.select("svgTs").selectAll(".l-area").remove();
     });
 
-
-
-
-
 }
-
-
-
-
-
 
 
 function getColorTs(name){
