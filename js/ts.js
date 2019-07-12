@@ -576,13 +576,22 @@ debugger
     }
 
 // control panel
+    // check to select/unselect all sensors
     d3.select("#allSensor")
-        .on("click", function () {
-            d3.selectAll(".line")
-                .attr("d", d => d.visible ? null:line(d.values) )
-                .attr("fill",d=>getColorTs(d.key))// .style("opacity",1);
-            d3.selectAll(".legend-box")
-                .attr("fill",d=>getColorTs(d.key))
+        .on("change", ()=> {
+            if (d3.select("#allSensor").property("checked")) {
+                d3.selectAll(".line")
+                    .transition()
+                    .attr("d", d =>  line(d.values))
+                    .attr("fill", d => getColorTs(d.key))// .style("opacity",1);
+                d3.selectAll(".legend-box")
+                    .attr("fill", d => getColorTs(d.key))
+            }
+            else
+            {
+                d3.selectAll("path.line").remove();
+                d3.selectAll(".legend-box").attr("fill",greyBtn);
+            }
         })
 
 
@@ -592,11 +601,11 @@ debugger
     };
 
 
-    d3.select("input#cleaAll").on("click", () => {
-        d3.select("svgTs").selectAll(".line").remove();
-        d3.select("svgTs").selectAll(".u-area").remove();
-        d3.select("svgTs").selectAll(".l-area").remove();
-    });
+    // d3.select("input#cleaAll").on("click", () => {
+    //     d3.selectAll("path.line").remove();
+    //     d3.select("svgTs").selectAll(".u-area").remove();
+    //     d3.select("svgTs").selectAll(".l-area").remove();
+    // });
 
 }
 
@@ -660,7 +669,7 @@ function findMaxY(data) {
 function findMinY(data) {
     var minYValues = data.map( d => {
         if (d.visible) {
-            return d3.min(d.values, value => value.Value) - 1;
+            return d3.min(d.values, value => value.value_min) - 1;
         }
     });
     return d3.min(minYValues);
@@ -674,10 +683,10 @@ function findMinY(data) {
 //
 // }
 //
-// function clearAll() {
-//     d3.selectAll("path.line").remove();
-//     // d3.selectAll("path.area").style("opacity", 0);
-//     // d3.selectAll("rect.legend-box").style("fill",greyBtn );
-//
-//
-// }
+function clearAll() {
+    d3.selectAll("path.line").remove();
+    // d3.selectAll("path.area").style("opacity", 0);
+    // d3.selectAll("rect.legend-box").style("fill",greyBtn );
+
+
+}
