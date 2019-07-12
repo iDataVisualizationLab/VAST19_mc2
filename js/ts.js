@@ -293,6 +293,7 @@ function drawTimeSeries(regionData) {
             focus.attr("transform", "translate(" + tsxScale(x1) + "," + tsyScale(d.values[i].value_mean) + ")"); // Find position
             focus.style("display", null);
             focus.selectAll("circle")
+                // .attr("id", f=>"circle-" + f.key)
                 .attr("fill", getColorTs(d.key));
 
             // console.log(d.values[i].time);
@@ -556,34 +557,37 @@ debugger
             dotTip.transition()
                 .duration(200)
                 .style("opacity", "0");
-        });
+        })
+        on("click", d=>drawRoute(d.key))
 }
 
-
+    // function to remove mobile dots on map
     function removePlot(sensor){
         d3.selectAll(".dots-" + sensor).remove();
 
 }
+    //function to draw routes on map
+    function drawRoute(sensor){
+
+
+
+
+
+    }
 
 // control panel
-    var toggle = true;
     d3.select("#allSensor")
-        .on("change", function () {
-            d3.selectAll(".line-group")
-                .style("opacity", +(toggle = !toggle))
-
-            d3.selectAll(".u-area-group")
-                .style("opacity", +(toggle = !toggle))
-            d3.selectAll("l-area-group")
-                .style("opacity", +(toggle = !toggle));
+        .on("click", function () {
+            d3.selectAll(".line")
+                .attr("d", d => d.visible ? null:line(d.values) )
+                .attr("fill",d=>getColorTs(d.key))// .style("opacity",1);
+            d3.selectAll(".legend-box")
+                .attr("fill",d=>getColorTs(d.key))
         })
 
 
     function selectAllMobile() {
 
-        d3.selectAll(".line")
-            .transition()
-            .attr("d", d => d.visible ? line(d.values) : null);
 
     };
 
