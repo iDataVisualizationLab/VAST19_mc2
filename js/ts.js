@@ -357,11 +357,11 @@ function drawTimeSeries(regionData) {
 
 
             // Update graph
-            lines.select("path")
+            lines.select("#lin-"+d.key)
                 .transition()
                 .attr("d", d => d.visible ? line(d.values) : null);
             // update legend
-            legend.select("rect")
+            legend.select("rect")//("#leg-"+d.key)
                 .transition()
                 .attr("fill", d => d.visible ? getColorTs(d.key) : greyBtn);
             // // update upper area
@@ -582,6 +582,7 @@ debugger
             if (d3.select(this).property("checked")) {
                 d3.select("#allMobile").property("disabled" , true);
                 d3.select("#allStatic").property("disabled" , true);
+
                 d3.selectAll(".line")
                     .attr("d", d =>  line(d.values))
                     .attr("stroke", d => getColorTs(d.key))// .style("opacity",1);
@@ -592,7 +593,7 @@ debugger
             {
                 d3.select("#allMobile").property("disabled" , false);
                 d3.select("#allStatic").property("disabled" , false);
-                d3.selectAll("path.line").remove();
+                d3.selectAll("path.line").attr("d",null);
                 d3.selectAll(".legend-box").attr("fill",greyBtn);
             }
         })
