@@ -578,17 +578,20 @@ debugger
 // control panel
     // check to select/unselect all sensors
     d3.select("#allSensor")
-        .on("change", ()=> {
-            if (d3.select("#allSensor").property("checked")) {
+        .on("change", function() {
+            if (d3.select(this).property("checked")) {
+                d3.select("#allMobile").property("disabled" , true);
+                d3.select("#allStatic").property("disabled" , true);
                 d3.selectAll(".line")
-                    .transition()
                     .attr("d", d =>  line(d.values))
-                    .attr("fill", d => getColorTs(d.key))// .style("opacity",1);
+                    .attr("stroke", d => getColorTs(d.key))// .style("opacity",1);
                 d3.selectAll(".legend-box")
                     .attr("fill", d => getColorTs(d.key))
             }
             else
             {
+                d3.select("#allMobile").property("disabled" , false);
+                d3.select("#allStatic").property("disabled" , false);
                 d3.selectAll("path.line").remove();
                 d3.selectAll(".legend-box").attr("fill",greyBtn);
             }
