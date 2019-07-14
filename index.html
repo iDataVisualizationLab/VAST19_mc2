@@ -13,16 +13,13 @@
     <link rel="stylesheet" href="css/controlPanel.css">
 
 
-
-
-
-
     <script>
         $( function() {
             $( "#map" ).draggable();
             $("#controlPanel").draggable();
         } );
     </script>
+
 
 </head>
 
@@ -55,7 +52,7 @@
     <div id="colorLegend"></div>
     <div class="valueSelector" id="updateHeatmap">
         <h4>Heatmap</h4>
-        <input type="radio" id="maxValue" name="valueChange" value="Max value" >Show max value<br>
+        <input type="radio" id="maxValue" name="valueChange" value="Max value" checked>Show max value<br>
         <input type="radio" id="meanValue" name="valueChange" value="Mean value" >Show mean value<br>
         <input type="radio" id="minValue" name="valueChange" value="Min value" >Show min value<br>
 
@@ -63,10 +60,10 @@
 
     <div class="tsSelector">
         <h4>Timeseries</h4>
-        <input type="checkbox"  id="allMobile" onclick=selectAllMobile()>Select all mobile sensors<br>
-        <input type="checkbox" id="allStatic" onclick=selectAllStatic()>Select all static sensors<br>
-        <input type="checkbox" id="allSensor" onclick=selectAll() >Select all sensors<br>
-        <input type="button" id="clearAll" value="Clear chart" onclick=clearAll()><br>
+        <input type="checkbox"  id="allMobile">Select all mobile sensors<br>
+        <input type="checkbox" id="allStatic">Select all static sensors<br>
+        <input type="checkbox" id="allSensor">Select all sensors<br>
+        <input type="button" id="clearAll" value="Clear chart"><br>
     </div>
     <!--<h4>Mobile sensors</h4>-->
     <!--<div id="mobileOptions">-->
