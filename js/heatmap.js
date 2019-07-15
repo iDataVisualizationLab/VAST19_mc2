@@ -34,6 +34,11 @@ while (true) {
 }
 times = times.map(d => d.toString());
 
+var heatTip = d3.select("#heatmap")
+	.append("div")
+	.style("opacity", 0)
+	.attr("class", "tooltip");
+
 function draw_heatmap(data,index,value) {
 	// get sensors list
 	var sensors = d3.map(data,d=>d["Sensor-id"]).keys();
@@ -46,10 +51,7 @@ function draw_heatmap(data,index,value) {
 
 	// d3.select("#"+ "heatmap" + index).selectAll("*").remove();
 	
-	var heatTip = d3.select("#heatmap")
-		.append("div")
-		.style("opacity", 0)
-		.attr("class", "tooltip");
+
 
 	let theDiv = d3.select("#heatmap"+index);
 	if(!theDiv.empty()){
@@ -60,11 +62,17 @@ function draw_heatmap(data,index,value) {
 
 	}
 
+	// if(theDiv.style.display==="none"){
+	// 	theDiv.style.display="block";
+	// }else{
+	// 	theDiv.style.display="block";
+	// }
+
 	var svgHeat = d3.select("#heatmap")
 		.append("div")
 		.attr("id", "heatmap"+ index)
 		// .classed("selected",true)
-		.style("display", "block")
+		// .style("display", "block")
 		.append("svg")
 		// .style("display", "block")
 		.attr("width", heatWidth + heatMargin.left + heatMargin.right )
@@ -216,7 +224,8 @@ function draw_heatmap(data,index,value) {
 	// let radioMean = d3.select("#meanValue").on("change",show_mean());
 	// let radiomin = d3.select("#minValue").on("change",show_min());
 
-	let inputs = d3.selectAll("input");
+    // control panel selector
+	let inputs = d3.selectAll(".valueSelector input");
 	inputs.on("change",()=>{
 		let inputValue = this.value;
 		if(inputValue === "Max Value" ) { show_max(); }
@@ -232,13 +241,13 @@ function draw_heatmap(data,index,value) {
 	}
 
 	function show_mean(){
-		heatMap
+        heatMap
 			.transition()
 			.duration(500)
 			.style("fill",d=>heatColor(+d.value_mean));
 	}
 	function show_max(){
-		heatMap
+        heatMap
 			.transition()
 			.duration(500)
 			.style("fill",d => heatColor(+d.Value));
@@ -275,7 +284,7 @@ timeLabel.selectAll("g")
 	.style("text-anchor", "start");
 	// .attr("transform", (d,i) => "translate(" + cellSize/2 + ", 0) rotate(90)")
 	// .attr("class", d=>d)
-debugger
+
 
 
 // var sensorLabels = svgHeat.selectAll(".sensorLabel")
