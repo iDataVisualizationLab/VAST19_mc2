@@ -19,18 +19,18 @@
         </div>
 
         <h4><span>Team Members:</span></h4>
-        <span>Jian Guo, iDV Lab, Texas Tech University, </span><span><a href="mailto:huyen.nguyen@ttu.edu">jian.guo@ttu.edu</a>&nbsp;&nbsp; PRIMARY<br></span>
+        <span>Jian Guo, iDV Lab, Texas Tech University, </span><span><a href="mailto:huyen.nguyen@ttu.edu">jian.guo@ttu.edu</a>&nbsp;&nbsp;&nbsp;PRIMARY<br></span>
         <span>Tommy Dang, iDV Lab, Texas Tech University, </span><span><a href="mailto:tommy.dang@ttu.edu">tommy.dang@ttu.edu</a></span>
 
         <h4>Student Team: <span style="font-weight: normal">YES</span></h4>
         <h4>Tools Used:</h4>
         <span>HTML, CSS, JavaScript<br> D3.js <br> GitHub: </span><span><a
-            href="https://github.com/iDataVisualizationLab/N/tree/master/VAST19/mc2">https://github.com/iDataVisualizationLab/N/tree/master/VAST19/mc2</a>
+            href="https://github.com/iDataVisualizationLab/VAST19_mc2">https://github.com/iDataVisualizationLab/VAST19_mc2</a>
             <br> Web demo: </span><span><a
-            href="https://idatavisualizationlab.github.io/N/VAST19/mc2/">https://idatavisualizationlab.github.io/N/VAST19/mc2/<a></span>
+            href="https://idatavisualizationlab.github.io/VAST19_mc2/">https://idatavisualizationlab.github.io/VAST19_mc2/<a></span>
 
         <h4>Approximately how many hours were spent working on this submission in total?</h4>
-        <span>100 hours</span>
+        <span>300 hours</span>
 
         <h4>May we post your submission in the Visual Analytics Benchmark Repository after VAST Challenge 2019 is complete?<span style="font-weight: normal"> YES</span></h4>
 
@@ -41,18 +41,30 @@
         <br><br>
         <hr>
         <h4>System Overview</h4>
+        Our visualization application includes four parts: The heat map, the St. Himark map, the control panel and the time series chart.<br>
+        The heat map shows the readings of all the sensors that have appeared in a region for the entire five-day time span (April 4 to April 10). The x axis of the heatmap represents time and y axis
+        represents different sensor readings, including mobile sensors and static sensors in a certain region. A square represents the maximum reading of a certain sensor in 30 minutes
+        period. The opacity  of the border from 0 to 1 shows the number of readings from 0 to 360 in that period. <br>
+        The map shows all 19 regions in St. Highmark. Each region can be clicked to show/hide the corresponding heat map. Multiple regions can be selected to compare.<br>
+        The control panel shows the color scale of the heat map, and selection options for easily controlling both the heat map and the time series chart.<br>
+        Finally, the time series shows the reading of all 50 mobile sensors and 9 static sensors spanning over the entire 5 days. The x axis represents timestamps of 30 minutes
+        interval in 5 days. The y axis represents the average values for the readings. The legend of the time series can be highlighted
+        and clicked, showing/hiding each corresponding line for the reading of a certain sensor. The lines can also be clicked to show the area formed by
         <img id="overviewFig" src="images/f_0_1.png" class="full">
-        <p class="caption"><span>Figure 1. Our visual interface: (left) control panel, (top) Main view, and (bottom) St. Himark map </span></p>
-        <h4>Radar chart design:</h4>    
+        <p class="caption"><span>Figure 1. Our visual interface: (left) Heat map, (upper-right) St. Himark map , and (bottom-right) Control panel;  </span></p>
+        <h4>Time series:</h4>
         
 
-        <img id="radarChart" src="images/f_0_2.png" class="full">
-        <p class="caption"><span>Figure 2. Examples of circular chart design for hourly summary of 3 mobile sensors: mobile sensor 10, mobile sensor 21, and mobile sensor 45.</span></p>
+        <img id="timeseries" src="images/f_0_2.png" class="full">
+        <p class="caption"><span>Figure 2. Our visual interface(continued):Time series chart</span></p>
 
         <div> 
    Due to a large number of sensor readings, we revise the Rosemary chart to embed the transformed color scale directly into the inside area of the pies. Our customized chart adopts the box plot layout which shows the five-number summary: minimum (inner ring), first quartile (Q1), mean (dashed curve), third quartile (Q3), and maximum (outer ring). This allows users to quickly spot the ranges of sensor readings as depicted in Figure 2. The examples in the report will show the hourly summary (from left to right) of various sensors (top-down) of St. Himark</div>
     </div>    
 </page>
+
+
+
 <page size="A3">
      <div class="pageContent">
          
@@ -93,6 +105,11 @@ c. What effects do you see in the sensor readings after the earthquake and other
         </div> 
     </div>     
 </page>
+
+
+
+
+
 <page size="A3">
      <div class="pageContent">
 
