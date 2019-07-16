@@ -225,9 +225,10 @@ Promise.all(filelist).then(files => {
 
                         mapSvg
                             .data(data.filter(d=>d["Sensor-id"]===sensor))
+                            // .data(data)
                             .enter()
                             .append("circle")
-                            .attr("class","dots")
+                            .attr("class",d=>"dots dots-" + d["Sensor-id"])
                             .attr("cx", d=> {
                                 return projection([d.Long, d.Lat])[0];
                             })
@@ -235,6 +236,7 @@ Promise.all(filelist).then(files => {
                                 return projection([d.Long, d.Lat])[1];
                             })
                             .attr("r", "3")
+                            .attr("r",d=>d.Value/250 +2)
                             .style("fill", d=>getColorTs(d["Sensor-id"]))
                             .style("opacity",.8)
                             .on("mouseover", (d,i)=>{
@@ -261,7 +263,15 @@ Promise.all(filelist).then(files => {
                             .on("mouseout",()=>{
                                 dotTip.transition()
                                     .duration(200)
-                                    .style("opacity","0");});
+                                    .style("opacity","0");})
+                            .on("click",d=>drawRoute(d["Sensor-id"]))
+
+                        function drawRoute(sensor){
+
+
+
+
+                        }
 
                     }
 
@@ -378,5 +388,7 @@ Promise.all(filelist).then(files => {
                     .style("opacity", 1)
             }
 
-        });
+
+
+    });
 });
