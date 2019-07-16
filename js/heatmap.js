@@ -13,7 +13,7 @@ var heatWidth = 1400 - heatMargin.left - heatMargin.right;
  //set the colors
 // var colors = ['#f7f7f7','#d1e5f0','#b2182b'];
 // var colors = [ "#e6e6e6", "#9dbee6",  "#e61e1a"];
-var colors = ["#e6e6e6" ,"#9dbee6",   "#e6852f", "#e61e1a","#ca0020"];
+var colors = ["#e6e6e6" ,  "#e6852f", "#e61e1a","#ca0020"];
 
 //["#e6e6d8",   "#e6531a",,"#e6b061","#c8dce6",,"#e6d49c","#afcae6",]
 //main function to update heatmap

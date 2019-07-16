@@ -22,7 +22,7 @@ var legendColor =  d3.scaleLinear()
     // .domain([0,2800])
 //     .domain([0,250,550,900,1500,2000,2500])
 //     .domain([0,100,300,600,1000,1500,2100,2800])
-    .range(["#e6e6e6" ,"#9dbee6",   "#e6852f", "#e61e1a","#ca0020",'#67001f']);
+    .range(["#e6e6e6" , "#e6852f", "#e61e1a","#ca0020",'#67001f']);
 
 //create the gradient horizontally
 var svgLegend = d3.select("#colorLegend").append("svg")
