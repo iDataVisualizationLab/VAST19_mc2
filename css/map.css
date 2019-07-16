@@ -10,9 +10,9 @@
     border-style: solid;
     border-color: lightgrey;
 }
-.geoPath{
-    fill:lightgrey;
-}
+/*.geoPath{*/
+    /*fill:lightgrey;*/
+/*}*/
 
 #map #regMap path{
     stroke: #bbbbbb;
@@ -41,5 +41,5 @@ div.tooltip {
 }
 .selected{
     border-color:black;
-    fill:#2171b5;
+    fill:whitesmoke;
 }
