@@ -184,73 +184,34 @@ function draw_heatmap(data,index,value) {
 			.style("opacity", 1)
 	}
 
-	// drop down change
-	//
-	// let value_data = {
-	// 	"Min value": data.map(d => d.value_min),
-	// 	"Mean value": data.map(d => d.value_mean),
-	// 	"Max value": data.map(d => d.Value)
-	// }
-	//
-	// console.log(value_data);
-	//
-	// let dropDown = d3.select("#updateHeatmap")
-	// 	.insert("select","svg")
-	// 	.on("change",dropDownChange)
-	//
-	// let dropDownChange = function(){
-	// 	let new_value = d3.select(this).property("value");
-	//
-	// 	update_values(new_value);
-	//
-	// }
-	// dropDown.selectAll("option")
-	// 	.data(value_data)
-	// 	.enter()
-	// 	.append("option")
-	// 	.attr("value",d=>d.key)
-	// 	.text(d=>d.key);
-	//
-	// function update_values(value){
-	// 	svgHeat
-	// 		.transition()
-	// 		.duration()
-	// 		.style("fill",d=>heatColor(value_data[value]));
-	//
-	// }
-
-	// let initial = update_value("Max value");
-	// let radioMax = d3.select("#maxValue").on("change",show_min())
-	// let radioMean = d3.select("#meanValue").on("change",show_mean());
-	// let radiomin = d3.select("#minValue").on("change",show_min());
 
     // control panel selector
 	let inputs = d3.selectAll(".valueSelector input");
-	inputs.on("change",()=>{
+	inputs.on("change",function(){
 		let inputValue = this.value;
-		if(inputValue === "Max Value" ) { show_max(); }
-		else if (inputValue === "Min Value") {show_min(); }
+		if(inputValue === "Max value" ) { show_max(); }
+		else if (inputValue === "Min value") {show_min(); }
 		else{show_mean();}
 	})
 
 	function show_min(){
-		heatMap
+		d3.selectAll(".cmp")
 			.transition()
 			.duration(500)
-			.style("fill",d => heatColor(+d.value_min));
+			.style("fill",d => heatColor(d.value_min));
 	}
 
 	function show_mean(){
-        heatMap
+		d3.selectAll(".cmp")
 			.transition()
 			.duration(500)
-			.style("fill",d=>heatColor(+d.value_mean));
+			.style("fill",d=>heatColor(d.value_mean));
 	}
 	function show_max(){
-        heatMap
+		d3.selectAll(".cmp")
 			.transition()
 			.duration(500)
-			.style("fill",d => heatColor(+d.Value));
+			.style("fill",d => heatColor(d.Value));
 	}
 
 

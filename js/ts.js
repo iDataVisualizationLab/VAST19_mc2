@@ -477,15 +477,15 @@ function drawTimeSeries(regionData) {
             .transition()
             .attr("d", d => d.visible ? line(d.values) : null);
 
-        upperAreas.select(".u-area-group path")
-            .transition()
-            .attr("d", d => d.visible ? upperArea(d.values) : null);
-        lowerAreas.select(".l-area-group path")
-            .transition()
-            .attr("d", d => d.visible ? lowerArea(d.values) : null);
+        // upperAreas.select(".u-area-group path")
+        //     .transition()
+        //     .attr("d", d => d.visible ? upperArea(d.values) : null);
+        // lowerAreas.select(".l-area-group path")
+        //     .transition()
+        //     .attr("d", d => d.visible ? lowerArea(d.values) : null);
 
     }
-    debugger
+
 
 
     function plot_dots(sensor) {
@@ -553,35 +553,46 @@ function drawTimeSeries(regionData) {
 // control panel
     // check to select/unselect all sensors
     d3.select("#allSensor")
-        .on("change", function() {
+        .on("change", function(){
+        if (d3.select(this).property("checked")) {
+            d3.selectAll(".legend-box").each(function(sel, i){
+                if(!sel.visible){
+                    //Select it
+                    d3.select(this).on("click")(sel, i);
+                }
+            });
+        }
+        else
+        {
+            d3.selectAll(".legend-box").each(function(sel){
+                if(sel.visible){
+                    //Select it
+                    d3.select(this).on("click")(sel, i);
+                }
+            });
+        }
+    })
+
+    // select/unselect all mobile sensors
+    d3.select("#allMobile")
+        .on("change", function(){
             if (d3.select(this).property("checked")) {
-                d3.select("#allMobile").property("disabled" , true);
-                d3.select("#allStatic").property("disabled" , true);
 
-                d3.selectAll("path.line")
-                    .attr("d", d =>  line(d.values))
-                    .attr("stroke", d => getColorTs(d.key))// .style("opacity",1);
-                d3.selectAll(".legend-box")
-                    .attr("fill", d => getColorTs(d.key))
             }
-            else
-            {
-                d3.select("#allMobile").property("disabled" , false);
-                d3.select("#allStatic").property("disabled" , false);
+            else{
 
-                // $(".line").detach();
-                d3.selectAll("path.line")
-                    .attr("d",d=>{
-                        if(!d.visible){
-                            null;
-                        }else{
-                            line(d.values);
-                        }
-
-                    });
-                d3.selectAll(".legend-box").attr("fill",greyBtn);
             }
-        })
+
+    })
+
+    d3.select("#allStatic")
+        .on("change", function(){
+
+
+
+    })
+
+
 
 
     d3.select("#clearAll").on("click",function(){
