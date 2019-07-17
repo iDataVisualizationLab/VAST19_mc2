@@ -36,7 +36,7 @@
 
         <h4>Video</h4>
         <span>
-            <a href="https://idatavisualizationlab.github.io/N/VAST19/mc2/video.html">https://idatavisualizationlab.github.io/N/VAST19/mc2/video.html</a>
+            <a href="https://idatavisualizationlab.github.io/VAST19_mc2/report.html">https://idatavisualizationlab.github.io/VAST19_mc2/report.html</a>
         </span>
         <br><br>
         <hr>
@@ -87,8 +87,8 @@
          <p class="caption"><span>Figure 3. Overview of static sensor readings.</span></p>
          <div>
              Figure 3 shows readings from all 9 static sensors over the entire time span. A pattern can be detected that all static sensors except static-13 tend to have
-             high readings
-
+             clustered high readings around 3pm on April 9th until the end of April 10th. Which indicates that they constantly detected radiation during that period. On the
+             contraty, static sensor 15 almost has no readings at all during this period. We will look into this in the next question.
 
          </div>
      </div>
@@ -97,10 +97,10 @@
 
 <page size="A3">
      <div class="pageContent">
-         <img id="radarChart" src="images/f_1_3.png" class="full">
-         <p class="caption"><span>Figure 5. Sensor readings for Old Town.</span></p> 
+         <!--<img id="radarChart" src="images/f_1_3.png" class="full">-->
+         <!--<p class="caption"><span>Figure 5. Sensor readings for Old Town.</span></p> -->
 
-         <div> Figure 5 is an example when Old Town is selected. The arrow points to 4pm on Wed 08 with the high readings of the dynamic sensor 10. <br><br></div>
+         <!--<div> Figure 5 is an example when Old Town is selected. The arrow points to 4pm on Wed 08 with the high readings of the dynamic sensor 10. <br><br></div>-->
     
 
         <div class="question">2 - Use visual analytics to represent and analyze uncertainty in the measurement of radiation across the city. <br>
@@ -109,11 +109,30 @@ b. Which regions of the city have greater uncertainty of radiation measurement? 
 c. What effects do you see in the sensor readings after the earthquake and other major events? What effect do these events have on uncertainty?<br>
         </div>
 
-        <img id="radarChart" src="images/f_2_1.png" class="full">
-         <p class="caption"><span>Figure 6. Overview of all sensors by every hour.</span></p> 
-        <div> To show the uncertainty in the data, we refine the Rosemary chart to show min vs. max (at the bottom) and Q1 vs. Q3 (on the top). As shown in Figure 6, 50 dynamic sensors are listed on the top and statics and 8 static sensors are listed at the bottom, the thumbnails next to the sensor ids summarize the sensor reading over the entire time span. The larger bands indicate a higher variance in the sensors reading over the given period of time. The static sensors tend to be more reliable than the dynamic sensors by looking at the thumbnails or the time series charts. A group of high values and high variances sensors are highlighted in the red box on the left.<br><br> 
+        <img id="stat-13" src="images/f_2_1.png" class="full">
+         <p class="caption"><span>Figure 4. Comparison between static-13 and static-15.</span></p>
+        <div>
+            As described above, there is contrary readings between static-13 and static-15. We can see in figure 4 that static-13 is the sensor that
+            is closest to the nuclear plant among all the 9 static sensors. If there is a radiation leak, this sensor should be the first to detect it.
+            However, compared to static-15,the second closest static sensor to the nuclear plant, its reading is abnormal. The readings of static-13
+            during the period when radiation level is mostly detected by other sensors are missing. Therefore, static-13 is too uncertain to trust.
 
-        </div> 
+
+        </div>
+
+         <img id="stat-11" src="images/f_2_3.png" class="full">
+         <p class="caption"><span>Figure 5. Comparison between static-11 and other mobile sensors in region 9.</span></p>
+         <div>
+             Figure 5 shows a discrepancy between static-11 and other mobile sensors in region 9 Broadview. Static-11 shows frequent high reading values
+             from April 9th to the end of April 10th, while there are not enough mobile sensors agree with it.  The only available readings during
+             this period from the mobile sensors is mobile-26, however, the readings are all the same value. Given the commonsense that the sensor detector
+             may be affected by many factors, including the condition of the car, the road and the weather, etc., the readings could not stay the same for hours.
+             Therefore, without additional static or mobile sensor readings, it is hard to tell if static-11's reading is reliable or not. Thus, region 9
+             has greater uncertainty ot radiation measurement.
+
+
+         </div>
+
     </div>     
 </page>
 
