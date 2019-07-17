@@ -590,6 +590,7 @@ function drawTimeSeries(regionData) {
         d3.selectAll("path.line").attr("d",d=>null);
         d3.selectAll("path.l-area").remove();
         d3.selectAll("path.u-area").remove();
+        d3.selectAll(".dots").remove();
 
     })
 
@@ -676,10 +677,10 @@ function findMinY(data) {
 //
 // }
 //
-function clearAll() {
-    d3.selectAll("path.line").remove();
-    // d3.selectAll("path.area").style("opacity", 0);
-    // d3.selectAll("rect.legend-box").style("fill",greyBtn );
-
-
-}
+// function clearAll() {
+//     d3.selectAll("path.line").remove();
+//     // d3.selectAll("path.area").style("opacity", 0);
+//     // d3.selectAll("rect.legend-box").style("fill",greyBtn );
+//
+//
+// }
