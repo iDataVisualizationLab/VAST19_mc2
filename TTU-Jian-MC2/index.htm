@@ -41,16 +41,16 @@
         <br><br>
         <hr>
         <h4>System Overview</h4>
-        Our visualization application includes four parts: The heat map, the St. Himark map, the control panel and the time series chart.<br>
-        The heat map shows the readings of all the sensors that have appeared in a region for the entire five-day time span (April 4 to April 10). The x axis of the heatmap represents time and y axis
+        Our visualization application includes four parts: The heat map, the St. Himark map, the control panel and the time series chart.The heat map shows the readings of all the sensors that have appeared in a region for the entire five-day time span (April 4 to April 10). The x axis of the heatmap represents time and y axis
         represents different sensor readings, including mobile sensors and static sensors in a certain region. A square represents the maximum reading of a certain sensor in 30 minutes
         period. The opacity  of the border from 0 to 1 shows the number of readings from 0 to 360 in that period.
         The map shows all 19 regions in St. Highmark. Each region can be clicked to show/hide the corresponding heat map. Multiple regions can be selected to compare.
         The control panel shows the color scale of the heat map, and selection options for easily controlling both the heat map and the time series chart. The map and the control panel can be dragged conveniently.
         Finally, the time series shows the reading of all 50 mobile sensors and 9 static sensors spanning over the entire 5 days. The x axis represents timestamps of 30 minutes
         interval in 5 days. The y axis represents the average values for the readings. The legend of the time series can be highlighted
-        and clicked, showing/hiding each corresponding line for the reading of a certain sensor. The lines can also be clicked to show the area formed between maximum value and
-        minimum value
+        and clicked. Toggling the legend box will show/hide the corresponding line. Toggle-clicking a line will show the area between the line's maximun and minimum values. This
+        could give us a big picture of the value range.
+
         <img id="overviewFig" src="images/f_0.jpg" class="full">
         <p class="caption"><span>Figure 1. Our visual interface: (left) Heat map, (upper-right) St. Himark map , and (bottom-right) Control panel;  </span></p>
         <!--<h4>Time series:</h4>-->
@@ -76,17 +76,21 @@
         <img id="all" src="images/f_1_1.png" class="full">
          <p class="caption"><span>Figure 2. Overview of all sensors for the entire time span.</span></p>
 
-         <div> The time series chart in Figure 2 shows the overview of the average values of  all sensors for the entire time span (5 days). Sensors are listed top-down. The last 9 sensors are
-             static sensors. As is shown, mobile sensor 9, 10,  21, 22, 24, 25, 27, 28, 29 and 45 tends to have very high average readings. These readings may indicate high
+         <div> The time series chart in Figure 2 shows an overview of the average values of  all sensors for the entire time span (5 days). Sensors are listed top-down. The last 9 sensors are
+             static sensors. As is shown, mobile sensor 9, 10,  21, 22, 24, 25, 27, 28, 29 and 45 tends to have very high average readings. These readings may result from high
              radiation level around the sensor.
 
 
          </div>
 
         <img id="mobiles" src="images/f_1_2.jpg" class="full">
-         <p class="caption"><span>Figure 3. Sensor readings for Wilson Forest.</span></p>
-         When users mouse over a region on the map, all sensor readings for that region will be highlighted in the main view. Figure 4 is an example when Wilson Forest is selected. 
+         <p class="caption"><span>Figure 3. Overview of static sensor readings.</span></p>
+         <div>
+             Figure 3 shows readings from all 9 static sensors over the entire time span. A pattern can be detected that all static sensors except static-13 tend to have
+             high readings
 
+
+         </div>
      </div>
 </page>
 
