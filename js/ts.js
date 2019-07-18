@@ -465,7 +465,7 @@ function drawTimeSeries(regionData) {
             .transition()
             .call(tsxAxis);
 
-        maxY = findMaxY(dataset) + 100;
+        maxY = findMaxY(dataset);
         minY = findMinY(dataset);
         tsyScale.domain([minY, maxY]).nice();
 
@@ -477,12 +477,12 @@ function drawTimeSeries(regionData) {
             .transition()
             .attr("d", d => d.visible ? line(d.values) : null);
 
-        // upperAreas.select(".u-area-group path")
-        //     .transition()
-        //     .attr("d", d => d.visible ? upperArea(d.values) : null);
-        // lowerAreas.select(".l-area-group path")
-        //     .transition()
-        //     .attr("d", d => d.visible ? lowerArea(d.values) : null);
+        upperAreas.select(".u-area-group path")
+            .transition()
+            .attr("d", d => d.visible ? upperArea(d.values) : null);
+        lowerAreas.select(".l-area-group path")
+            .transition()
+            .attr("d", d => d.visible ? lowerArea(d.values) : null);
 
     }
 
@@ -577,9 +577,25 @@ function drawTimeSeries(regionData) {
     d3.select("#allMobile")
         .on("change", function(){
             if (d3.select(this).property("checked")) {
+                d3.selectAll(".legend-box")
+                    .filter((d,i)=>i<50)
+                    .each(function(sel, i){
+                    if(!sel.visible){
+                        //Select it
+                        d3.select(this).on("click")(sel, i);
+                    }
+                });
 
             }
             else{
+                d3.selectAll(".legend-box")
+                    .filter((d,i)=>i<50)
+                    .each(function(sel){
+                    if(sel.visible){
+                        //Select it
+                        d3.select(this).on("click")(sel, i);
+                    }
+                });
 
             }
 
@@ -587,7 +603,28 @@ function drawTimeSeries(regionData) {
 
     d3.select("#allStatic")
         .on("change", function(){
+            if (d3.select(this).property("checked")) {
+                d3.selectAll(".legend-box")
+                    .filter((d,i)=>i>49)
+                    .each(function(sel, i){
+                        if(!sel.visible){
+                            //Select it
+                            d3.select(this).on("click")(sel, i);
+                        }
+                    });
 
+            }
+            else{
+                d3.selectAll(".legend-box")
+                    .filter((d,i)=>i>49)
+                    .each(function(sel){
+                        if(sel.visible){
+                            //Select it
+                            d3.select(this).on("click")(sel, i);
+                        }
+                    });
+
+            }
 
 
     })
@@ -597,8 +634,8 @@ function drawTimeSeries(regionData) {
 
     d3.select("#clearAll").on("click",function(){
         d3.select("#allSensor").property("checked",false);
-        d3.selectAll(".legend-box").attr("fill",greyBtn);
-        d3.selectAll("path.line").attr("d",d=>null);
+        d3.selectAll(".legend-box").attr("fill",d=>d.visible? getColorTs(d.key):greyBtn);
+        d3.selectAll("path.line").remove();
         d3.selectAll("path.l-area").remove();
         d3.selectAll("path.u-area").remove();
         d3.selectAll(".dots").remove();
