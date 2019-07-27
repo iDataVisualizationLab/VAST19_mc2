@@ -5,7 +5,7 @@ for ( i = 1; i < 20; i ++ )
     var filename = "data/aggTimeByReg/region" + i + ".csv";
     filelist.push(d3.csv(filename));
 }
-// some variables for later usage
+// some global variables for later usage
 const regionNameList =
     ['Palace Hills',
         'Northwest',
@@ -54,16 +54,9 @@ d3.csv("data/allSensorReadings_minMax.csv").then(data=>{
         d["value_min"] = +d["value_min"];
         d.visible = true;
     })
-    // drawTimeSeries(data.filter(d=>d.Value < 5000));
-    // draw_line(data.filter(d=>d.Value < 5000));
 
-
-
-
+// read heat map files
 Promise.all(filelist).then(files => {
-    // d3.csv("../data/times.csv").then(d=>{d.time = parse(d.time)
-    // Promise.all( tsfilelist ).then( tsfiles => {
-        // Promise.all(mbfilelist).then( mbfiles=> {
             var index = 1;
             var alldata = [];
             for (let i = 0; i < files.length; i++) {
@@ -76,19 +69,17 @@ Promise.all(filelist).then(files => {
                 })
                 alldata.push(files[i]);
             }
-            // var times = d3.map(alldata[0],d=>d.Timestamp).keys();
 
             //draw initial heatmap
             draw_heatmap(alldata[index - 1],1);
 
-            // drawTimeSeries(tsfiles[index - 1]);
-            // draw_mobile_location(mddata[index -1]);
-
+            // create a tool tip for the map regions
             const mapTip = d3.select("#map")
                 .append("div")
                 .style("opacity", 0)
                 .attr("class", "tstooltip");
 
+            // read geojson file
             d3.json('data/StHimark.geojson').then(geojson => {
 
                 const width = 500, height = 500;
@@ -179,52 +170,66 @@ Promise.all(filelist).then(files => {
                                 return "translate(" + projection([d.Long, d.Lat]) + ")";
                             });
 
-                        // .on("mouseover",d=>{
-                        //     d3.select(".statIcon")
-                        //         .html("Static: " + d["Sensor-id"])
-                        // });
                     });
 
-
-
-                    //create checkboxes for each mobile sensors to plot them on the map
-                    // let dotTip = d3.select("#map")
-                    //     .append("div")
-                    //     .style("opacity", 0)
-                    //     .attr("class", "tstooltip");
-                    //
-                    // let newData = d3.nest().key(d => d["Sensor-id"]).entries(data);
-                    //
-                    // let sensorOptions = d3.select("#mobileOptions");
-                    //    sensorOptions.selectAll("input")
-                    //         .data(newData.filter(d=>d.key !== "static-1" && d.key !== "static-4"&& d.key != "static-6" && d.key != "static-9" && d.key != "static-11" && d.key != "static-12" && d.key != "static-13" && d.key != "static-14" && d.key != "static-15"))
-                    //         .enter().append("label")
-                    //         .text(d=>d.key)
-                    //         .append("input")
-                    //         .attr("type","checkbox")
-                    //         .attr("class","mobile-selector")
-                    //         // .property("checked",d=>d["Sensor-id"]=="mobile-1")
-                    //         .attr("name","mobileSelection")
-                    //         .attr("id",d=>"box-" + d.key)
-                    //         .on("change",d=>plotDots(d.key))
-                    //         .append('text')
-                    //         .text(d=>d.key);
-
-
-
-                    debugger
-
+                    // function to plot sensor dots on map(used in time series)
                     let plot = function plotDots(sensor){
-                        // if(d3.select("#leg-" + sensor).visible){
-                        //     d3.select
-                        // }
                         let dotTip = d3.select("#map")
                             .append("div")
                             .style("opacity", 0)
                             .attr("class", "tstooltip");
 
+                        let filtered = data.filter(d=>d["Sensor-id"]===sensor && d.Value < 5000 && d["value_count"] >0);
+                        let nest = d3.nest().key(d => d["Sensor-id"]).entries(filtered)
+                        let points = filtered.map((d=>{
+                            return [+d.Long,+d.Lat]
+
+                        }));
+
+                        let coordinate={
+                            "type":"lineString",
+                            "coordinates":points
+                        }
+                        let routeLine = d3.line()
+                            .curve(d3.curveLinear)
+                            .x( d=> {
+                                return projection([d.Long, d.Lat])[0];
+                            })
+                            .y( d=> {
+                                return projection([d.Long, d.Lat])[1];
+                            })
+
+                        let sensorRoute = mapSvg.data(nest)
+                            .enter()
+                            .append("path")
+                            .attr("d",d=>routeLine(d.values))
+                            .attr("class","mobileRoute")
+                            .attr("id",d=>"mobRoute-" + d.key)
+                        d3.selectAll(".mobileRoute")
+                            .style("stroke",d=>getColorTs(d.key))
+                            .style("fill-opacity",0)
+
+                        // let layout = d3.layoutTrail().positioner(d=>projection(d.Long,d.Lat));
+                        // let routeData = layout
+                        //     // .grouping(function(d) {return d["Sensor-id"]})
+                        //     .data(filtered)
+                        //     // .coordType("coordinates")
+                        //     .coordType("xy")
+                        //     .layout()
+                        //
+                        // let routeLine = mapSvg
+                        //     .selectAll("line")
+                        //     .data(routeData)
+                        //     .enter()
+                        //     .append("line")
+                        //     .attr("x1",d=>d.x1)
+                        //     .attr("y1",d=>d.y1)
+                        //     .attr("y2",d=>d.y1)
+                        //     .attr("x2",d=>d.x1)
+
+debugger
                         mapSvg
-                            .data(data.filter(d=>d["Sensor-id"]===sensor))
+                            .data(data.filter(d=>{return d["Sensor-id"]===sensor && d.Value < 5000 && d["value_count"] >0 }))
                             // .data(data)
                             .enter()
                             .append("circle")
@@ -239,7 +244,9 @@ Promise.all(filelist).then(files => {
                             .attr("r",d=>d.Value/250 +2)
                             .style("fill", d=>getColorTs(d["Sensor-id"]))
                             .style("opacity",.8)
-                            .on("mouseover", (d,i)=>{
+                            .on("mouseover", function(d,i){
+                                // d3.select(this)
+                                //     .style("opacity", 1)
                                 dotTip.transition()
                                     .duration(200)
                                     .style("opacity","1");
@@ -258,9 +265,11 @@ Promise.all(filelist).then(files => {
                                     )
                                     // .style("left", (d3.mouse(this)[0] + 0) + "px")
                                     // .style("top", (d3.mouse(this)[1]) + 0 + "px");})
-                                    .style("left", d3.select(this).attr("cx") + "px")
+                                    .style("left", d3.select(this).attr("cx") +"px")
                                     .style("top", d3.select(this).attr("cy") + "px");})
                             .on("mouseout",()=>{
+                                // d3.select(this)
+                                //     .style("opacity", 0.8)
                                 dotTip.transition()
                                     .duration(200)
                                     .style("opacity","0");})
@@ -268,15 +277,10 @@ Promise.all(filelist).then(files => {
 
                         function drawRoute(sensor){
 
-
-
-
                         }
-
                     }
 
                     tsPlot = plot;
-
 
                     //plot hospitals on map
                     mapSvg.enter()
@@ -342,6 +346,7 @@ Promise.all(filelist).then(files => {
                 drawTimeSeries(data.filter(d=>d.Value < 5000));
             })
 
+
             // where helper functions go
             function removeWhitespace(str) {
                 return str.replace(/\s+/g, '');
@@ -356,8 +361,6 @@ Promise.all(filelist).then(files => {
                 // .style("stroke", "black")
                     .style("opacity", 0.5)
             }
-
-
 
             function click(d) {
                 let thisElm = d3.select("#" + removeWhitespace(d.properties.Nbrhood));
@@ -387,8 +390,5 @@ Promise.all(filelist).then(files => {
                 // .style("stroke", "black")
                     .style("opacity", 1)
             }
-
-
-
     });
 });

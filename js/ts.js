@@ -421,18 +421,8 @@ function drawTimeSeries(regionData) {
         .attr("class", "legend-text")
         .attr("fill", "#5d5d5d")
         .style("font-size", "11")
-        .text(d => d.key)
-    // .on("click", d => {
-    //     d.visible = !d.visible;
-    //     legend.select("text")
-    //         .transition()
-    //         .attr("fill", d => d.visible ? getColorTs(d.key) : "#5d5d5d");
-    //     if (d.visible) {
-    //         tsPlot(d.key);
-    //     }
-    //
-    //
-    // });
+        .text(d => d.key);
+
 
     //For brusher of the slider bar at the bottom
     function brushing() {
@@ -539,16 +529,10 @@ function drawTimeSeries(regionData) {
     // function to remove mobile dots on map
     function removePlot(sensor){
         d3.selectAll(".dots-" + sensor).remove();
+        d3.select("#mobRoute-" + sensor).remove();
 
     }
-    //function to draw routes on map
-    function drawRoute(sensor){
 
-
-
-
-
-    }
 
 // control panel
     // check to select/unselect all sensors
@@ -585,7 +569,6 @@ function drawTimeSeries(regionData) {
                         d3.select(this).on("click")(sel, i);
                     }
                 });
-
             }
             else{
                 d3.selectAll(".legend-box")
@@ -596,9 +579,7 @@ function drawTimeSeries(regionData) {
                         d3.select(this).on("click")(sel, i);
                     }
                 });
-
             }
-
     })
 
     d3.select("#allStatic")
@@ -623,15 +604,10 @@ function drawTimeSeries(regionData) {
                             d3.select(this).on("click")(sel, i);
                         }
                     });
-
             }
-
-
     })
 
-
-
-
+    // clear all lines on chart
     d3.select("#clearAll").on("click",function(){
         d3.select("#allSensor").property("checked",false);
         d3.selectAll(".legend-box").attr("fill",d=>d.visible? getColorTs(d.key):greyBtn);
@@ -641,14 +617,6 @@ function drawTimeSeries(regionData) {
         d3.selectAll(".dots").remove();
 
     })
-
-
-    // d3.select("input#cleaAll").on("click", () => {
-    //     d3.selectAll("path.line").remove();
-    //     d3.select("svgTs").selectAll(".u-area").remove();
-    //     d3.select("svgTs").selectAll(".l-area").remove();
-    // });
-
 }
 
 
