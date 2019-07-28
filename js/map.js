@@ -204,10 +204,31 @@ Promise.all(filelist).then(files => {
                             .append("path")
                             .attr("d",d=>routeLine(d.values))
                             .attr("class","mobileRoute")
-                            .attr("id",d=>"mobRoute-" + d.key)
+                            .attr("id",d=>"route-" + d.key)
                         d3.selectAll(".mobileRoute")
                             .style("stroke",d=>getColorTs(d.key))
+                            .style("stroke-width", (d,i)=>d.values[i].value_mean/250 +2)
                             .style("fill-opacity",0)
+                            .style("opacity",0.5)
+                            .on("mouseover", function(d,i){
+                                d3.selectAll(".mobileRoute").style("opacity",0.1);
+                                d3.select("#route-" + d.key).style("opacity",1);
+
+                                d3.selectAll(".dots").style("opacity", 0.1);
+                                d3.selectAll(".dots-" + d.key).style("opacity", 1)
+
+                                d3.selectAll('.line').style("opacity",0.1);
+                                d3.select("#lin-" + d.key).style("opacity", 1);
+
+                                d3.selectAll(".legend").style("opacity", 0.1);
+                                d3.select("#leg-" + d.key).style("opacity", 1);
+                               })
+                            .on("mouseout",function(){
+                                d3.selectAll(".line").style("opacity",1);
+                                d3.selectAll(".legend").style("opacity",1);
+                                d3.selectAll(".mobileRoute").style("opacity", 0.5)
+                                d3.selectAll(".dots").style("opacity", 0.8)
+                               })
 
                         // let layout = d3.layoutTrail().positioner(d=>projection(d.Long,d.Lat));
                         // let routeData = layout
@@ -227,7 +248,7 @@ Promise.all(filelist).then(files => {
                         //     .attr("y2",d=>d.y1)
                         //     .attr("x2",d=>d.x1)
 
-debugger
+// debugger
                         mapSvg
                             .data(data.filter(d=>{return d["Sensor-id"]===sensor && d.Value < 5000 && d["value_count"] >0 }))
                             // .data(data)
@@ -243,7 +264,7 @@ debugger
                             .attr("r", "3")
                             .attr("r",d=>d.Value/250 +2)
                             .style("fill", d=>getColorTs(d["Sensor-id"]))
-                            .style("opacity",.8)
+                            .style("opacity",0.5)
                             .on("mouseover", function(d,i){
                                 // d3.select(this)
                                 //     .style("opacity", 1)

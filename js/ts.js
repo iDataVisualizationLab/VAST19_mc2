@@ -281,10 +281,21 @@ function drawTimeSeries(regionData) {
             // plot_dots(d.key);
         })
         .on("mouseover", function (d,i) {
-            d3.selectAll('.line').style("opacity", 0.2);
+            // change line opacity
+            d3.selectAll('.line').style("opacity", 0.1);
             d3.select(this).style("opacity", 1).style("stroke-width", "2px");
-            d3.selectAll(".legend").style("opacity", 0.2);
+
+            // change legend box opacity
+            d3.selectAll(".legend").style("opacity", 0.1);
             d3.select("#leg-" + d.key).style("opacity", 1);
+
+            // change mobile route opacity (on map)
+            d3.selectAll(".mobileRoute").style("opacity", 0.1)
+            d3.select("#route-" + d.key).style("opacity", 1)
+
+            // change dots opacity (on map)
+            d3.selectAll(".dots").style("opacity",0.1)
+            d3.selectAll(".dots-" + d.key).style("opacity",1)
 
             // Show circle
             var x0 = tsxScale.invert(d3.mouse(this)[0]),
@@ -319,8 +330,11 @@ function drawTimeSeries(regionData) {
         })
         .on("mouseout", function () {
             d3.selectAll('.line').style("opacity", 1);
-            d3.select(this).style("stroke-width", "1.5px");
+            // d3.select(this).style("stroke-width", "1.5px");
             d3.selectAll(".legend").style("opacity", 1);
+            d3.selectAll(".mobileRoute").style("opacity", 0.5)
+            d3.selectAll(".dots").style("opacity",0.8)
+
             focus.style("display", "none");
 
             // Hide tooltip
@@ -478,58 +492,58 @@ function drawTimeSeries(regionData) {
 
 
 
-    function plot_dots(sensor) {
-        let dotTip = d3.select("#map")
-            .append("div")
-            .style("opacity", 0)
-            .attr("class", "tstooltip");
-        mapTs.data(dataset.filter(f=>f.key === sensor ))
-            .enter()
-            .append("circle")
-            .attr("class", "dots")
-            .attr("cx", (d,i) => {
-                return projectionTs([d.values[i].Long, d.values[i].Lat])[0];
-            })
-            .attr("cy", function (d,i) {
-                return projectionTs([d.values[i].Long, d.values[i].Lat])[1];
-            })
-            .attr("r", "3")
-            .style("fill", d=>getColorTs(d.key))
-            .style("opacity", .8)
-            .on("mouseover", (d,i) => {
-                dotTip.transition()
-                    .duration(200)
-                    .style("opacity", "1");
-
-                dotTip
-                    .html("Sensor: " + d.key + "<br>"
-                        + "Time: " + d.values[i].Timestamp.toLocaleTimeString([], {
-                            year: '2-digit',
-                            month: '2-digit',
-                            day: '2-digit',
-                            hour: '2-digit',
-                            minute: '2-digit'
-                        }) + "<br>"
-                        + "Mean: " + d.values[i].value_mean.toFixed(2) + " (cpm)" + "<br>"
-                        + "Max: " + d.values[i].Value.toFixed(2) + "(cpm)" + "<br>"
-                        + "Min: " + d.values[i].value_min.toFixed(2) + "(cpm)" + "<br>")
-                    // .style("left", (d3.mouse(this)[0] + 0) + "px")
-                    // .style("top", (d3.mouse(this)[1]) + 0 + "px");})
-                    .style("left", d3.select(this).attr("cx") + "px")
-                    .style("top", d3.select(this).attr("cy") + "px");
-            })
-            .on("mouseout", () => {
-                dotTip.transition()
-                    .duration(200)
-                    .style("opacity", "0");
-            })
-        on("click", d=>drawRoute(d.key))
-    }
+    // function plot_dots(sensor) {
+    //     let dotTip = d3.select("#map")
+    //         .append("div")
+    //         .style("opacity", 0)
+    //         .attr("class", "tstooltip");
+    //     mapTs.data(dataset.filter(f=>f.key === sensor ))
+    //         .enter()
+    //         .append("circle")
+    //         .attr("class", "dots")
+    //         .attr("cx", (d,i) => {
+    //             return projectionTs([d.values[i].Long, d.values[i].Lat])[0];
+    //         })
+    //         .attr("cy", function (d,i) {
+    //             return projectionTs([d.values[i].Long, d.values[i].Lat])[1];
+    //         })
+    //         .attr("r", "3")
+    //         .style("fill", d=>getColorTs(d.key))
+    //         .style("opacity", .8)
+    //         .on("mouseover", (d,i) => {
+    //             dotTip.transition()
+    //                 .duration(200)
+    //                 .style("opacity", "1");
+    //
+    //             dotTip
+    //                 .html("Sensor: " + d.key + "<br>"
+    //                     + "Time: " + d.values[i].Timestamp.toLocaleTimeString([], {
+    //                         year: '2-digit',
+    //                         month: '2-digit',
+    //                         day: '2-digit',
+    //                         hour: '2-digit',
+    //                         minute: '2-digit'
+    //                     }) + "<br>"
+    //                     + "Mean: " + d.values[i].value_mean.toFixed(2) + " (cpm)" + "<br>"
+    //                     + "Max: " + d.values[i].Value.toFixed(2) + "(cpm)" + "<br>"
+    //                     + "Min: " + d.values[i].value_min.toFixed(2) + "(cpm)" + "<br>")
+    //                 // .style("left", (d3.mouse(this)[0] + 0) + "px")
+    //                 // .style("top", (d3.mouse(this)[1]) + 0 + "px");})
+    //                 .style("left", d3.select(this).attr("cx") + "px")
+    //                 .style("top", d3.select(this).attr("cy") + "px");
+    //         })
+    //         .on("mouseout", () => {
+    //             dotTip.transition()
+    //                 .duration(200)
+    //                 .style("opacity", "0");
+    //         })
+    //     on("click", d=>drawRoute(d.key))
+    // }
 
     // function to remove mobile dots on map
     function removePlot(sensor){
         d3.selectAll(".dots-" + sensor).remove();
-        d3.select("#mobRoute-" + sensor).remove();
+        d3.select("#route-" + sensor).remove();
 
     }
 
