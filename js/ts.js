@@ -34,38 +34,26 @@ var tsxAxis = d3.axisBottom(tsxScale)
 // Define the lines
 var line = d3.line()
     .x(d => tsxScale(d.Timestamp))
-    .y(d => tsyScale(d.value_mean))
+    .y(d => tsyScale(d.value_median))
     .curve(d3.curveLinear)
-    .defined(d => !isNaN(d.value_mean));// Hiding line value for missing data
-var maxLine = d3.line()
-    .x(d => tsxScale(d.Timestamp))
-    .y(d => tsyScale(d.Value))
-    .curve(d3.curveLinear)
-    .defined(d => !isNaN(d.Value));
-
-var minLine = d3.line()
-    .x(d => tsxScale(d.Timestamp))
-    .y(d => tsyScale(d.value_min))
-    .curve(d3.curveLinear)
-    .defined(d => !isNaN(d.value_min));
-
+    .defined(d => !isNaN(d.value_median));// Hiding line value for missing data
 
 // //define the min-max area
 var upperArea = d3.area()
     .curve(d3.curveBasis)
     .x(d => tsxScale(d.Timestamp))
     // .x (function (d) { return x(d.Timestamp); })
-    .y0(function (d) { return tsyScale(d.value_mean); })
+    .y0(function (d) { return tsyScale(d.value_median); })
     .y1(function (d) { return tsyScale(d.Value); })
-    .defined(d => !isNaN(d.Value) && !isNaN(d.value_mean));;
+    .defined(d => !isNaN(d.Value) && !isNaN(d.value_median));;
 
 var lowerArea = d3.area()
     .curve(d3.curveBasis)
     .x(d => tsxScale(d.Timestamp))
     // .x (function (d) { return x(d.Timestamp) ; })
     .y0(function (d) { return tsyScale(d.value_min); })
-    .y1(function (d) { return tsyScale(d.value_mean); })
-    .defined(d => !isNaN(d.value_mean)&& !isNaN(d.value_min));;
+    .y1(function (d) { return tsyScale(d.value_median); })
+    .defined(d => !isNaN(d.value_median)&& !isNaN(d.value_min));;
 
 var svgTs = d3.select("#timeSeries").append("svg")
     .attr("width", tsWidth + tsMargin.left + tsMargin.right)
@@ -209,37 +197,6 @@ function drawTimeSeries(regionData) {
         .on("click", d => {
             return d.visible = !d.visible;
         });
-// draw min, max lines
-    var maxLines = svgTs.selectAll(".max-line-group")
-        .data(dataset)
-        .enter()
-        .append("g")
-        .attr("clip-path", "url(#clip)")
-        .attr("class", "max-line-group")
-        .attr("id", d => "maxlinegrp-" + d.key);
-
-    maxLines.append("path")
-        .attr("class", "max-line")
-        .attr("d", d => d.visible ? maxLine(d.values) : null)
-        .style("stroke", d => getColorTs(d.key))
-        .style("fill-opacity", 0)
-        .attr("id", d => "maxline-" + d.key)
-
-    var minLines = svgTs.selectAll(".min-line-group")
-        .data(dataset)
-        .enter()
-        .append("g")
-        .attr("clip-path", "url(#clip)")
-        .attr("class", "min-line-group")
-        .attr("id", d => "minlinegrp-" + d.key);
-
-    minLines.append("path")
-        .attr("class", "min-line")
-        .attr("d", d => d.visible ? minLine(d.values) : null)
-        .style("stroke", d => getColorTs(d.key))
-        .style("fill-opacity", 0)
-        .attr("id", d => "minline-" + d.key)
-
 
 // Draw Line
     var lines = svgTs.selectAll(".line-group")
@@ -257,33 +214,39 @@ function drawTimeSeries(regionData) {
         .style("stroke", d => getColorTs(d.key))
         // .style("fill-opacity", 0.5)
         .attr("id", d => "lin-" + d.key)
-        .on("click", (d, i) => {
-
-            d.visible = !d.visible;
-            // Update graph
-            upperAreas.select("#u-area-" + d.key)
-                .transition()
-                .attr("d", d => d.visible ? upperArea(d.values) : null);
-            lowerAreas.select("#l-area-" + d.key)
-                .transition()
-                .attr("d", d => d.visible ? upperArea(d.values) : null);
-            // maxLines.select("#maxline-" + d.key)
-            //     .transition()
-            //     .attr("d",d=>d.visible? maxLine(d.values):null);
-            // minLines.select("#minline-" + d.key)
-            //     .transition()
-            //     .attr("d", d=>d.visible? minLine(d.values):null);
-            // if(d.visible){
-            //     plot_dots("d");
-            // }else{
-            //     null;
-            // }
-            // plot_dots(d.key);
-        })
+        // .on("click", (d, i) => {
+        //
+        //     d.visible = !d.visible;
+        //     // Update graph
+        //     upperAreas.select("#u-area-" + d.key)
+        //         .transition()
+        //         .attr("d", d => d.visible ? upperArea(d.values) : null);
+        //     lowerAreas.select("#l-area-" + d.key)
+        //         .transition()
+        //         .attr("d", d => d.visible ? upperArea(d.values) : null);
+        //     // maxLines.select("#maxline-" + d.key)
+        //     //     .transition()
+        //     //     .attr("d",d=>d.visible? maxLine(d.values):null);
+        //     // minLines.select("#minline-" + d.key)
+        //     //     .transition()
+        //     //     .attr("d", d=>d.visible? minLine(d.values):null);
+        //     // if(d.visible){
+        //     //     plot_dots("d");
+        //     // }else{
+        //     //     null;
+        //     // }
+        //     // plot_dots(d.key);
+        // })
         .on("mouseover", function (d,i) {
             // change line opacity
             d3.selectAll('.line').style("opacity", 0.1);
             d3.select(this).style("opacity", 1).style("stroke-width", "2px");
+
+            // change areas opacity
+            d3.selectAll('.u-area').style("opacity",0.1);
+            d3.select("#u-area-" + d.key).style("opacity",1)
+            d3.selectAll('.l-area').style("opacity",0.1);
+            d3.select("#l-area-" + d.key).style("opacity",1)
 
             // change legend box opacity
             d3.selectAll(".legend").style("opacity", 0.1);
@@ -301,7 +264,7 @@ function drawTimeSeries(regionData) {
             var x0 = tsxScale.invert(d3.mouse(this)[0]),
                 x1 = d3.timeMinute.every(10).round(x0),
                 i = bisectDate(d.values, x1);
-            focus.attr("transform", "translate(" + tsxScale(x1) + "," + tsyScale(d.values[i].value_mean) + ")"); // Find position
+            focus.attr("transform", "translate(" + tsxScale(x1) + "," + tsyScale(d.values[i].value_median) + ")"); // Find position
             focus.style("display", null);
             focus.selectAll("circle")
             // .attr("id", f=>"circle-" + f.key)
@@ -322,18 +285,22 @@ function drawTimeSeries(regionData) {
                         hour: '2-digit',
                         minute: '2-digit'
                     }) + "<br>"
-                    + "Mean: " + d.values[i].value_mean.toFixed(2) + " (cpm)" + "<br>"
+                    + "Median: " + d.values[i].value_median.toFixed(2) + " (cpm)" + "<br>"
                     + "Max: " + d.values[i].Value.toFixed(2) + "(cpm)" + "<br>"
                     + "Min: " + d.values[i].value_min.toFixed(2) + "(cpm)" + "<br>")
                 .style("left", (d3.event.pageX) + "px")
                 .style("top", (d3.event.pageY) + "px");
         })
         .on("mouseout", function () {
+            // change opacity
             d3.selectAll('.line').style("opacity", 1);
             // d3.select(this).style("stroke-width", "1.5px");
             d3.selectAll(".legend").style("opacity", 1);
             d3.selectAll(".mobileRoute").style("opacity", 0.5)
-            d3.selectAll(".dots").style("opacity",0.8)
+            d3.selectAll(".dots").style("opacity",0.5)
+            d3.selectAll(".u-area").style("opacity",0.5)
+            d3.selectAll(".l-area").style("opacity",0.5)
+
 
             focus.style("display", "none");
 
@@ -351,10 +318,14 @@ function drawTimeSeries(regionData) {
         .attr("id", d => "leg-" + d.key);
 
     legend.append("rect")
-        .attr("width", 10)
-        .attr("height", 10)
+        .attr("width", 12)
+        .attr("height", 12)
         .attr("x", tsWidth + (tsMargin.right / 3) - 25)
         .attr("y", (d, i) => (i + 1) * legendSpace - 4)
+        // .attr("stroke","black")
+        // .attr("stroke-width",(d,i)=>{
+        //     return (d.values[i].Value - d.values[i].value_min)/250 + 3
+        // })
         .attr("fill", d => d.visible ? getColorTs(d.key) : greyBtn)
         // .attr("fill", d =>  getColorTs(d.key))
         .attr("class", "legend-box")
@@ -369,7 +340,6 @@ function drawTimeSeries(regionData) {
                 .transition()
                 .call(tsyAxis);
 
-
             // Update graph
             lines.select("#lin-"+d.key)
                 .transition()
@@ -378,29 +348,33 @@ function drawTimeSeries(regionData) {
             legend.select("rect")//("#leg-"+d.key)
                 .transition()
                 .attr("fill", d => d.visible ? getColorTs(d.key) : greyBtn);
+
             // // update upper area
             upperAreas.select("#u-area-" + d.key)
                 .transition()
-                .attr("d", d => {
-                    if (!d.visible) {
-                        null;
-                    }
-                });
+                .attr("d",d=>d.visible?upperArea(d.values):null)
+                // .attr("d", d => {
+                //     if (!d.visible) {
+                //         null;
+                //     }
+                // });
             // update
             lowerAreas.select("#l-area-" + d.key)
                 .transition()
-                .attr("d", d => {
-                    if (!d.visible) {
-                        null;
-                    }
-                });
+                .attr("d",d=>d.visible?lowerArea(d.values):null)
+
+            // .attr("d", d => {
+                //     if (!d.visible) {
+                //         null;
+                //     }
+                // });
 
             if (d.visible) {
-                //     if (d.attr("visibility")=="visible") {
-
+                //plot sensor routes on map
                 tsPlot(d.key);
                 // plot_dots(d.key);
             }else{
+                //remove sensor routes from map
                 removePlot(d.key);
             }
         })
@@ -408,13 +382,29 @@ function drawTimeSeries(regionData) {
             // d3.select(this)
             //     .transition()
             //     .attr("fill", d => getColorTs(d.key));
-
-            d3.selectAll('.line').style("opacity", 0.2);
-            // d3.select(this).style("opacity", 1).style("stroke-width", "2px");
-            d3.selectAll(".legend").style("opacity", 0.2);
+            // change line opacity
+            d3.selectAll('.line').style("opacity", 0.1);
             d3.select("#lin-" + d.key).style("opacity", 1);
+            // change legend opacity
+            d3.selectAll(".legend").style("opacity", 0.1);
             d3.select("#leg-" + d.key).style("opacity", 1);
+
+            // change areas opacity
+            d3.selectAll('.u-area').style("opacity",0.1);
+            d3.select("#u-area-" + d.key).style("opacity",1)
+            d3.selectAll('.l-area').style("opacity",0.1);
+            d3.select("#l-area-" + d.key).style("opacity",1)
+
+            // change mobile route opacity (on map)
+            d3.selectAll(".mobileRoute").style("opacity", 0.1)
+            d3.select("#route-" + d.key).style("opacity", 1)
+
+            // change dots opacity (on map)
+            d3.selectAll(".dots").style("opacity",0.1)
+            d3.selectAll(".dots-" + d.key).style("opacity",1)
+
         })
+
         .on("mouseout", function (d) {
             // d3.select(this)
             //     .transition()
@@ -423,6 +413,11 @@ function drawTimeSeries(regionData) {
             d3.selectAll('.line').style("opacity", 1);
             d3.select(this).style("stroke-width", "2px");
             d3.selectAll(".legend").style("opacity", 1);
+            d3.selectAll(".mobileRoute").style("opacity", 0.5)
+            d3.selectAll(".dots").style("opacity",0.5)
+            d3.selectAll(".u-area").style("opacity",0.5)
+            d3.selectAll(".l-area").style("opacity",0.5)
+
             focus.style("display", "none");
 
             // Hide tooltip
@@ -490,147 +485,12 @@ function drawTimeSeries(regionData) {
 
     }
 
-
-
-    // function plot_dots(sensor) {
-    //     let dotTip = d3.select("#map")
-    //         .append("div")
-    //         .style("opacity", 0)
-    //         .attr("class", "tstooltip");
-    //     mapTs.data(dataset.filter(f=>f.key === sensor ))
-    //         .enter()
-    //         .append("circle")
-    //         .attr("class", "dots")
-    //         .attr("cx", (d,i) => {
-    //             return projectionTs([d.values[i].Long, d.values[i].Lat])[0];
-    //         })
-    //         .attr("cy", function (d,i) {
-    //             return projectionTs([d.values[i].Long, d.values[i].Lat])[1];
-    //         })
-    //         .attr("r", "3")
-    //         .style("fill", d=>getColorTs(d.key))
-    //         .style("opacity", .8)
-    //         .on("mouseover", (d,i) => {
-    //             dotTip.transition()
-    //                 .duration(200)
-    //                 .style("opacity", "1");
-    //
-    //             dotTip
-    //                 .html("Sensor: " + d.key + "<br>"
-    //                     + "Time: " + d.values[i].Timestamp.toLocaleTimeString([], {
-    //                         year: '2-digit',
-    //                         month: '2-digit',
-    //                         day: '2-digit',
-    //                         hour: '2-digit',
-    //                         minute: '2-digit'
-    //                     }) + "<br>"
-    //                     + "Mean: " + d.values[i].value_mean.toFixed(2) + " (cpm)" + "<br>"
-    //                     + "Max: " + d.values[i].Value.toFixed(2) + "(cpm)" + "<br>"
-    //                     + "Min: " + d.values[i].value_min.toFixed(2) + "(cpm)" + "<br>")
-    //                 // .style("left", (d3.mouse(this)[0] + 0) + "px")
-    //                 // .style("top", (d3.mouse(this)[1]) + 0 + "px");})
-    //                 .style("left", d3.select(this).attr("cx") + "px")
-    //                 .style("top", d3.select(this).attr("cy") + "px");
-    //         })
-    //         .on("mouseout", () => {
-    //             dotTip.transition()
-    //                 .duration(200)
-    //                 .style("opacity", "0");
-    //         })
-    //     on("click", d=>drawRoute(d.key))
-    // }
-
     // function to remove mobile dots on map
     function removePlot(sensor){
         d3.selectAll(".dots-" + sensor).remove();
         d3.select("#route-" + sensor).remove();
 
     }
-
-
-// control panel
-    // check to select/unselect all sensors
-    d3.select("#allSensor")
-        .on("change", function(){
-        if (d3.select(this).property("checked")) {
-            d3.selectAll(".legend-box").each(function(sel, i){
-                if(!sel.visible){
-                    //Select it
-                    d3.select(this).on("click")(sel, i);
-                }
-            });
-        }
-        else
-        {
-            d3.selectAll(".legend-box").each(function(sel){
-                if(sel.visible){
-                    //Select it
-                    d3.select(this).on("click")(sel, i);
-                }
-            });
-        }
-    })
-
-    // select/unselect all mobile sensors
-    d3.select("#allMobile")
-        .on("change", function(){
-            if (d3.select(this).property("checked")) {
-                d3.selectAll(".legend-box")
-                    .filter((d,i)=>i<50)
-                    .each(function(sel, i){
-                    if(!sel.visible){
-                        //Select it
-                        d3.select(this).on("click")(sel, i);
-                    }
-                });
-            }
-            else{
-                d3.selectAll(".legend-box")
-                    .filter((d,i)=>i<50)
-                    .each(function(sel){
-                    if(sel.visible){
-                        //Select it
-                        d3.select(this).on("click")(sel, i);
-                    }
-                });
-            }
-    })
-
-    d3.select("#allStatic")
-        .on("change", function(){
-            if (d3.select(this).property("checked")) {
-                d3.selectAll(".legend-box")
-                    .filter((d,i)=>i>49)
-                    .each(function(sel, i){
-                        if(!sel.visible){
-                            //Select it
-                            d3.select(this).on("click")(sel, i);
-                        }
-                    });
-
-            }
-            else{
-                d3.selectAll(".legend-box")
-                    .filter((d,i)=>i>49)
-                    .each(function(sel){
-                        if(sel.visible){
-                            //Select it
-                            d3.select(this).on("click")(sel, i);
-                        }
-                    });
-            }
-    })
-
-    // clear all lines on chart
-    d3.select("#clearAll").on("click",function(){
-        d3.select("#allSensor").property("checked",false);
-        d3.selectAll(".legend-box").attr("fill",d=>d.visible? getColorTs(d.key):greyBtn);
-        d3.selectAll("path.line").remove();
-        d3.selectAll("path.l-area").remove();
-        d3.selectAll("path.u-area").remove();
-        d3.selectAll(".dots").remove();
-
-    })
 }
 
 
