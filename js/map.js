@@ -45,12 +45,13 @@ var tsPlot;
 // console.log(mbfilelist);
 
 // load data for time series
-d3.csv("data/allSensorReadings_minMax.csv").then(data=>{
+d3.csv("data/allSensorReadings_iqr.csv").then(data=>{
+// d3.csv("data/MobileSensorReadings.csv").then(data=>{
     data.forEach(d=>{
         d.Timestamp = parse(d.Timestamp);
         d.Value = +d.Value;
         d["value_count"] = +d["value_count"];
-        d["value_mean"] = +d["value_mean"];
+        d["value_median"] = +d["value_median"];
         d["value_min"] = +d["value_min"];
         d.visible = true;
     })
@@ -205,48 +206,32 @@ Promise.all(filelist).then(files => {
                             .attr("d",d=>routeLine(d.values))
                             .attr("class","mobileRoute")
                             .attr("id",d=>"route-" + d.key)
+
                         d3.selectAll(".mobileRoute")
                             .style("stroke",d=>getColorTs(d.key))
-                            .style("stroke-width", (d,i)=>d.values[i].value_mean/250 +2)
+                            // .style("stroke-width", (d,i)=>d.values[i].value_median/250 +2)
                             .style("fill-opacity",0)
                             .style("opacity",0.5)
-                            .on("mouseover", function(d,i){
-                                d3.selectAll(".mobileRoute").style("opacity",0.1);
-                                d3.select("#route-" + d.key).style("opacity",1);
-
-                                d3.selectAll(".dots").style("opacity", 0.1);
-                                d3.selectAll(".dots-" + d.key).style("opacity", 1)
-
-                                d3.selectAll('.line').style("opacity",0.1);
-                                d3.select("#lin-" + d.key).style("opacity", 1);
-
-                                d3.selectAll(".legend").style("opacity", 0.1);
-                                d3.select("#leg-" + d.key).style("opacity", 1);
-                               })
-                            .on("mouseout",function(){
-                                d3.selectAll(".line").style("opacity",1);
-                                d3.selectAll(".legend").style("opacity",1);
-                                d3.selectAll(".mobileRoute").style("opacity", 0.5)
-                                d3.selectAll(".dots").style("opacity", 0.8)
-                               })
-
-                        // let layout = d3.layoutTrail().positioner(d=>projection(d.Long,d.Lat));
-                        // let routeData = layout
-                        //     // .grouping(function(d) {return d["Sensor-id"]})
-                        //     .data(filtered)
-                        //     // .coordType("coordinates")
-                        //     .coordType("xy")
-                        //     .layout()
+                            .on("mouseover", d=>highlight(d))
+                        // {
+                        //         d3.selectAll(".mobileRoute").style("opacity",0.1);
+                        //         d3.select("#route-" + d.key).style("opacity",1);
                         //
-                        // let routeLine = mapSvg
-                        //     .selectAll("line")
-                        //     .data(routeData)
-                        //     .enter()
-                        //     .append("line")
-                        //     .attr("x1",d=>d.x1)
-                        //     .attr("y1",d=>d.y1)
-                        //     .attr("y2",d=>d.y1)
-                        //     .attr("x2",d=>d.x1)
+                        //         d3.selectAll(".dots").style("opacity", 0.1);
+                        //         d3.selectAll(".dots-" + d.key).style("opacity", 1)
+                        //
+                        //         d3.selectAll('.line').style("opacity",0.1);
+                        //         d3.select("#lin-" + d.key).style("opacity", 1);
+                        //
+                        //         d3.selectAll(".legend").style("opacity", 0.1);
+                        //         d3.select("#leg-" + d.key).style("opacity", 1);
+                        //        })
+                            .on("mouseout",dim)
+                                // d3.selectAll(".line").style("opacity",1);
+                                // d3.selectAll(".legend").style("opacity",1);
+                                // d3.selectAll(".mobileRoute").style("opacity", 0.5)
+                                // d3.selectAll(".dots").style("opacity", 0.5)
+                               // })
 
 // debugger
                         mapSvg
@@ -281,19 +266,24 @@ Promise.all(filelist).then(files => {
                                                 hour: '2-digit',
                                                 minute:'2-digit'})  + "<br>"
                                         + "Max: " + d.Value.toFixed(2) + " (cmp)" + "<br>"
-                                        + "Mean:" + d.value_mean.toFixed(2) + " (cmp)" + "<br>"
+                                        + "Median:" + d.value_median.toFixed(2) + " (cmp)" + "<br>"
                                         + "Min: " + d.value_min.toFixed(2) + " (cmp)" + "<br>"
                                     )
                                     // .style("left", (d3.mouse(this)[0] + 0) + "px")
                                     // .style("top", (d3.mouse(this)[1]) + 0 + "px");})
                                     .style("left", d3.select(this).attr("cx") +"px")
-                                    .style("top", d3.select(this).attr("cy") + "px");})
+                                    .style("top", d3.select(this).attr("cy") + "px");
+
+                            })
+
                             .on("mouseout",()=>{
                                 // d3.select(this)
                                 //     .style("opacity", 0.8)
                                 dotTip.transition()
                                     .duration(200)
-                                    .style("opacity","0");})
+                                    .style("opacity","0");
+
+                            })
                             .on("click",d=>drawRoute(d["Sensor-id"]))
 
                         function drawRoute(sensor){
@@ -392,6 +382,38 @@ Promise.all(filelist).then(files => {
                         draw_heatmap(alldata[index],index+1,);
                     }
                 }
+            }
+
+
+
+            function highlight(d){
+                d3.selectAll(".cpm").filter(e=> (e != undefined) && (e["Sensor-id"]===undefined || !e["Sensor-id"].find(f=>f["Sensor-id"]===d.key)).style("opacity"),0.2)
+                debugger
+                d3.selectAll(".mobileRoute").style("opacity",0.1);
+                d3.select("#route-" + d.key).style("opacity",1);
+
+                d3.selectAll(".dots").style("opacity", 0.1);
+                d3.selectAll(".dots-" + d.key).style("opacity", 1)
+
+                d3.selectAll('.line').style("opacity",0.1);
+                d3.select("#lin-" + d.key).style("opacity", 1);
+
+                d3.selectAll(".legend").style("opacity", 0.1);
+                d3.select("#leg-" + d.key).style("opacity", 1);
+
+                d3.selectAll('.u-area').style("opacity",0.1);
+                d3.select("#u-area-" + d.key).style("opacity",1)
+                d3.selectAll('.l-area').style("opacity",0.1);
+                d3.select("#l-area-" + d.key).style("opacity",1)
+            }
+
+            function dim(){
+                d3.selectAll(".line").style("opacity",1);
+                d3.selectAll(".legend").style("opacity",1);
+                d3.selectAll(".mobileRoute").style("opacity", 0.5)
+                d3.selectAll(".dots").style("opacity", 0.5)
+                d3.selectAll(".u-area").style("opacity",0.5)
+                d3.selectAll(".l-area").style("opacity",0.5)
             }
 
             function mousemove(d) {

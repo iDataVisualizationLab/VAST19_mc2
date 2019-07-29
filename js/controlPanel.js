@@ -63,7 +63,7 @@ svgLegend.append("rect")
     .attr("height", 10)
     .style("fill", "url(#legend-heatmap)");
 
-debugger
+
 svgLegend.append("text")
     .attr("class", "mono")
     .text(function(d) { return "≥ " + Math.round(d); })
@@ -92,3 +92,87 @@ svgLegend.append("g")
     .attr("class", "axis--legend")
     .attr("transform", "translate(50," + (40) + ")")
     .call(xAxisLegend);
+
+// control panel
+// check to select/unselect all sensors
+d3.select("#allSensor")
+    .on("change", function(){
+        if (d3.select(this).property("checked")) {
+            d3.selectAll(".legend-box").each(function(sel, i){
+                if(!sel.visible){
+                    //Select it
+                    d3.select(this).on("click")(sel, i);
+                }
+            });
+        }
+        else
+        {
+            d3.selectAll(".legend-box").each(function(sel){
+                if(sel.visible){
+                    //Select it
+                    d3.select(this).on("click")(sel, i);
+                }
+            });
+        }
+    })
+
+// select/unselect all mobile sensors
+d3.select("#allMobile")
+    .on("change", function(){
+        if (d3.select(this).property("checked")) {
+            d3.selectAll(".legend-box")
+                .filter((d,i)=>i<50)
+                .each(function(sel, i){
+                    if(!sel.visible){
+                        //Select it
+                        d3.select(this).on("click")(sel, i);
+                    }
+                });
+        }
+        else{
+            d3.selectAll(".legend-box")
+                .filter((d,i)=>i<50)
+                .each(function(sel){
+                    if(sel.visible){
+                        //Select it
+                        d3.select(this).on("click")(sel, i);
+                    }
+                });
+        }
+    })
+
+d3.select("#allStatic")
+    .on("change", function(){
+        if (d3.select(this).property("checked")) {
+            d3.selectAll(".legend-box")
+                .filter((d,i)=>i>49)
+                .each(function(sel, i){
+                    if(!sel.visible){
+                        //Select it
+                        d3.select(this).on("click")(sel, i);
+                    }
+                });
+
+        }
+        else{
+            d3.selectAll(".legend-box")
+                .filter((d,i)=>i>49)
+                .each(function(sel){
+                    if(sel.visible){
+                        //Select it
+                        d3.select(this).on("click")(sel, i);
+                    }
+                });
+        }
+    })
+
+// clear all lines on chart
+d3.select("#clearAll").on("click",function(){
+    d3.select("#allSensor").property("checked",false);
+    d3.selectAll(".legend-box").attr("fill",d=>d.visible? getColorTs(d.key):greyBtn);
+    d3.selectAll("path.line").remove();
+    d3.selectAll("path.l-area").remove();
+    d3.selectAll("path.u-area").remove();
+    d3.selectAll(".dots").remove();
+
+})
