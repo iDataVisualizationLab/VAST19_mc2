@@ -37,16 +37,6 @@
 <!--<div id="heatmapLegend"></div>-->
 <!--<div id="floatPanel" class="ui-widget-content">-->
 
-<div id="map" class="ui-widget-content">
-    <svg width="550px" height="450px">
-        <!--<div id="mapLegend">-->
-        <!--</div>-->
-        <svg width = 100 height = 70>
-            <g class="legendGroup"></g>
-        </svg>
-        <g id="regMap"></g>
-    </svg>
-</div>
 
 <div id="controlPanel" class="ui-widget-content">
     <div id="colorLegend"></div>
@@ -63,20 +53,31 @@
         <input type="checkbox"  id="allMobile">Select all mobile sensors<br>
         <input type="checkbox" id="allStatic">Select all static sensors<br>
         <input type="checkbox" id="allSensor">Select all sensors<br>
-        <input type="button" id="clearAll" value="Clear chart"><br>
+        <!--<input type="button" id="clearAll" value="Clear chart"><br>-->
     </div>
     <!--<h4>Mobile sensors</h4>-->
     <!--<div id="mobileOptions">-->
         <!--&lt;!&ndash;<input type="checkbox" id="allCheck" Value="Select all">&ndash;&gt;-->
     <!--</div>-->
 </div>
-<!--</div>-->
+
+<div id="map" class="ui-widget-content">
+    <svg width="550px" height="450px">
+        <!--<div id="mapLegend">-->
+        <!--</div>-->
+        <svg width = 100 height = 70>
+            <g class="legendGroup"></g>
+        </svg>
+        <g id="regMap"></g>
+    </svg>
+</div>
+
 
 <div id="timeSeries"></div>
 
 <script src="https://d3js.org/d3.v5.min.js"></script>
-
 <script src="js/map.js"></script>
+<script src="js/pathlayout.js"></script>
 <script src="js/heatmap.js"></script>
 <script src="js/ts.js"></script>
 <script src="js/controlPanel.js"></script>
