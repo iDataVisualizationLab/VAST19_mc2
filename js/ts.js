@@ -10,7 +10,7 @@ var tsMargin = {top:20, right:120, bottom: 90, left: 50},
 
 var tsParseTime = d3.timeParse("%Y-%m-%d %H:%M:%S");
 bisectDate = d3.bisector( d => d.Timestamp).left;
-
+// bisect_right = d3.bisector( d => d.Timestamp).right;
 // Set up scales
 var tsxScale = d3.scaleTime().range([0, tsWidth]),
     tsxScale2 = d3.scaleTime().range([0, tsWidth]),
@@ -197,7 +197,7 @@ function drawTimeSeries(regionData) {
         .on("click", d => {
             return d.visible = !d.visible;
         });
-
+    toolTipLine();
 // Draw Line
     var lines = svgTs.selectAll(".line-group")
         .data(dataset)
@@ -262,7 +262,7 @@ function drawTimeSeries(regionData) {
 
             // Show circle
             var x0 = tsxScale.invert(d3.mouse(this)[0]),
-                x1 = d3.timeMinute.every(10).round(x0),
+                x1 = d3.timeMinute.every(5).round(x0),
                 i = bisectDate(d.values, x1);
             focus.attr("transform", "translate(" + tsxScale(x1) + "," + tsyScale(d.values[i].value_median) + ")"); // Find position
             focus.style("display", null);
@@ -270,7 +270,7 @@ function drawTimeSeries(regionData) {
             // .attr("id", f=>"circle-" + f.key)
                 .attr("fill", getColorTs(d.key));
 
-            // console.log(d.values[i].time);
+
             // Show tooltip
             // tooltip.style("display", null)
             tooltip.transition()
@@ -286,10 +286,12 @@ function drawTimeSeries(regionData) {
                         minute: '2-digit'
                     }) + "<br>"
                     + "Median: " + d.values[i].value_median.toFixed(2) + " (cpm)" + "<br>"
-                    + "Max: " + d.values[i].Value.toFixed(2) + "(cpm)" + "<br>"
-                    + "Min: " + d.values[i].value_min.toFixed(2) + "(cpm)" + "<br>")
-                .style("left", (d3.event.pageX) + "px")
-                .style("top", (d3.event.pageY) + "px");
+                    + "Max: " + d.values[i].Value.toFixed(2) + " (cpm)" + "<br>"
+                    + "Min: " + d.values[i].value_min.toFixed(2) + " (cpm)" + "<br>")
+                .style("left", (d3.event.pageX + 9) + "px")
+                .style("top", (d3.event.pageY - 43) + "px");
+            debugger
+
         })
         .on("mouseout", function () {
             // change opacity
@@ -300,7 +302,6 @@ function drawTimeSeries(regionData) {
             d3.selectAll(".dots").style("opacity",0.5)
             d3.selectAll(".u-area").style("opacity",0.5)
             d3.selectAll(".l-area").style("opacity",0.5)
-
 
             focus.style("display", "none");
 
@@ -318,7 +319,7 @@ function drawTimeSeries(regionData) {
         .attr("id", d => "leg-" + d.key);
 
     legend.append("rect")
-        .attr("width", 12)
+        .attr("width", (d,i)=>d.values)
         .attr("height", 12)
         .attr("x", tsWidth + (tsMargin.right / 3) - 25)
         .attr("y", (d, i) => (i + 1) * legendSpace - 4)
@@ -431,6 +432,106 @@ function drawTimeSeries(regionData) {
         .attr("fill", "#5d5d5d")
         .style("font-size", "11")
         .text(d => d.key);
+
+
+    function toolTipLine(){
+        var mouseG = svgTs.append("g")
+            .attr("class", "mouse-over-effects");
+
+        mouseG.append("path") // this is the black vertical line to follow mouse
+            .attr("class", "mouse-line")
+            .style("stroke", "black")
+            .style("stroke-width", "1px")
+            .style("opacity", "0");
+
+        var lines = document.getElementsByClassName('line');
+debugger
+        var mousePerLine = mouseG.selectAll('.mouse-per-line')
+            .data(dataset)
+            .enter()
+            .append("g")
+            .attr("class", "mouse-per-line");
+
+        mousePerLine.append("circle")
+            .attr("r", 4)
+            .style("stroke", function(d) {
+                return getColorTs(d.key);
+            })
+            .style("fill", "none")
+            .style("stroke-width", "1px")
+            .style("opacity", "0");
+        //
+        // mousePerLine.append("text")
+        //     .attr("transform", "translate(10,3)")
+
+        mouseG.append('svg:rect') // append a rect to catch mouse movements on canvas
+            .attr('width', tsWidth) // can't catch mouse events on a g element
+            .attr('height', tsHeight)
+            .attr('fill', 'none')
+            .attr('pointer-events', 'all')
+            .on('mouseout', function() { // on mouse out hide line, circles and text
+                d3.select(".mouse-line")
+                    .style("opacity", "0");
+                // d3.selectAll(".mouse-per-line circle")
+                //     .style("opacity", "0");
+                // d3.selectAll(".mouse-per-line text")
+                //     .style("opacity", "0");
+            })
+            .on('mouseover', function() { // on mouse in show line, circles and text
+                d3.select(".mouse-line")
+                    .style("opacity", "1");
+                // d3.selectAll(".mouse-per-line circle")
+                //     .style("opacity", "1");
+                // d3.selectAll(".mouse-per-line text")
+                //     .style("opacity", "1");
+            })
+            .on('mousemove', function() { // mouse moving over canvas
+                var mouse = d3.mouse(this);
+                d3.select(".mouse-line")
+                    .attr("d", function() {
+                        var d = "M" + mouse[0] + "," + tsHeight;
+                        d += " " + mouse[0] + "," + 0;
+                        return d;
+                    });
+
+
+                d3.selectAll(".mouse-per-line")
+                    .attr("transform", function(d, i) {
+                        console.log(tsWidth/mouse[0])
+
+                        var xDate = tsxScale.invert(mouse[0]);
+                        var x1 = d3.timeMinute.every(5).round(xDate),
+
+                        idx = bisectDate(d.values, x1);
+
+                        var beginning = 0,
+                            end = lines[i].getTotalLength(),
+                            target = null;
+
+                        while (true){
+                            target = Math.floor((beginning + end) / 2);
+                            pos = lines[i].getPointAtLength(target);
+                            if ((target === end || target === beginning) && pos.x !== mouse[0]) {
+                                break;
+                            }
+                            if (pos.x > mouse[0])      end = target;
+                            else if (pos.x < mouse[0]) beginning = target;
+                            else break; //position found
+                        }
+
+                        d3.select(this).select('text')
+                            .text(tsyScale.invert(pos.y))
+                            .attr("font-size","11px");
+
+
+                        d3.select("#dot-" + d.key + idx).style("fill","white");
+// debugger
+                        return "translate(" + mouse[0] + "," + pos.y +")";
+                    });
+            });
+    }
+
+
 
 
     //For brusher of the slider bar at the bottom
