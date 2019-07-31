@@ -319,7 +319,7 @@ function drawTimeSeries(regionData) {
         .attr("id", d => "leg-" + d.key);
 
     legend.append("rect")
-        .attr("width", (d,i)=>d.values)
+        .attr("width", 12)
         .attr("height", 12)
         .attr("x", tsWidth + (tsMargin.right / 3) - 25)
         .attr("y", (d, i) => (i + 1) * legendSpace - 4)
