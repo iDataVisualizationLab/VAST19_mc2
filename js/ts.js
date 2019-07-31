@@ -64,12 +64,12 @@ var svgTs = d3.select("#timeSeries").append("svg")
 var greyBtn = "#d7d7d7";
 
 // 59 Custom colors, 50 mobile, 9 static
-var colorScheme = ["#1f77b4","#aec7e8","#ff7f0e","#ffbb78","#2ca02c","#98df8a","#d62728","#ff9896","#9467bd","#c5b0d5",
-    "#8c564b","#c49c94", "#e377c2","#f7b6d2","#bcbd22","#dbdb8d","#17becf","#9edae5", "#393b79","#6b6ecf",
+var colorScheme = ["#1f77b4","#aec7e8","#ff7f0e","#2ca02c","#98df8a","#d62728","#ff9896","#9467bd","#c5b0d5",
+    "#8c564b","#c49c94", "#e377c2","#f7b6d2","#bcbd22","#dbdb8d","#17becf","#9edae5","#ffbb78", "#393b79","#6b6ecf",
     "#637939","#b5cf6b","#843c39","#d6616b","#7b4173","#ce6dbd","#5254a3","#8ca252","#9c9ede","#cedb9c",
     "#ff7f0e","#ffbb78","#2ca02c","#98df8a", "#d62728","#ff9896","#9467bd","#c5b0d5","#8c564b", "#c49c94",
-    "#e377c2","#f7b6d2","#bcbd22","#dbdb8d","#17becf","#9edae5", "#1f77b4","#aec7e8", "#ff7f0e","#ffbb78",
-    "#2ca02c","#98df8a","#d62728","#ff9896","#9467bd","#c5b0d5","#8c564b","#c49c94","#e377c2","#f7b6d2"]
+    "#e377c2","#f7b6d2","#bcbd22","#dbdb8d","#17becf","#9edae5", "#1f77b4","#aec7e8", "#ff7f0e",
+    "#2ca02c","#98df8a","#d62728","#ff9896","#9467bd","#c5b0d5","#ffbb78","#8c564b","#c49c94","#e377c2","#f7b6d2"]
 
 var color = d3.scaleOrdinal().range(colorScheme);
 
@@ -78,11 +78,25 @@ var color = d3.scaleOrdinal().range(colorScheme);
 // function to draw time series
 function drawTimeSeries(regionData) {
     let dataset = d3.nest().key(d => d["Sensor-id"]).entries(regionData);
-    var yMin = d3.min(dataset, d => d3.min(d.values, v => v.value_min)),
+    var yMin = d3.min(dataset, d => d3.min(d.values, v => v.value_median)),
         yMax = d3.max(dataset, d => d3.max(d.values, v => v.Value)) + 100;
 
-    // console.log(yMin);
-    // console.log(yMax);
+    let qTotal = d3.nest().key(d=>d["Sensor-id"]).rollup(v=> {
+        return {
+            // Timestamp = v.value.Timestamp,
+            q25sum : d3.sum(v, d => d.value_quantile25),
+            q75sum : d3.sum(v, d => d.value_quantile75)
+        };
+    }).entries(regionData);
+
+    let qTotalMax = d3.max(qTotal, d=>d.value.q75sum)
+    let qTotalMin = d3.min(qTotal, d=>d.value.q25sum)
+
+    let q25 = qTotal.map(d=>d.value.q25sum)
+    let q75 = qTotal.map(d=>d.value.q75sum)
+
+    debugger
+
 
     tsxScale.domain(d3.extent(regionData, d => d.Timestamp));
     tsyScale.domain([yMin, yMax]);
@@ -318,11 +332,15 @@ function drawTimeSeries(regionData) {
         .attr("class", "legend")
         .attr("id", d => "leg-" + d.key);
 
-    legend.append("rect")
-        .attr("width", 12)
-        .attr("height", 12)
+        legend.append("rect")
+            // .attr("width", (d,i)=>((q75[i] - q25[i])/1500 ))
+            // .attr("height", (d,i)=>((q75[i] - q25[i])/1500 ))
+            .attr("width", (d,i)=>((q75[i] - q25[i])/500 ))
+            .attr("height", 10)
+    //     .attr("width",12)
+    //     .attr("height",12)
         .attr("x", tsWidth + (tsMargin.right / 3) - 25)
-        .attr("y", (d, i) => (i + 1) * legendSpace - 4)
+        .attr("y", (d, i) => (i + 1 ) * legendSpace -4)
         // .attr("stroke","black")
         // .attr("stroke-width",(d,i)=>{
         //     return (d.values[i].Value - d.values[i].value_min)/250 + 3
@@ -334,8 +352,8 @@ function drawTimeSeries(regionData) {
             d.visible = !d.visible;
 
             //Update axis
-            maxY = findMaxY(dataset) + 100;
-            minY = findMinY(dataset) + 5;
+            maxY = findMaxY(dataset);
+            minY = findMinY(dataset);
             tsyScale.domain([minY, maxY]).nice();
             svgTs.select(".y.axis")
                 .transition()
@@ -372,7 +390,8 @@ function drawTimeSeries(regionData) {
 
             if (d.visible) {
                 //plot sensor routes on map
-                tsPlot(d.key);
+                tsRoutes(d.key);
+                tsDots(d.key);
                 // plot_dots(d.key);
             }else{
                 //remove sensor routes from map
@@ -426,14 +445,14 @@ function drawTimeSeries(regionData) {
         });
 
     legend.append("text")
-        .attr("x", tsWidth + (tsMargin.right / 3))
+        .attr("x", tsWidth + (tsMargin.right / 3 + 10 ))
         .attr("y", (d, i) => (i + 1) * legendSpace + 4)
         .attr("class", "legend-text")
         .attr("fill", "#5d5d5d")
         .style("font-size", "11")
         .text(d => d.key);
 
-
+    // draw a vertical line,  to control movement of sensors on the map over time.
     function toolTipLine(){
         var mouseG = svgTs.append("g")
             .attr("class", "mouse-over-effects");
@@ -445,7 +464,7 @@ function drawTimeSeries(regionData) {
             .style("opacity", "0");
 
         var lines = document.getElementsByClassName('line');
-debugger
+
         var mousePerLine = mouseG.selectAll('.mouse-per-line')
             .data(dataset)
             .enter()
@@ -523,9 +542,8 @@ debugger
                             .text(tsyScale.invert(pos.y))
                             .attr("font-size","11px");
 
-
-                        d3.select("#dot-" + d.key + idx).style("fill","white");
-// debugger
+                        d3.select("#dot-" + d.key + "-" + idx).style("fill","white").style("opacity",1);
+debugger
                         return "translate(" + mouse[0] + "," + pos.y +")";
                     });
             });
@@ -613,7 +631,7 @@ function getColorTs(name){
                 result = 2;
                 break;
             case 6:
-                result = 2;
+                result = 3;
                 break;
             case 9:
                 result = 4;
@@ -654,7 +672,7 @@ function findMaxY(data) {
 function findMinY(data) {
     var minYValues = data.map( d => {
         if (d.visible) {
-            return d3.min(d.values, value => value.value_min) - 1;
+            return d3.min(d.values, value => value.value_median) - 1;
         }
     });
     return d3.min(minYValues);

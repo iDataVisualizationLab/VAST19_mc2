@@ -28,7 +28,8 @@ const regionNameList =
         'West Parton'];
 var projectionTs;
 var mapTs;
-var tsPlot;
+var tsRoutes;
+var tsDots;
 // var tsfilelist = [];
 // for ( i = 1; i < 20; i ++ )
 // {
@@ -57,7 +58,7 @@ d3.csv("data/allSensorReadings_iqr.csv").then(data=>{
     })
 
 // read heat map files
-Promise.all(filelist).then(files => {
+    Promise.all(filelist).then(files => {
             var index = 1;
             var alldata = [];
             for (let i = 0; i < files.length; i++) {
@@ -148,6 +149,7 @@ Promise.all(filelist).then(files => {
                         .attr("font-size", "8pt");
 
                     mapTs = mapSvg;
+
                     //load data for static sensors and plot them on to the map
                     d3.csv("data/StaticSensorLocations.csv").then(location => {
                         mapSvg.enter()
@@ -173,13 +175,9 @@ Promise.all(filelist).then(files => {
 
                     });
 
-                    // function to plot sensor dots on map(used in time series)
-                    let plot = function plotDots(sensor){
-                        let dotTip = d3.select("#map")
-                            .append("div")
-                            .style("opacity", 0)
-                            .attr("class", "tstooltip");
 
+                    // function to plot sensor dots on map(used in time series)
+                    let plotRoutes = function plotRoutes(sensor){
                         let filtered = data.filter(d=>d["Sensor-id"]===sensor && d.Value < 5000 && d["value_count"] >0);
                         let nest = d3.nest().key(d => d["Sensor-id"]).entries(filtered)
                         let points = filtered.map((d=>{
@@ -213,85 +211,83 @@ Promise.all(filelist).then(files => {
                             .style("fill-opacity",0)
                             .style("opacity",0.5)
                             .on("mouseover", d=>highlight(d))
-                        // {
-                        //         d3.selectAll(".mobileRoute").style("opacity",0.1);
-                        //         d3.select("#route-" + d.key).style("opacity",1);
-                        //
-                        //         d3.selectAll(".dots").style("opacity", 0.1);
-                        //         d3.selectAll(".dots-" + d.key).style("opacity", 1)
-                        //
-                        //         d3.selectAll('.line').style("opacity",0.1);
-                        //         d3.select("#lin-" + d.key).style("opacity", 1);
-                        //
-                        //         d3.selectAll(".legend").style("opacity", 0.1);
-                        //         d3.select("#leg-" + d.key).style("opacity", 1);
-                        //        })
                             .on("mouseout",dim)
-                                // d3.selectAll(".line").style("opacity",1);
-                                // d3.selectAll(".legend").style("opacity",1);
-                                // d3.selectAll(".mobileRoute").style("opacity", 0.5)
-                                // d3.selectAll(".dots").style("opacity", 0.5)
-                               // })
+
 
 // debugger
+//                         draw_point(sensor);
+
+
+                    }
+                    let plotDots = function plotDots(sensor) {
+                        let dotTip = d3.select("#map")
+                            .append("div")
+                            .style("opacity", 0)
+                            .attr("class", "tstooltip");
                         mapSvg
-                            .data(data.filter(d=>{return d["Sensor-id"]===sensor && d.Value < 5000 && d["value_count"] >0 }))
+                            .data(data.filter(d => {
+                                return d["Sensor-id"] === sensor && d.Value < 5000 && d["value_count"] > 0
+                            }))
                             // .data(data)
                             .enter()
                             .append("circle")
-                            .attr("class",d=>"dots dots-" + d["Sensor-id"])
-                            .attr("cx", d=> {
+                            .attr("class", d => "dots dots-" + d["Sensor-id"])
+                            .attr("id", (d, i) => "dot-" + d["Sensor-id"] + "-" + i)
+                            .attr("cx", d => {
                                 return projection([d.Long, d.Lat])[0];
                             })
-                            .attr("cy", d=> {
+                            .attr("cy", d => {
                                 return projection([d.Long, d.Lat])[1];
                             })
-                            .attr("r", "3")
-                            .attr("r",d=>d.Value/250 +2)
-                            .style("fill", d=>getColorTs(d["Sensor-id"]))
-                            .style("opacity",0.5)
-                            .on("mouseover", function(d,i){
+                            // .attr("r", "3")
+                            .attr("r", d => d.Value / 250 + 3)
+                            .style("fill", d => getColorTs(d["Sensor-id"]))
+                            .style("opacity", 0.5)
+                            .on("mouseover", function (d, i) {
                                 // d3.select(this)
                                 //     .style("opacity", 1)
                                 dotTip.transition()
                                     .duration(200)
-                                    .style("opacity","1");
+                                    .style("opacity", "1");
                                 dotTip
-                                    .html("Sensor:" +d["Sensor-id"] + "<br>"
+                                    .html("Sensor:" + d["Sensor-id"] + "<br>"
                                         + ""
                                         + "Time: " + d.Timestamp.toLocaleTimeString([],
-                                            { year: '2-digit',
+                                            {
+                                                year: '2-digit',
                                                 month: '2-digit'
-                                                ,day: '2-digit',
+                                                , day: '2-digit',
                                                 hour: '2-digit',
-                                                minute:'2-digit'})  + "<br>"
-                                        + "Max: " + d.Value.toFixed(2) + " (cmp)" + "<br>"
-                                        + "Median:" + d.value_median.toFixed(2) + " (cmp)" + "<br>"
-                                        + "Min: " + d.value_min.toFixed(2) + " (cmp)" + "<br>"
+                                                minute: '2-digit'
+                                            }) + "<br>"
+                                        + "Max: " + d.Value.toFixed(2) + " (cpm)" + "<br>"
+                                        + "Median:" + d.value_median.toFixed(2) + " (cpm)" + "<br>"
+                                        + "Min: " + d.value_min.toFixed(2) + " (cpm)" + "<br>"
                                     )
                                     // .style("left", (d3.mouse(this)[0] + 0) + "px")
                                     // .style("top", (d3.mouse(this)[1]) + 0 + "px");})
-                                    .style("left", d3.select(this).attr("cx") +"px")
-                                    .style("top", d3.select(this).attr("cy") + "px");
+                                    .style("left", (d3.select(this).attr("cx") + 9) + "px")
+                                    .style("top", (d3.select(this).attr("cy") - 43) + "px");
 
                             })
 
-                            .on("mouseout",()=>{
+                            .on("mouseout", () => {
                                 // d3.select(this)
                                 //     .style("opacity", 0.8)
                                 dotTip.transition()
                                     .duration(200)
-                                    .style("opacity","0");
+                                    .style("opacity", "0");
 
                             })
-                            .on("click",d=>drawRoute(d["Sensor-id"]))
+                            .on("click", d => drawRoute(d["Sensor-id"]))
 
-                        function drawRoute(sensor){
+                        function drawRoute(sensor) {
 
                         }
                     }
 
-                    tsPlot = plot;
+                    tsRoutes = plotRoutes;
+                    tsDots = plotDots;
 
                     //plot hospitals on map
                     mapSvg.enter()
@@ -354,7 +350,7 @@ Promise.all(filelist).then(files => {
                 }
 
                 draw_map(geojson);
-                drawTimeSeries(data.filter(d=>d.Value < 5000));
+                drawTimeSeries(data.filter(d=>d.Value < 5000 && d.value_min >= 0));
             })
 
 
@@ -385,10 +381,8 @@ Promise.all(filelist).then(files => {
             }
 
 
-
             function highlight(d){
                 d3.selectAll(".cpm").filter(e=> (e != undefined) && (e["Sensor-id"]===undefined || !e["Sensor-id"].find(f=>f["Sensor-id"]===d.key)).style("opacity"),0.2)
-                debugger
                 d3.selectAll(".mobileRoute").style("opacity",0.1);
                 d3.select("#route-" + d.key).style("opacity",1);
 
