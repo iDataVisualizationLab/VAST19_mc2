@@ -177,6 +177,7 @@ d3.csv("data/allSensorReadings_iqr.csv").then(data=>{
 
 
                     // function to plot sensor dots on map(used in time series)
+
                     let plotRoutes = function plotRoutes(sensor){
                         let filtered = data.filter(d=>d["Sensor-id"]===sensor && d.Value < 5000 && d["value_count"] >0);
                         let nest = d3.nest().key(d => d["Sensor-id"]).entries(filtered)
@@ -212,22 +213,22 @@ d3.csv("data/allSensorReadings_iqr.csv").then(data=>{
                             .style("opacity",0.5)
                             .on("mouseover", d=>highlight(d))
                             .on("mouseout",dim)
-
-
-// debugger
-//                         draw_point(sensor);
-
-
                     }
+
+
+
                     let plotDots = function plotDots(sensor) {
+                        let filtered = data.filter(d=>d["Sensor-id"]===sensor && d.Value < 5000 && d["value_count"] >0);
+
                         let dotTip = d3.select("#map")
                             .append("div")
                             .style("opacity", 0)
                             .attr("class", "tstooltip");
+
+
+                        //plot circles
                         mapSvg
-                            .data(data.filter(d => {
-                                return d["Sensor-id"] === sensor && d.Value < 5000 && d["value_count"] > 0
-                            }))
+                            .data(filtered)
                             // .data(data)
                             .enter()
                             .append("circle")
@@ -278,16 +279,35 @@ d3.csv("data/allSensorReadings_iqr.csv").then(data=>{
                                     .duration(200)
                                     .style("opacity", "0");
 
-                            })
-                            .on("click", d => drawRoute(d["Sensor-id"]))
+                            });
+                            // .on("click", d => drawRoute(d["Sensor-id"]))
 
-                        function drawRoute(sensor) {
 
-                        }
+                        // set up the initial position of car sensor
+                        let initialPosition = [{Long: filtered[0].Long,Lat:filtered[0].Lat}];
+                        // debugger
+
+                        // plot car icon
+                        mapSvg
+                            .enter()
+                            .data(initialPosition)
+                            // .enter()
+                            .append("image")
+                            .attr("class", "carIcon")
+                            .attr("id", d=>"carIcon-" + sensor)
+                            .attr("width", 10)
+                            .attr("height", 10)
+                            .attr("xlink:href", "Icon/car_sensor.svg")
+                            .attr("x",d=> projection([d.Long,d.Lat])[0] - 5)
+                            .attr("y",d=> projection([d.Long,d.Lat])[1] - 5);
+                            // .attr("transform", d => {
+                            //     return "translate(" + [projection([d.Long, d.Lat])[0]-5, projection([d.Long, d.Lat])[1]-5] + ")";
+                            // });
                     }
 
                     tsRoutes = plotRoutes;
                     tsDots = plotDots;
+
 
                     //plot hospitals on map
                     mapSvg.enter()

@@ -95,7 +95,7 @@ function drawTimeSeries(regionData) {
     let q25 = qTotal.map(d=>d.value.q25sum)
     let q75 = qTotal.map(d=>d.value.q75sum)
 
-    debugger
+   // debugger
 
 
     tsxScale.domain(d3.extent(regionData, d => d.Timestamp));
@@ -394,7 +394,7 @@ function drawTimeSeries(regionData) {
                 tsDots(d.key);
                 // plot_dots(d.key);
             }else{
-                //remove sensor routes from map
+                //remove sensor routes, icons and dots from map
                 removePlot(d.key);
             }
         })
@@ -471,14 +471,14 @@ function drawTimeSeries(regionData) {
             .append("g")
             .attr("class", "mouse-per-line");
 
-        mousePerLine.append("circle")
-            .attr("r", 4)
-            .style("stroke", function(d) {
-                return getColorTs(d.key);
-            })
-            .style("fill", "none")
-            .style("stroke-width", "1px")
-            .style("opacity", "0");
+        // mousePerLine.append("circle")
+        //     .attr("r", 4)
+        //     .style("stroke", function(d) {
+        //         return getColorTs(d.key);
+        //     })
+        //     .style("fill", "none")
+        //     .style("stroke-width", "1px")
+        //     .style("opacity", "0");
         //
         // mousePerLine.append("text")
         //     .attr("transform", "translate(10,3)")
@@ -522,7 +522,7 @@ function drawTimeSeries(regionData) {
                         var x1 = d3.timeMinute.every(5).round(xDate),
 
                         idx = bisectDate(d.values, x1);
-
+debugger
                         var beginning = 0,
                             end = lines[i].getTotalLength(),
                             target = null;
@@ -541,15 +541,26 @@ function drawTimeSeries(regionData) {
                         d3.select(this).select('text')
                             .text(tsyScale.invert(pos.y))
                             .attr("font-size","11px");
+                        // "#dot-" + d.key + "-" + idx.style("fill","white").style("opacity",1);
+                        let xPos = d3.select("#dot-" + d.key + "-" + idx).attr("cx");
 
-                        d3.select("#dot-" + d.key + "-" + idx).style("fill","white").style("opacity",1);
+                        let yPos =  d3.select("#dot-" + d.key + "-" + idx).attr("cy");
 debugger
+                        d3.select("#carIcon-" + d.key )
+                            .transition()
+                            .duration(2000)
+                            // .attrTween("transform", translateAlong(tsRoutes.node()))
+                            .ease(d3.easeLinear)
+                            .attr("x", xPos-5)
+                            .attr("y", yPos-5);
+                            // .attr("transform", (d,i)=> {
+                            //     return "translate(" + [projectionTs([d.values[i].Long,d.values[i].Lat])[0]-5,projectionTs([d.values[i].Long,d.values[i].Lat])[1]-5] + ")";
+                            //  });
+// debugger
                         return "translate(" + mouse[0] + "," + pos.y +")";
                     });
             });
     }
-
-
 
 
     //For brusher of the slider bar at the bottom
@@ -608,6 +619,7 @@ debugger
     function removePlot(sensor){
         d3.selectAll(".dots-" + sensor).remove();
         d3.select("#route-" + sensor).remove();
+        d3.selectAll("#carIcon-" + sensor).remove();
 
     }
 }
@@ -678,18 +690,13 @@ function findMinY(data) {
     return d3.min(minYValues);
 }
 
-
-// function selectAll(){
-//     d3.select("svgTs").selectAll("path.line")
-//         .style("stroke", d => getColorTs(d.key))
-//         .style("opacity", 1)
-//
-// }
-//
-// function clearAll() {
-//     d3.selectAll("path.line").remove();
-//     // d3.selectAll("path.area").style("opacity", 0);
-//     // d3.selectAll("rect.legend-box").style("fill",greyBtn );
-//
+// function translateAlong(path){
+//     var l = path.getTotalLength();
+//     return function(d, i, a) {
+//         return function(t) {
+//             var p = path.getPointAtLength(t * l);
+//             return "translate(" + p.x + "," + p.y + ")";
+//         };
+//     };
 //
 // }
